@@ -1,0 +1,61 @@
+<!-- [z-paging]上拉加载更多view -->
+<template name="z-paging-load-more">
+	<view class="zp-l-container"  @click="doClick">
+		<image v-if="isLoading" class="zp-l-loading-image" :src="base64Flower" mode=""></image>
+		<text class="zp-l-loading-text">{{statusText}}</text>
+	</view>
+</template>
+<script lang="uts">
+	import { base64FlowerWhite, base64Flower } from '../uts/z-paging-static.uts'
+	import Enum from '../uts/z-paging-enum.uts'
+	export default {
+		name: 'z-paging-load-more',
+		props: {
+			status: {
+				type: Number,
+				default: Enum.More.Default,
+			}
+			
+		},
+		data() {
+			return {
+				base64Flower: base64Flower
+			};
+		},
+		computed: {
+			isLoading(): boolean {
+				return this.status === Enum.More.Loading;
+			},
+			statusText(): string {
+				const statusTextArr: string[] = ['点击加载更多', '加载中...', '没有更多了', '加载失败'];
+				return statusTextArr[this.status];
+			}
+		},
+		methods: {
+			doClick() {
+				this.$emit('doClick');
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.zp-l-container {
+		height: 80rpx;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.zp-l-loading-image {
+		width: 34rpx;
+		height: 34rpx;
+	}
+	.zp-l-loading-text {
+		color: grey;
+		margin-left: 10rpx;
+		font-size: 28rpx;
+	}
+
+
+</style>

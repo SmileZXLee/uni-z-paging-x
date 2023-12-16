@@ -1,0 +1,66 @@
+<template>
+	<view class="content">
+		<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
+			<template #top>
+				<view style="height: 20px;background-color: red;">top</view>
+			</template>
+			<template #refresher>
+				<view class="" style="height: 100rpx;background-color: blue;">
+					下拉刷新中
+				</view>
+			</template>
+			<list-item v-for="(item, index) in dataList" :key="index">
+				<view class="" style="height: 200rpx;">
+					{{item}}
+				</view>
+			</list-item>
+			<template #bottom>
+				<view style="height: 20px;background-color: red;">bottom</view>
+			</template>
+		</z-paging-x>
+	</view>
+</template>
+
+<script lang="uts">
+	import { QueryResult } from '@/uni_modules/z-paging-x/components/z-paging-x/types/index.uts';
+
+	export default {
+		data() {
+			return {
+				dataList: [] as Array<any>
+			}
+		},
+		onLoad() {
+			
+		},
+		methods: {
+			queryList(qr: QueryResult) {
+				console.log(qr.pageNo);
+				setTimeout(() => {
+					let data: any[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(data);
+				},1000)
+			}
+		}
+	}
+</script>
+
+<style>
+	.content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.logo {
+		height: 200rpx;
+		width: 200rpx;
+		margin-top: 200rpx;
+		margin-bottom: 50rpx;
+	}
+
+	.title {
+		font-size: 36rpx;
+		color: #8f8f94;
+	}
+</style>

@@ -1,0 +1,17 @@
+/* [z-paging]公共css*/
+
+.z-paging-x-content {
+	
+}
+
+.z-paging-x-content-fixed, .zpx-loading-fixed {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.zpx-list-view {
+	flex: 1;
+}

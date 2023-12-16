@@ -1,0 +1,14 @@
+// import { defineMixin } from 'vue'
+
+// export default defineMixin({
+// 	data() {
+// 		return {
+			
+// 		}
+// 	},
+// 	methods: {
+// 		complete() {
+// 			console.log('complete')
+// 		}
+// 	}
+// })

@@ -1,0 +1,128 @@
+ <!--                        _             
+  ____     _ __   __ _  __ _(_)_ __   __ _ 
+ |_  /____| '_ \ / _` |/ _` | | '_ \ / _` |
+  / /_____| |_) | (_| | (_| | | | | | (_| |
+ /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
+          |_|          |___/         |___/ -X
+		  
+v0.1.0 (2024-01-01)
+by ZXLee
+-->
+<!-- 文档地址：https://z-paging.zxlee.cn -->
+<!-- github地址：https://github.com/SmileZXLee/uni-z-paging-x -->
+<!-- dcloud地址：https://ext.dcloud.net.cn/plugin?id=3935 -->
+<!-- 反馈QQ群：371624008 -->
+
+<template name="z-paging-x">
+	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':true}">
+		<!-- 顶部固定的slot -->
+		<slot name="top" />
+		<list-view class="zpx-list-view" :refresher-enabled="true" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
+			<slot />
+			<list-item>
+			    <z-paging-load-more v-if="!isLoading || totalData.length > 0" :status="loadMoreStatus"/>
+			</list-item>
+			<list-item slot="refresher">
+			    <slot name="refresher" />
+			</list-item>
+		</list-view>
+		<slot name="bottom" />
+	</view>
+</template>
+
+<script lang="uts"> 
+	import zPagingLoadMore from './components/z-paging-load-more.uvue'
+	import Enum from './uts/z-paging-enum.uts'
+	import { QueryResult } from './types/index.uts'
+	export default {
+		components: { zPagingLoadMore },
+		props: {
+			//自定义初始的pageNo，默认为1
+			defaultPageNo: {
+				type: Number,
+				default: 1
+			},
+			//自定义pageSize，默认为10
+			defaultPageSize: {
+				type: Number,
+				default: 10
+			},
+		},
+		watch: {
+			defaultPageSize(newVal: number) {
+				this.pageSize = newVal;
+			}
+		},
+		data() {
+			return {
+				// 下拉刷新状态
+				refresherStatus: Enum.Refresher.Default,
+				// 底部加载更多状态
+				loadMoreStatus: Enum.More.Default,
+				// 当前页
+				pageNo: 1,
+				// 当前pageSize
+				pageSize: 10,
+				// 设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
+				refresherTriggered: false,
+				// 是否是加载中状态
+				isLoading: false,
+				currentData: [] as Array<any>,
+				totalData: [] as Array<any>,
+			}
+		},
+		mounted() {
+			this.pageNo = this.defaultPageNo;
+			this._emitQuery(this.pageNo, this.pageSize);
+		},
+		methods: {
+			complete(data: any[]) {
+				this.isLoading = false;
+				// 设置下拉刷新状态为结束
+				this.refresherTriggered = false;
+				this.currentData = [...data];
+				if (data.length >= this.defaultPageSize) {
+					// 将底部加载更多状态设置为默认状态
+					this.loadMoreStatus = Enum.More.Default;
+				} else {
+					// 将底部加载更多状态设置为没有更多数据
+					this.loadMoreStatus = Enum.More.NoMore;
+				}
+				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
+				this.totalData = this.pageNo === this.defaultPageNo ? this.currentData : this.totalData.concat(this.currentData);
+				// #ifdef VUE3
+				this.$emit('update:modelValue', this.totalData);
+				// #endif
+			},
+			
+			// 下拉刷新控件被下拉事件
+			_onRefresherpulling(_ : RefresherEvent) {
+				
+			},
+			// 下拉刷新被触发事件
+			_onRefresherrefresh(_ : RefresherEvent) {
+				this.refresherTriggered = true;
+				this.pageNo = this.defaultPageNo;
+				this._emitQuery(this.pageNo, this.pageSize);
+			},
+			// 滚动到底部事件
+			_onScrolltolower() {
+				if (this.isLoading) return;
+				// 将底部加载更多状态设置为加载中
+				this.loadMoreStatus = Enum.More.Loading;
+				this.pageNo ++;
+				this._emitQuery(this.pageNo, this.pageSize);
+			},
+			
+			//emit query事件
+			_emitQuery(pageNo: number, pageSize: number){
+				this.isLoading = true;
+				this.$emit('query', { pageNo, pageSize } as QueryResult);
+			},
+		}
+	}
+</script>
+
+<style scoped>
+	@import "./css/z-paging-main.css";
+</style>
