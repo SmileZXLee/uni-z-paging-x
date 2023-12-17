@@ -1,8 +1,10 @@
 <!-- [z-paging]上拉加载更多view -->
 <template name="z-paging-load-more">
 	<view class="zp-l-container"  @click="doClick">
+		<view v-if="isNoMore" class="zp-l-line" />
 		<image v-if="isLoading" class="zp-l-loading-image" :src="base64Flower" mode=""></image>
 		<text class="zp-l-loading-text">{{statusText}}</text>
+		<view v-if="isNoMore" class="zp-l-line" />
 	</view>
 </template>
 <script lang="uts">
@@ -25,6 +27,9 @@
 		computed: {
 			isLoading(): boolean {
 				return this.status === Enum.More.Loading;
+			},
+			isNoMore(): boolean {
+				return this.status === Enum.More.NoMore;
 			},
 			statusText(): string {
 				const statusTextArr: string[] = ['点击加载更多', '加载中...', '没有更多了', '加载失败'];
@@ -52,10 +57,16 @@
 		height: 34rpx;
 	}
 	.zp-l-loading-text {
-		color: grey;
+		color: #a4a4a4;
 		margin-left: 10rpx;
 		font-size: 28rpx;
 	}
-
+	
+	.zp-l-line {
+		background-color: #eeeeee;
+		width: 100rpx;
+		height: 1px;
+		margin: 0rpx 10rpx;
+	}
 
 </style>

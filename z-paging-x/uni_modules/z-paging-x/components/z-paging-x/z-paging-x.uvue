@@ -17,13 +17,14 @@ by ZXLee
 	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':true}">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<list-view class="zpx-list-view" :refresher-enabled="true" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
+		<list-view class="zpx-list-view" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
 			<slot />
 			<list-item>
 			    <z-paging-load-more v-if="!isLoading || totalData.length > 0" :status="loadMoreStatus"/>
 			</list-item>
 			<list-item slot="refresher">
-			    <slot name="refresher" />
+				<slot v-if="$slots['refresher']" name="refresher" />
+				<z-paging-refresher v-else :status="refresherStatus"/>
 			</list-item>
 		</list-view>
 		<slot name="bottom" />
@@ -31,11 +32,13 @@ by ZXLee
 </template>
 
 <script lang="uts"> 
+	import zPagingRefresher from './components/z-paging-refresher.uvue'
 	import zPagingLoadMore from './components/z-paging-load-more.uvue'
 	import Enum from './uts/z-paging-enum.uts'
+	import { convertToPx } from './uts/z-paging-utils.uts'
 	import { QueryResult } from './types/index.uts'
 	export default {
-		components: { zPagingLoadMore },
+		components: { zPagingRefresher, zPagingLoadMore },
 		props: {
 			//自定义初始的pageNo，默认为1
 			defaultPageNo: {
@@ -47,11 +50,11 @@ by ZXLee
 				type: Number,
 				default: 10
 			},
-		},
-		watch: {
-			defaultPageSize(newVal: number) {
-				this.pageSize = newVal;
-			}
+			//设置自定义下拉刷新阈值，默认为80rpx
+			refresherThreshold: {
+				type: Number,
+				default: 80
+			},
 		},
 		data() {
 			return {
@@ -71,15 +74,35 @@ by ZXLee
 				totalData: [] as Array<any>,
 			}
 		},
+		computed: {
+			finalRefresherThreshold(): number {
+				return UTSAndroid.rpx2px(this.refresherThreshold)
+			},
+		},
+		watch: {
+			defaultPageSize(newVal: number) {
+				this.pageSize = newVal;
+			},
+			totalData(newVal: Array<any>) {
+				this.$emit('update:modelValue', newVal);
+			}
+		},
 		mounted() {
 			this.pageNo = this.defaultPageNo;
 			this._emitQuery(this.pageNo, this.pageSize);
 		},
 		methods: {
+			reload() {
+				this.pageNo = this.defaultPageNo;
+				// this.totalData = [];
+				this._emitQuery(this.pageNo, this.pageSize);
+			},
+			//请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
 			complete(data: any[]) {
 				this.isLoading = false;
 				// 设置下拉刷新状态为结束
 				this.refresherTriggered = false;
+				this.refresherStatus = Enum.Refresher.Default;
 				this.currentData = [...data];
 				if (data.length >= this.defaultPageSize) {
 					// 将底部加载更多状态设置为默认状态
@@ -90,24 +113,31 @@ by ZXLee
 				}
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
 				this.totalData = this.pageNo === this.defaultPageNo ? this.currentData : this.totalData.concat(this.currentData);
-				// #ifdef VUE3
-				this.$emit('update:modelValue', this.totalData);
-				// #endif
 			},
 			
 			// 下拉刷新控件被下拉事件
-			_onRefresherpulling(_ : RefresherEvent) {
-				
+			_onRefresherpulling(e: RefresherEvent) {
+				this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
 			},
 			// 下拉刷新被触发事件
 			_onRefresherrefresh(_ : RefresherEvent) {
+				_handleRefresh();
+			},
+			// 滚动到底部事件
+			_onScrolltolower() {
+				this._handleLoadMore();
+			},
+			
+			// 处理用户下拉刷新
+			_handleRefresh() {
+				this.refresherStatus = Enum.Refresher.Loading;
 				this.refresherTriggered = true;
 				this.pageNo = this.defaultPageNo;
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
-			// 滚动到底部事件
-			_onScrolltolower() {
-				if (this.isLoading) return;
+			// 处理加载更多数据
+			_handleLoadMore() {
+				if (this.isLoading || this.loadMoreStatus === Enum.More.NoMore) return;
 				// 将底部加载更多状态设置为加载中
 				this.loadMoreStatus = Enum.More.Loading;
 				this.pageNo ++;

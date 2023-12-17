@@ -1,0 +1,78 @@
+<!-- [z-paging]上拉加载更多view -->
+<template name="z-paging-refresher">
+	<view class="zp-r-container">
+		<image v-if="isLoading" class="zp-r-image" :src="base64Flower"></image>
+		<image v-else class="zp-r-image" :class="{'zp-r-arrow-down': isDefault}" :src="base64Arrow"></image>
+		<text class="zp-r-text">{{statusText}}</text>
+	</view>
+</template>
+<script lang="uts">
+	import { base64ArrowWhite, base64Arrow, base64Flower } from '../uts/z-paging-static.uts'
+	import Enum from '../uts/z-paging-enum.uts'
+	export default {
+		name: 'z-paging-refresher',
+		props: {
+			status: {
+				type: Number,
+				default: Enum.Refresher.Default,
+			}
+			
+		},
+		data() {
+			return {
+				base64Arrow: base64Arrow,
+				base64Flower: base64Flower,
+			};
+		},
+		computed: {
+			isDefault(): boolean {
+				return this.status === Enum.Refresher.Default;
+			},
+			isLoading(): boolean {
+				return this.status === Enum.Refresher.Loading;
+			},
+			statusText(): string {
+				// 下拉刷新状态 0.默认状态 1.松手立即刷新 2.刷新中 3.刷新结束
+				const statusTextArr: string[] = ['继续下拉刷新', '松开立即刷新', '正在刷新...', '刷新成功'];
+				return statusTextArr[this.status];
+			}
+		},
+		methods: {
+			doClick() {
+				this.$emit('doClick');
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.zp-r-container {
+		height: 80rpx;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.zp-r-image {
+		width: 34rpx;
+		height: 34rpx;
+		transition-duration: .2s;
+		transition-property: transform;
+	}
+	
+	.zp-r-arrow-top {
+		transform: rotate(0deg);
+	}
+	
+	.zp-r-arrow-down {
+		transform: rotate(180deg);
+	}
+	
+	.zp-r-text {
+		color: grey;
+		margin-left: 10rpx;
+		font-size: 28rpx;
+	}
+
+
+</style>
