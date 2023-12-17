@@ -147,7 +147,7 @@ by ZXLee
 			//emit query事件
 			_emitQuery(pageNo: number, pageSize: number){
 				this.isLoading = true;
-				this.$emit('query', { pageNo, pageSize } as QueryResult);
+				this.$emit('query', pageNo, pageSize);
 			},
 		}
 	}

@@ -2,16 +2,17 @@
 <template name="z-paging-load-more">
 	<view class="zp-l-container"  @click="doClick">
 		<view v-if="isNoMore" class="zp-l-line" />
-		<image v-if="isLoading" class="zp-l-loading-image" :src="base64Flower" mode=""></image>
+		<z-paging-loading v-if="isLoading" />
 		<text class="zp-l-loading-text">{{statusText}}</text>
 		<view v-if="isNoMore" class="zp-l-line" />
 	</view>
 </template>
 <script lang="uts">
-	import { base64FlowerWhite, base64Flower } from '../uts/z-paging-static.uts'
 	import Enum from '../uts/z-paging-enum.uts'
+	import zPagingLoading from '../components/z-paging-loading.uvue'
 	export default {
 		name: 'z-paging-load-more',
+		components: { zPagingLoading },
 		props: {
 			status: {
 				type: Number,
@@ -21,7 +22,7 @@
 		},
 		data() {
 			return {
-				base64Flower: base64Flower
+				
 			};
 		},
 		computed: {
@@ -52,10 +53,6 @@
 		justify-content: center;
 	}
 	
-	.zp-l-loading-image {
-		width: 34rpx;
-		height: 34rpx;
-	}
 	.zp-l-loading-text {
 		color: #a4a4a4;
 		margin-left: 10rpx;

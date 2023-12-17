@@ -1,0 +1,34 @@
+<template name="z-paging-loading">
+	<image class="z-paging-loading-img" id="z-paging-loading-img" :src="base64Flower"></image>
+</template>
+
+<script>
+	import { base64Flower } from '../uts/z-paging-static.uts'
+	export default {
+		data() {
+			return {
+				base64Flower: base64Flower
+			}
+		},
+		mounted() {
+			this.$nextTick(() => {
+				const ele = uni.getElementById('z-paging-loading-img');
+				if (ele !== null) {
+					ele.style.setProperty('transform', 'rotate(360deg)');
+					ele.style.setProperty('transition-duration', '1000');
+				}
+			})
+		}
+	}
+</script>
+
+<style>
+	.z-paging-loading-img {
+		width: 34rpx;
+		height: 34rpx;
+		transition-duration: 2000;
+		transition-property: transform;
+		transition-timing-function: linear;
+		transform: rotate(0deg);
+	}
+</style>
