@@ -30,7 +30,7 @@
 		},
 		methods: {
 			queryList(pageNo: number, pageSize: number) {
-				console.log(pageNo);
+				console.log(pageNo, pageSize);
 				setTimeout(() => {
 					let data: any[] = pageNo >= 3 ? [1] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(data);

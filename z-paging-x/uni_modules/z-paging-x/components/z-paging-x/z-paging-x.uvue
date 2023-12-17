@@ -20,11 +20,14 @@ by ZXLee
 		<list-view class="zpx-list-view" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
 			<slot />
 			<list-item>
-			    <z-paging-load-more v-if="!isLoading || totalData.length > 0" :status="loadMoreStatus"/>
+			    <z-paging-load-more v-if="!isLoading || totalData.length > 0" :status="loadMoreStatus" @clickMore="_handleLoadMore"/>
 			</list-item>
 			<list-item slot="refresher">
 				<slot v-if="$slots['refresher']" name="refresher" />
 				<z-paging-refresher v-else :status="refresherStatus"/>
+			</list-item>
+			<list-item style="flex: 1;" v-if="totalData.length == 0 && !isLoading">
+				<z-paging-x-empty />
 			</list-item>
 		</list-view>
 		<slot name="bottom" />
@@ -34,11 +37,12 @@ by ZXLee
 <script lang="uts"> 
 	import zPagingRefresher from './components/z-paging-refresher.uvue'
 	import zPagingLoadMore from './components/z-paging-load-more.uvue'
+	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
 	import Enum from './uts/z-paging-enum.uts'
 	import { convertToPx } from './uts/z-paging-utils.uts'
 	import { QueryResult } from './types/index.uts'
 	export default {
-		components: { zPagingRefresher, zPagingLoadMore },
+		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
 		props: {
 			//自定义初始的pageNo，默认为1
 			defaultPageNo: {

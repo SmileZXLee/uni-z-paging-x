@@ -1,6 +1,6 @@
 <!-- [z-paging]上拉加载更多view -->
 <template name="z-paging-load-more">
-	<view class="zp-l-container"  @click="doClick">
+	<view class="zp-l-container"  @click="onClickMore">
 		<view v-if="isNoMore" class="zp-l-line" />
 		<z-paging-loading v-if="isLoading" />
 		<text class="zp-l-loading-text">{{statusText}}</text>
@@ -38,8 +38,8 @@
 			}
 		},
 		methods: {
-			doClick() {
-				this.$emit('doClick');
+			onClickMore() {
+				this.$emit('clickMore');
 			}
 		}
 	}
