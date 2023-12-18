@@ -2,7 +2,7 @@
 	<view class="content">
 		<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
 			<template #top>
-				<view style="height: 20px;background-color: red;">top</view>
+				<view style="height: 20px;background-color: red;" @click="reload">top</view>
 			</template>
 			<list-item v-for="(item, index) in dataList" :key="index">
 				<view class="" style="height: 200rpx;">
@@ -17,8 +17,6 @@
 </template>
 
 <script lang="uts">
-	import { QueryResult } from '@/uni_modules/z-paging-x/components/z-paging-x/types/index.uts';
-
 	export default {
 		data() {
 			return {
@@ -29,6 +27,9 @@
 			
 		},
 		methods: {
+			reload() {
+				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
+			},
 			queryList(pageNo: number, pageSize: number) {
 				console.log(pageNo, pageSize);
 				setTimeout(() => {

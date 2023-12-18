@@ -20,14 +20,14 @@ by ZXLee
 		<list-view class="zpx-list-view" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
 			<slot />
 			<list-item>
-			    <z-paging-load-more v-if="!isLoading || totalData.length > 0" :status="loadMoreStatus" @clickMore="_handleLoadMore"/>
+			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" @clickMore="_handleLoadMore"/>
 			</list-item>
 			<list-item slot="refresher">
-				<slot v-if="$slots['refresher']" name="refresher" />
+				<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
 				<z-paging-refresher v-else :status="refresherStatus"/>
 			</list-item>
-			<list-item style="flex: 1;" v-if="totalData.length == 0 && !isLoading">
-				<z-paging-x-empty />
+			<list-item :class="{'zpx-flex1': showEmpty}">
+				<z-paging-x-empty v-if="showEmpty"/>
 			</list-item>
 		</list-view>
 		<slot name="bottom" />
@@ -82,6 +82,12 @@ by ZXLee
 			finalRefresherThreshold(): number {
 				return UTSAndroid.rpx2px(this.refresherThreshold)
 			},
+			showEmpty(): boolean {
+				return this.totalData.length == 0 && !this.isLoading;
+			},
+			showLoadMore(): boolean {
+				return (!isLoading || totalData.length > 0) && !this.showEmpty;
+			}
 		},
 		watch: {
 			defaultPageSize(newVal: number) {
@@ -98,16 +104,16 @@ by ZXLee
 		methods: {
 			reload() {
 				this.pageNo = this.defaultPageNo;
-				// this.totalData = [];
+				this.totalData = [];
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
 			//请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
-			complete(data: any[]) {
+			complete(data: Array<any>) {
 				this.isLoading = false;
 				// 设置下拉刷新状态为结束
 				this.refresherTriggered = false;
 				this.refresherStatus = Enum.Refresher.Default;
-				this.currentData = [...data];
+				const currentData: Array<any> = [...data];
 				if (data.length >= this.defaultPageSize) {
 					// 将底部加载更多状态设置为默认状态
 					this.loadMoreStatus = Enum.More.Default;
@@ -116,7 +122,7 @@ by ZXLee
 					this.loadMoreStatus = Enum.More.NoMore;
 				}
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
-				this.totalData = this.pageNo === this.defaultPageNo ? this.currentData : this.totalData.concat(this.currentData);
+				this.totalData = this.pageNo === this.defaultPageNo ? currentData : this.totalData.concat(currentData);
 			},
 			
 			// 下拉刷新控件被下拉事件
