@@ -17,7 +17,7 @@ by ZXLee
 	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':true}">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<list-view class="zpx-list-view" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
+		<list-view class="zpx-list-view zpx-flex1" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
 			<slot />
 			<list-item>
 			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" @clickMore="_handleLoadMore"/>
