@@ -6,7 +6,7 @@
 			</template>
 			<list-item v-for="(item, index) in dataList" :key="index">
 				<view class="" style="height: 200rpx;">
-					{{item}}
+					{{item.title}}
 				</view>
 			</list-item>
 			<template #bottom>
@@ -17,10 +17,11 @@
 </template>
 
 <script lang="uts">
+	import { queryData, ListItem } from '../../http/request.uts'
 	export default {
 		data() {
 			return {
-				dataList: [] as Array<any>
+				dataList: [] as Array<ListItem>
 			}
 		},
 		onLoad() {
@@ -32,10 +33,9 @@
 			},
 			queryList(pageNo: number, pageSize: number) {
 				console.log(pageNo, pageSize);
-				setTimeout(() => {
-					let data: any[] = pageNo >= 3 ? [1] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(data);
-				},1000)
+				queryData({ pageNo, pageSize, type: 1 }).then((res: UTSJSONObject) => {
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+				})
 			}
 		}
 	}

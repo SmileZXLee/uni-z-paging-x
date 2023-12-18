@@ -1,0 +1,71 @@
+const loadingTime = 500;
+const showLog = false;
+
+export type ListItem = {
+    title : string,
+	detail: string
+};
+
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+
+export function queryData(data: UTSJSONObject): Promise<UTSJSONObject> {
+	const listCount = 24;
+	return _queryData(data, listCount);
+}
+
+function _queryData(data: UTSJSONObject, listCount: number): Promise<UTSJSONObject> {
+	let pageNo = data['pageNo'] as number;
+	let pageSize = data['pageSize'] as number;
+	let type = data['type'] as number;
+	if (pageNo < 0 || pageSize <= 0) {
+		return _callQueryResult([] as Array<ListItem>);
+	}
+	if (showLog) {
+		console.log('%c\n----------请求开始--------', 'color:green;');
+		console.info(`请求参数：【pageNo:${pageNo},pageSize:${pageSize}】`)
+		console.log('%c----------请求结束--------\n', 'color:green;');
+	}
+	uni.showLoading({
+		title: '加载中...'
+	})
+	if (pageNo == 0) {
+		pageNo = 1;
+	}
+	var totalPagingList: Array<ListItem> = [];
+	for (let i = 0; i < listCount; i++) {
+		const item = {
+			'title': (i + 1).toString(),
+			'detail': '测试信息' + type
+		} as ListItem;
+		totalPagingList.push(item);
+	}
+	let pageNoIndex = (pageNo - 1) * pageSize;
+	if (pageNoIndex + pageSize <= totalPagingList.length) {
+		return _callQueryResult(totalPagingList.splice(pageNoIndex, pageSize));
+	} else if (pageNoIndex < totalPagingList.length) {
+		return _callQueryResult(totalPagingList.splice(pageNoIndex, totalPagingList.length - pageNoIndex));
+	} else {
+		return _callQueryResult([] as Array<ListItem>);
+	}
+}
+
+function _callQueryResult(arg: Array<ListItem>): Promise<UTSJSONObject> {
+	return new Promise((resolve, _) => {
+		setTimeout(() => {
+			uni.hideLoading();
+			resolve({
+				data: arg
+			});
+		}, loadingTime)
+	})
+
+}
+
+

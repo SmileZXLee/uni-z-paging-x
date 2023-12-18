@@ -12,11 +12,13 @@
 		},
 		mounted() {
 			this.$nextTick(() => {
-				const ele = uni.getElementById('z-paging-loading-img');
-				if (ele !== null) {
-					ele.style.setProperty('transform', 'rotate(360deg)');
-					ele.style.setProperty('transition-duration', '1000');
-				}
+				setTimeout(() => {
+					const ele = uni.getElementById('z-paging-loading-img');
+					if (ele !== null) {
+						ele.style.setProperty('transform', 'rotate(360deg)');
+						ele.style.setProperty('transition-duration', '1000');
+					}
+				}, 10)
 			})
 		}
 	}
