@@ -1,15 +1,15 @@
 <!-- [z-paging]上拉加载更多view -->
 <template name="z-paging-refresher">
-	<view class="zp-r-container">
+	<view class="zpx-r-container">
 		<z-paging-loading v-if="isLoading"/>
-		<image v-else class="zp-r-image" :class="{'zp-r-arrow-down': isDefault}" :src="base64Arrow"></image>
-		<text class="zp-r-text">{{statusText}}</text>
+		<image v-else class="zpx-r-image" :class="{'zpx-r-arrow-down': isDefault}" :src="base64Arrow"></image>
+		<text class="zpx-r-text">{{statusText}}</text>
 	</view>
 </template>
 <script lang="uts">
-	import { base64ArrowWhite, base64Arrow } from '../uts/z-paging-static.uts'
+	import { base64ArrowWhite, base64Arrow } from '../static/index.uts'
 	import zPagingLoading from '../components/z-paging-loading.uvue'
-	import Enum from '../uts/z-paging-enum.uts'
+	import Enum from '../enums/index.uts'
 	export default {
 		name: 'z-paging-refresher',
 		components: { zPagingLoading },
@@ -43,30 +43,29 @@
 </script>
 
 <style scoped>
-	@import "../css/z-paging-static.css";
-	.zp-r-container {
+	.zpx-r-container {
 		height: 80rpx;
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 	}
 	
-	.zp-r-image {
+	.zpx-r-image {
 		width: 34rpx;
 		height: 34rpx;
 		transition-duration: .2s;
 		transition-property: transform;
 	}
 	
-	.zp-r-arrow-top {
+	.zpx-r-arrow-top {
 		transform: rotate(0deg);
 	}
 	
-	.zp-r-arrow-down {
+	.zpx-r-arrow-down {
 		transform: rotate(180deg);
 	}
 	
-	.zp-r-text {
+	.zpx-r-text {
 		color: grey;
 		margin-left: 10rpx;
 		font-size: 28rpx;

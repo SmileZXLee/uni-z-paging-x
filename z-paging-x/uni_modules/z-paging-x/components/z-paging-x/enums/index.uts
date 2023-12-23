@@ -1,4 +1,4 @@
-// [z-paging]枚举
+// [z-paging-x]枚举
 
 type LoadingType = {
 	Refresher: number;
@@ -10,11 +10,6 @@ type More = {
 	NoMore: number;
 	Default: number;
 	Fail: number;
-}
-
-type CellHeightMode = {
-	Dynamic: string;
-	Fixed: string;
 }
 
 type Refresher = {
@@ -39,7 +34,6 @@ type QueryFrom = {
 type EnumType = {
 	LoadingType: LoadingType;
 	More: More;
-	CellHeightMode: CellHeightMode;
 	Refresher: Refresher;
 	CacheMode: CacheMode;
 	QueryFrom: QueryFrom;
@@ -71,13 +65,6 @@ export default {
 		Reload: 1,
 		Refresh: 2,
 		LoadingMore: 3
-	},
-	//虚拟列表cell高度模式
-	CellHeightMode: {
-		//固定高度
-		Fixed: 'fixed',
-		//动态高度
-		Dynamic: 'dynamic'
 	},
 	//列表缓存模式
 	CacheMode: {

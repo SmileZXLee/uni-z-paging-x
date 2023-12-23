@@ -14,7 +14,7 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':fixed}">
+	<view :class="{'zpx-content':true, 'zpx-content-fixed':fixed}">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
 		<list-view class="zpx-list-view zpx-flex1" 
@@ -42,8 +42,7 @@ by ZXLee
 	import zPagingRefresher from './components/z-paging-refresher.uvue'
 	import zPagingLoadMore from './components/z-paging-load-more.uvue'
 	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
-	import Enum from './uts/z-paging-enum.uts'
-	import { convertToPx } from './uts/z-paging-utils.uts'
+	import Enum from './enums/index.uts'
 	import { QueryResult } from './types/index.uts'
 	export default {
 		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
@@ -165,6 +164,7 @@ by ZXLee
 				this.totalData = this.pageNo === this.defaultPageNo ? currentData : this.totalData.concat(currentData);
 			},
 			
+			
 			// 下拉刷新控件被下拉事件
 			_onRefresherpulling(e: RefresherEvent) {
 				this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
@@ -177,7 +177,6 @@ by ZXLee
 			_onScrolltolower() {
 				this._handleLoadMore();
 			},
-			
 			// 处理用户下拉刷新
 			_handleRefresh() {
 				this.refresherStatus = Enum.Refresher.Loading;
@@ -193,7 +192,6 @@ by ZXLee
 				this.pageNo ++;
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
-			
 			// emit query事件
 			_emitQuery(pageNo: number, pageSize: number){
 				this.isLoading = true;

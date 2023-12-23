@@ -1,9 +1,9 @@
 <template name="z-paging-loading">
-	<image class="z-paging-loading-img" id="z-paging-loading-img" :src="base64Flower"></image>
+	<image class="zpx-loading-img" id="z-paging-loading-img" :src="base64Flower"></image>
 </template>
 
 <script>
-	import { base64Flower } from '../uts/z-paging-static.uts'
+	import { base64Flower } from '../static/index.uts'
 	export default {
 		data() {
 			return {
@@ -25,7 +25,7 @@
 </script>
 
 <style>
-	.z-paging-loading-img {
+	.zpx-loading-img {
 		width: 34rpx;
 		height: 34rpx;
 		transition-duration: 2000;

@@ -1,16 +1,16 @@
 <template name="z-paging-x-empty">
-	<view :class="{'zpx-container':true}" :style="[emptyViewStyle]" @click="emptyViewClick">
+	<view :class="{'zpx-container':true}" :style="[emptyStyle]" @click="emptyClick">
 		<view class="zpx-main">
-			<image v-if="emptyViewImg.length == 0" class="zpx-main-image" :style="[emptyViewImgStyle]" :src="emptyImg" />
-			<image v-else class="zpx-main-image" mode="aspectFit" :style="[emptyViewImgStyle]" :src="emptyViewImg" />
-			<text class="zpx-main-title" :style="[emptyViewTitleStyle]">{{emptyViewText}}</text>
-			<text v-if="showEmptyViewReload" class="zpx-main-error-btn" :style="[emptyViewReloadStyle]" @click.stop="reloadClick">{{emptyViewReloadText}}</text>
+			<image v-if="emptyImg.length > 0" class="zpx-main-image" :style="[emptyImgStyle]" :src="emptyImg" />
+			<image v-else class="zpx-main-image" mode="aspectFit" :style="[emptyImgStyle]" :src="localEmptyImg" />
+			<text class="zpx-main-title" :style="[emptyTitleStyle]">{{emptyText}}</text>
+			<text v-if="showEmptyReload" class="zpx-main-error-btn" :style="[emptyReloadStyle]" @click.stop="reloadClick">{{emptyReloadText}}</text>
 		</view>
 	</view>
 </template>
 
 <script>
-	import { base64Empty, base64Error } from '../z-paging-x/uts/z-paging-static.uts'
+	import { base64Empty, base64Error } from '../z-paging-x/static/index.uts'
 	export default {
 		name: "z-paging-x-empty",
 		data() {
@@ -20,22 +20,22 @@
 		},
 		props: {
 			//空数据描述文字
-			emptyViewText: {
+			emptyText: {
 				type: String,
 				default: '没有数据哦~'
 			},
 			//空数据图片
-			emptyViewImg: {
+			emptyImg: {
 				type: String,
 				default: ''
 			},
 			//是否显示空数据图重新加载按钮
-			showEmptyViewReload: {
+			showEmptyReload: {
 				type: Boolean,
 				default: false
 			},
 			//空数据点击重新加载文字
-			emptyViewReloadText: {
+			emptyReloadText: {
 				type: String,
 				default: '重新加载'
 			},
@@ -45,34 +45,34 @@
 				default: false
 			},
 			//空数据图样式
-			emptyViewStyle: {
+			emptyStyle: {
 				type: Object
 			},
 			//空数据图img样式
-			emptyViewImgStyle: {
+			emptyImgStyle: {
 				type: Object
 			},
 			//空数据图描述文字样式
-			emptyViewTitleStyle: {
+			emptyTitleStyle: {
 				type: Object
 			},
 			//空数据图重新加载按钮样式
-			emptyViewReloadStyle: {
+			emptyReloadStyle: {
 				type: Object
 			},
 			//空数据图z-index
-			emptyViewZIndex: {
+			emptyZIndex: {
 				type: Number,
 				default: 9
 			},
 			//空数据图片是否使用fixed布局并铺满z-paging
-			emptyViewFixed: {
+			emptyFixed: {
 				type: Boolean,
 				default: true
 			}
 		},
 		computed: {
-			emptyImg(): string {
+			localEmptyImg(): string {
                 return this.isLoadFailed ? base64Error : base64Empty;
 			}
 		},
@@ -80,7 +80,7 @@
 			reloadClick() {
 				this.$emit('reload');
 			},
-			emptyViewClick() {
+			emptyClick() {
 				this.$emit('viewClick');
 			}
 		}

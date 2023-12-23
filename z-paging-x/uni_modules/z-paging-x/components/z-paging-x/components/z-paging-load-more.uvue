@@ -1,14 +1,14 @@
 <!-- [z-paging]上拉加载更多view -->
 <template name="z-paging-load-more">
-	<view class="zp-l-container"  @click="onClickMore">
-		<view v-if="isNoMore" class="zp-l-line" />
+	<view class="zpx-l-container"  @click="onClickMore">
+		<view v-if="isNoMore" class="zpx-l-line" />
 		<z-paging-loading v-if="isLoading" />
-		<text class="zp-l-loading-text">{{statusText}}</text>
-		<view v-if="isNoMore" class="zp-l-line" />
+		<text class="zpx-l-loading-text">{{statusText}}</text>
+		<view v-if="isNoMore" class="zpx-l-line" />
 	</view>
 </template>
 <script lang="uts">
-	import Enum from '../uts/z-paging-enum.uts'
+	import Enum from '../enums/index.uts'
 	import zPagingLoading from '../components/z-paging-loading.uvue'
 	export default {
 		name: 'z-paging-load-more',
@@ -46,20 +46,20 @@
 </script>
 
 <style scoped>
-	.zp-l-container {
+	.zpx-l-container {
 		height: 80rpx;
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
 	}
 	
-	.zp-l-loading-text {
+	.zpx-l-loading-text {
 		color: #a4a4a4;
 		margin-left: 10rpx;
 		font-size: 28rpx;
 	}
 	
-	.zp-l-line {
+	.zpx-l-line {
 		background-color: #eeeeee;
 		width: 100rpx;
 		height: 1px;

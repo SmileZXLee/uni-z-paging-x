@@ -1,6 +1,6 @@
 <template>
-	<view>
-		<common-tabs ref="tabs" :list="tabList" />
+	<view class="swiper-demo">
+		<common-tabs ref="tabs" :list="tabList" @change="tabChange"/>
 		<swiper class="swiper" :current="current" @transition="onSwiperTransition" @animationfinish="onSwiperAnimationfinish">
 			<swiper-item class="swiper-item" v-for="(_, index) in tabList" :key="index">
 				<!-- 这里的swiper-list-item为demo中为演示用定义的组件，列表及分页代码在swiper-list-item组件内 -->
@@ -16,26 +16,31 @@
 		data() {
 			return {
 				tabList: ['测试1','测试2','测试3','测试4'],
-				current: 0, 
+				current: 0
 			};
 		},
 		methods: {
-			// //swiper滑动结束
-			// swiperAnimationfinish(e: SwiperAnimationFinishEvent) {
-			// 	this.current = e.detail.current;
-			// },
+			tabChange(index: number) {
+				this.current = index;
+			},
+			// swiper滑动中
 			onSwiperTransition(e : SwiperTransitionEvent) {
 			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
 			},
-			// wwiper滑动动画结束事件.
+			// swiper滑动动画结束
 			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
 			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
+			  this.current = e.detail.current;
 			},
 		}
 	}
 </script>
 
 <style>
+	.swiper-demo {
+		flex: 1;
+	}
+	
 	.swiper {
 		flex: 1;
 	}

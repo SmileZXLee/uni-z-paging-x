@@ -67,7 +67,7 @@
 				setTimeout(() => {
 					this.cacheTabItemsSize()
 					this.setSwiperIndex(0, true)
-				}, 100);
+				}, 300);
 			})
 		},
 		methods: {
