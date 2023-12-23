@@ -1,40 +1,22 @@
 <template>
 	<view class="content">
-		<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
-			<template #top>
-				<view style="height: 20px;background-color: red;" @click="reload">top</view>
-			</template>
-			<list-item v-for="(item, index) in dataList" :key="index">
-				<view class="" style="height: 200rpx;">
-					{{item.title}}
-				</view>
-			</list-item>
-			<template #bottom>
-				<view style="height: 20px;background-color: red;">bottom</view>
-			</template>
-		</z-paging-x>
+		<button type="primary" @click="onPageJumpClick">普通模式</button>
 	</view>
 </template>
 
 <script lang="uts">
-	import { queryData, ListItem } from '../../http/request.uts'
 	export default {
 		data() {
 			return {
-				dataList: [] as Array<ListItem>
 			}
 		},
 		onLoad() {
 			
 		},
 		methods: {
-			reload() {
-				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
-			},
-			queryList(pageNo: number, pageSize: number) {
-				console.log(pageNo, pageSize);
-				queryData({ pageNo, pageSize, type: 1 }).then((res: UTSJSONObject) => {
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+			onPageJumpClick() {
+				uni.navigateTo({
+					url: '/pages/common-demo/common-demo'
 				})
 			}
 		}

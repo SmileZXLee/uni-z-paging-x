@@ -14,7 +14,7 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':true}">
+	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':fixed}">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
 		<list-view class="zpx-list-view zpx-flex1" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
@@ -59,6 +59,16 @@ by ZXLee
 				type: Number,
 				default: 80
 			},
+			//mounted后自动调用reload方法(mounted后自动调用接口)，默认为是
+			auto: {
+				type: Boolean,
+				default: true
+			},
+			//是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认为100%，默认为是
+			fixed: {
+				type: Boolean,
+				default: true
+			},
 		},
 		data() {
 			return {
@@ -99,7 +109,9 @@ by ZXLee
 		},
 		mounted() {
 			this.pageNo = this.defaultPageNo;
-			this._emitQuery(this.pageNo, this.pageSize);
+			if (this.auto) {
+				this._emitQuery(this.pageNo, this.pageSize);
+			}
 		},
 		methods: {
 			reload() {
