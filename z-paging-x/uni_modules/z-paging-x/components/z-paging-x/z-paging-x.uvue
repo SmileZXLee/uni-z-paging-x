@@ -10,21 +10,25 @@ by ZXLee
 -->
 <!-- 文档地址：https://z-paging.zxlee.cn -->
 <!-- github地址：https://github.com/SmileZXLee/uni-z-paging-x -->
-<!-- dcloud地址：https://ext.dcloud.net.cn/plugin?id=3935 -->
+<!-- dcloud地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
 	<view :class="{'z-paging-x-content':true, 'z-paging-x-content-fixed':fixed}">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<list-view class="zpx-list-view zpx-flex1" :refresher-enabled="true" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" refresher-default-style="none" @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
+		<list-view class="zpx-list-view zpx-flex1" 
+		:refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
 			<slot />
 			<list-item>
 			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" @clickMore="_handleLoadMore"/>
 			</list-item>
 			<list-item slot="refresher">
-				<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-				<z-paging-refresher v-else :status="refresherStatus"/>
+				<view class="zpx-list-refresher">
+					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+					<z-paging-refresher v-else :status="refresherStatus"/>
+				</view>
 			</list-item>
 			<list-item :class="{'zpx-flex1': showEmpty}">
 				<z-paging-x-empty v-if="showEmpty"/>
@@ -44,27 +48,42 @@ by ZXLee
 	export default {
 		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
 		props: {
-			//自定义初始的pageNo，默认为1
+			// 自定义初始的pageNo，默认为1
 			defaultPageNo: {
 				type: Number,
 				default: 1
 			},
-			//自定义pageSize，默认为10
+			// 自定义pageSize，默认为10
 			defaultPageSize: {
 				type: Number,
 				default: 10
 			},
-			//设置自定义下拉刷新阈值，默认为80rpx
+			// 是否开启自定义下拉刷新，默认为是
+			refresherEnabled: {
+				type: Boolean,
+				default: true
+			},
+			// 设置自定义下拉刷新阈值，默认等于refresher
 			refresherThreshold: {
 				type: Number,
-				default: 80
+				default: 0
 			},
-			//mounted后自动调用reload方法(mounted后自动调用接口)，默认为是
+			// 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新
+			useCustomRefresher: {
+				type: Boolean,
+				default: true
+			},
+			// 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据)，默认为是
+			loadMoreEnabled: {
+				type: Boolean,
+				default: true
+			},
+			// mounted后自动调用reload方法(mounted后自动调用接口)，默认为是
 			auto: {
 				type: Boolean,
 				default: true
 			},
-			//是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认为100%，默认为是
+			// 是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认为100%，默认为是
 			fixed: {
 				type: Boolean,
 				default: true
@@ -84,19 +103,20 @@ by ZXLee
 				refresherTriggered: false,
 				// 是否是加载中状态
 				isLoading: false,
+				refresherNodeHeight: 0 as number,
 				currentData: [] as Array<any>,
 				totalData: [] as Array<any>,
 			}
 		},
 		computed: {
 			finalRefresherThreshold(): number {
-				return UTSAndroid.rpx2px(this.refresherThreshold)
+				return this.refresherThreshold > 0 ? this.refresherThreshold : this.refresherNodeHeight > 0 ? this.refresherNodeHeight : 40;
 			},
 			showEmpty(): boolean {
 				return this.totalData.length == 0 && !this.isLoading;
 			},
 			showLoadMore(): boolean {
-				return (!isLoading || totalData.length > 0) && !this.showEmpty;
+				return this.loadMoreEnabled && (!isLoading || totalData.length > 0) && !this.showEmpty;
 			}
 		},
 		watch: {
@@ -112,11 +132,19 @@ by ZXLee
 			if (this.auto) {
 				this._emitQuery(this.pageNo, this.pageSize);
 			}
+			this.$nextTick(() => {
+				uni.createSelectorQuery().select('.zpx-list-refresher').boundingClientRect().exec((ret) => {
+					if (ret.length > 0) {
+						const refresherNode = ret[0] as NodeInfo;
+						this.refresherNodeHeight = refresherNode.height ?? 0;
+					}
+				})
+			})
 		},
 		methods: {
 			reload() {
 				this.pageNo = this.defaultPageNo;
-				this.totalData = [];
+				// this.totalData = [];
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
 			//请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
@@ -159,14 +187,14 @@ by ZXLee
 			},
 			// 处理加载更多数据
 			_handleLoadMore() {
-				if (this.isLoading || this.loadMoreStatus === Enum.More.NoMore) return;
+				if (!this.loadMoreEnabled || this.isLoading || this.loadMoreStatus === Enum.More.NoMore) return;
 				// 将底部加载更多状态设置为加载中
 				this.loadMoreStatus = Enum.More.Loading;
 				this.pageNo ++;
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
 			
-			//emit query事件
+			// emit query事件
 			_emitQuery(pageNo: number, pageSize: number){
 				this.isLoading = true;
 				this.$emit('query', pageNo, pageSize);

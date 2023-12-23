@@ -41,4 +41,24 @@
 .uni-column {
 	flex-direction: column;
 }
+
+.list-item {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	height: 180rpx;
+	padding: 30rpx;
+	background: white;
+	border-bottom: solid 1px #eeeeee;
+}
+.list-item-title {
+	
+}
+.list-item-type {
+	background-color: #007AFF;
+	color: white;
+	padding: 10rpx 20rpx;
+	border-radius: 10rpx;
+	font-size: 26rpx;
+}
 </style>

@@ -6,21 +6,20 @@ export type ListItem = {
 	detail: string
 };
 
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
-/* 这个js仅用于在demo中模拟网络请求，请勿导入或修改此文件。实际项目中在queryList中调用自己的请求即可 */
+// type Request = {
+// 	queryList: (data: UTSJSONObject) => Promise<UTSJSONObject>
+// }
 
-export function queryData(data: UTSJSONObject): Promise<UTSJSONObject> {
+export function requestList(data: UTSJSONObject): Promise<UTSJSONObject> {
 	const listCount = 24;
-	return _queryData(data, listCount);
+	return _queryList(data, listCount);
 }
 
-function _queryData(data: UTSJSONObject, listCount: number): Promise<UTSJSONObject> {
+// export default {
+// 	queryList 
+// } as Request
+
+function _queryList(data: UTSJSONObject, listCount: number): Promise<UTSJSONObject> {
 	let pageNo = data['pageNo'] as number;
 	let pageSize = data['pageSize'] as number;
 	let type = data['type'] as number;
@@ -41,7 +40,7 @@ function _queryData(data: UTSJSONObject, listCount: number): Promise<UTSJSONObje
 	var totalPagingList: Array<ListItem> = [];
 	for (let i = 0; i < listCount; i++) {
 		const item = {
-			'title': (i + 1).toString(),
+			'title': `标题${i + 1}`,
 			'detail': '测试信息' + type
 		} as ListItem;
 		totalPagingList.push(item);
@@ -67,5 +66,7 @@ function _callQueryResult(arg: Array<ListItem>): Promise<UTSJSONObject> {
 	})
 
 }
+
+
 
 

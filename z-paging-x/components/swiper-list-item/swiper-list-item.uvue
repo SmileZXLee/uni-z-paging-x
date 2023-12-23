@@ -1,0 +1,40 @@
+<template>
+	<view>
+		<z-paging-x ref="pagingX" :refresher-enabled="false" :fixed="false" v-model="dataList" @query="queryList">
+			<list-item v-for="(item, index) in dataList" :key="index">
+				<view class="list-item">
+					<text class="list-item-title">{{item.title}}</text>
+					<text class="list-item-type">{{item.detail}}</text>
+				</view>
+			</list-item>
+		</z-paging-x>
+	</view>
+</template>
+
+<script>
+	import { requestList, ListItem } from '@/http/request.uts'
+	export default {
+		name:"swiper-list-item",
+		data() {
+			return {
+				dataList: [] as Array<ListItem>
+			};
+		},
+		methods: {
+			queryList(pageNo: number, pageSize: number) {
+				const params = {
+					pageNo: pageNo,
+					pageSize: pageSize,
+					type: 1
+				}
+				requestList(params).then((res: UTSJSONObject) => {
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+
+</style>

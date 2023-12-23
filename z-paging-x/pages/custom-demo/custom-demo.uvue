@@ -1,7 +1,11 @@
 <template>
 	<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
 		<template #top>
-			<common-tabs :list="tabList" @change="tabChange" />
+			<common-tabs ref="tabs" :list="tabList" @change="tabChange" />
+		</template>
+		<!-- 自定义下拉刷新view -->
+		<template #refresher="{ refresherStatus }">
+			<custom-refresher :status="refresherStatus"/>
 		</template>
 		<list-item v-for="(item, index) in dataList" :key="index">
 			<view class="list-item">
@@ -21,6 +25,9 @@
 				tabIndex: 0,
 				dataList: [] as Array<ListItem>
 			}
+		},
+		onLoad() {
+			
 		},
 		methods: {
 			tabChange(index: number) {

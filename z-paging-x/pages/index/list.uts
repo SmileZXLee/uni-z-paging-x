@@ -1,0 +1,24 @@
+export type Item = {
+	title: string;
+	file: string;
+	subTitle: string;
+}
+export type List = {
+	list: Array<Item>;
+}
+
+export default {
+	list: [{
+		title: '普通模式演示',
+		file: 'common-demo',
+		subTitle: ''
+	},{
+		title: '自定义下拉刷新演示',
+		file: 'custom-demo',
+		subTitle: ''
+	},{
+		title: '滑动切换选项卡演示',
+		file: 'swiper-demo',
+		subTitle: ''
+	}]
+} as List
