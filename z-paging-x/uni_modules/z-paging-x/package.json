@@ -1,12 +1,13 @@
 {
   "id": "z-paging-x",
+  "name": "z-paging-x",
   "displayName": "z-paging-x",
-  "version": "1.0.0",
-  "description": "z-paging-x",
+  "version": "0.1.0",
+  "description": "z-paging现已支持uniapp x！持续完善中~",
   "keywords": [
     "z-paging-x"
 ],
-  "repository": "",
+  "repository": "https://github.com/SmileZXLee/uni-z-paging-x",
   "engines": {
     "HBuilderX": "^3.7.0"
   },
@@ -21,12 +22,12 @@
       }
     },
     "contact": {
-      "qq": ""
+      "qq": "393727164"
     },
     "declaration": {
-      "ads": "",
-      "data": "",
-      "permissions": ""
+      "ads": "无",
+      "data": "无",
+      "permissions": "无"
     },
     "npmurl": ""
   },
@@ -35,16 +36,16 @@
     "encrypt": [],
     "platforms": {
       "cloud": {
-        "tcb": "u",
-        "aliyun": "u"
+        "tcb": "y",
+        "aliyun": "y"
       },
       "client": {
         "Vue": {
           "vue2": "u",
-          "vue3": "u"
+          "vue3": "y"
         },
         "App": {
-          "app-android": "u",
+          "app-android": "y",
           "app-ios": "u"
         },
         "H5-mobile": {
