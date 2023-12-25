@@ -1,4 +1,5 @@
 # z-paging-x
+
 > z-paging uniapp x版
 
 [![version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
@@ -83,31 +84,72 @@ npm update z-paging-x
 
 ### props
 
-| 参数                 | 说明                                                         | 类型    | 默认值 | 可选值 |
-| :------------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
-| v-model              | 绑定最终的列表渲染变量(页面data中声明的值)，当列表数据改变时，所绑定的变量会跟着改变 | Array   | -      | -      |
-| default-page-no      | 自定义初始的pageNo(从第几页开始)                             | Number  | 1      | -      |
-| default-page-size    | 自定义pageSize(每页显示多少条)                               | Number  | 10     | -      |
-| fixed                | z-paging-x是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认铺满屏幕，页面中的view请放在z-paging-x标签内，需要固定在顶部的view使用`slot="top"`包住，需要固定在底部的view使用`slot="bottom"`包住。 | Boolean | true   | false  |
-| auto                 | mounted后自动调用reload方法(mounted后自动调用接口)           | Boolean | true   | false  |
-| refresher-enabled    | 是否开启自定义下拉刷新                                       | Boolean | true   | false  |
-| refresher-threshold  | 设置自定义下拉刷新阈值，默认单位为px。默认高度等于refresher高度 | Number  | 0      | -      |
-| use-custom-refresher | 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新 | Boolean | true   | false  |
-| load-more-enabled    | 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据) | Boolean | true   | false  |
+#### 数据&布局配置
 
+| 参数              | 说明                                                         | 类型    | 默认值 | 可选值 |
+| :---------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
+| v-model           | 绑定最终的列表渲染变量(页面data中声明的值)，当列表数据改变时，所绑定的变量会跟着改变 | Array   | -      | -      |
+| default-page-no   | 自定义初始的pageNo(从第几页开始)                             | Number  | 1      | -      |
+| default-page-size | 自定义pageSize(每页显示多少条)                               | Number  | 10     | -      |
+| fixed             | z-paging-x是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认铺满屏幕，页面中的view请放在z-paging-x标签内，需要固定在顶部的view使用`slot="top"`包住，需要固定在底部的view使用`slot="bottom"`包住。 | Boolean | true   | false  |
+| auto              | mounted后自动调用reload方法(mounted后自动调用接口)           | Boolean | true   | false  |
+| paging-style      | 自定义组件的样式                                             | Object  | {}     | -      |
+
+#### 下拉刷新配置
+
+| 参数                       | 说明                                                         | 类型    | 默认值       | 可选值 |
+| :------------------------- | :----------------------------------------------------------- | :------ | :----------- | :----- |
+| refresher-enabled          | 是否开启自定义下拉刷新                                       | Boolean | true         | false  |
+| refresher-threshold        | 设置自定义下拉刷新阈值，默认单位为px。默认高度等于refresher高度 | Number  | 0            | -      |
+| use-custom-refresher       | 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新 | Boolean | true         | false  |
+| refresher-default-text     | 自定义下拉刷新默认状态下的文字                               | String  | 继续下拉刷新 | -      |
+| refresher-pulling-text     | 自定义下拉刷新松手立即刷新状态下的文字                       | String  | 松开立即刷新 | -      |
+| refresher-refreshing-text  | 自定义下拉刷新刷新中状态下的文字                             | String  | 正在刷新...  | -      |
+| refresher-background       | 下拉刷新区域背景颜色                                         | String  | #FFF         |        |
+| show-refresher-when-reload | 列表刷新时自动显示下拉刷新view                               | Boolean | false        | true   |
+| refresher-update-time-key  | 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串 | String  | default      | -      |
+
+#### 底部加载更多配置
+
+| 参数                   | 说明                                                         | 类型    | 默认值                 | 可选值 |
+| :--------------------- | :----------------------------------------------------------- | :------ | :--------------------- | :----- |
+| load-more-enabled      | 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据) | Boolean | true                   | false  |
+| load-more-default-text | 滑动到底部"默认"文字                                         | String  | 点击加载更多           | -      |
+| load-more-loading-text | 滑动到底部"加载中"文字                                       | String  | 正在加载...            | -      |
+| load-more-no-more-text | 滑动到底部"没有更多"文字                                     | String  | 没有更多了             | -      |
+| load-more-fail-text    | 滑动到底部"加载失败"文字                                     | String  | 加载失败，点击重新加载 | -      |
+
+#### 空数据图配置
+
+| 参数       | 说明                                   | 类型   | 默认值      | 可选值 |
+| :--------- | :------------------------------------- | :----- | :---------- | :----- |
+| empty-text | 空数据描述文字                         | String | 没有数据哦~ | -      |
+| empty-img  | 空数据图片，默认使用z-paging内置的图片 | String | -           | -      |
+
+#### 点击返回顶部配置
+
+| 参数                  | 说明                                                         | 类型    | 默认值 | 可选值 |
+| :-------------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
+| show-back-to-top      | 是否显示点击返回顶部按钮                                     | Boolean | false  | true   |
+| back-to-top-threshold | 点击返回顶部按钮显示/隐藏的阈值(滚动距离)，默认单位为px。    | Number  | 300    | -      |
+| back-to-top-img       | 点击返回顶部按钮的自定义图片地址，默认使用z-paging内置的图片 | String  | -      | -      |
+| back-to-top-style     | 点击返回顶部按钮的自定义样式                                 | Object  | {}     | -      |
 
 ### events
 
-| 事件名 | 说明                                                         | 回调参数                                                     |
-| ------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| @query | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
+| 事件名          | 说明                                                         | 回调参数                                                     |
+| --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| @query          | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
+| @scroll         | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#scrollevent)) => void |
+| @backToTopClick |                                                              | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
 
 ### methods
 
-| 方法名   | 说明                                                         | 参数                         |
-| -------- | ------------------------------------------------------------ | ---------------------------- |
-| reload   | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                            |
-| complete | 请求结束(成功或者失败)调用此方法，将请求的结果传递给`z-paging-x`处理，会自动判断是否有更多数据(当通过`complete`传进去的数组长度小于`pageSize`时，则判定为没有更多了)。 | `参数1(必填)`:请求结果数组； |
+| 方法名      | 说明                                                         | 参数                         |
+| ----------- | ------------------------------------------------------------ | ---------------------------- |
+| reload      | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                            |
+| complete    | 请求结束(成功或者失败)调用此方法，将请求的结果传递给`z-paging-x`处理，会自动判断是否有更多数据(当通过`complete`传进去的数组长度小于`pageSize`时，则判定为没有更多了)。 | `参数1(必填)`:请求结果数组； |
+| scrollToTop | 滚动到顶部                                                   | -                            |
 
 ### slots
 
@@ -116,3 +158,4 @@ npm update z-paging-x
 | top       | 可以将自定义导航栏、tab-view等需要固定的`(不需要跟着滚动的)`元素放入`slot="top"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="top"`。需要固定在顶部的view请勿设置`position: fixed;` |
 | bottom    | 可以将需要固定在底部的`(不需要跟着滚动的)`元素放入`slot="bottom"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="bottom"`。需要固定在底部的view请勿设置`position: fixed;`。 |
 | refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ refresherStatus(0-默认状态 1.松手立即刷新 2.刷新中 3.刷新成功) }" |
+| backToTop | 自定义点击返回顶部view                                       |

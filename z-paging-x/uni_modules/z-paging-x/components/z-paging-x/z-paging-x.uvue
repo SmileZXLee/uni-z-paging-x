@@ -168,9 +168,9 @@ by ZXLee
 			//自动显示点击返回顶部按钮，默认为否
 			showBackToTop: {
 				type: Boolean,
-				default: true
+				default: false
 			},
-			//点击返回顶部按钮显示/隐藏的阈值(滚动距离)，单位为px，默认为200px
+			//点击返回顶部按钮显示/隐藏的阈值(滚动距离)，单位为px，默认为300px
 			backToTopThreshold: {
 				type: Number,
 				default: 300
