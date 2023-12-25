@@ -14,7 +14,21 @@
 
 ### 安装
 
-#### 通过uni_modules安装，在插件市场中点击右上角【使用HbuilderX导入插件】即可。 
+#### 方式1(推荐)：通过uni_modules安装，在插件市场中点击右上角【使用HbuilderX导入插件】即可。 
+
+***
+
+#### 方式2：通过npm安装  
+
+```bash
+//若项目之前未使用npm管理依赖（项目根目录下无package.json文件），先在项目根目录执行命令初始化npm工程
+npm init -y
+
+//安装
+npm install z-paging-x --save
+//更新
+npm update z-paging-x
+```
 
 ### 基本使用
 

@@ -14,7 +14,7 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{'zpx-content':true, 'zpx-content-fixed':fixed}">
+	<view :class="{'zpx-content':true, 'zpx-content-fixed':fixed}" :style="[pagingStyle]">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
 		<list-view class="zpx-list-view zpx-flex1" 
@@ -22,12 +22,12 @@ by ZXLee
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
 			<slot />
 			<list-item>
-			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" @clickMore="_handleLoadMore"/>
+			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
 			</list-item>
 			<list-item slot="refresher">
 				<view class="zpx-list-refresher">
 					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-					<z-paging-refresher v-else :status="refresherStatus"/>
+					<z-paging-refresher :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus"/>
 				</view>
 			</list-item>
 			<list-item :class="{'zpx-flex1': showEmpty}">
@@ -43,7 +43,6 @@ by ZXLee
 	import zPagingLoadMore from './components/z-paging-load-more.uvue'
 	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
 	import Enum from './enums/index.uts'
-	import { QueryResult } from './types/index.uts'
 	export default {
 		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
 		props: {
@@ -57,15 +56,35 @@ by ZXLee
 				type: Number,
 				default: 10
 			},
+			// 设置组件的style
+			pagingStyle: {
+				type: Object,
+				default: {}
+			},
 			// 是否开启自定义下拉刷新，默认为是
 			refresherEnabled: {
 				type: Boolean,
 				default: true
 			},
-			// 设置自定义下拉刷新阈值，默认等于refresher
+			// 设置自定义下拉刷新阈值，默认等于refresher高度
 			refresherThreshold: {
 				type: Number,
 				default: 0
+			},
+			// 自定义下拉刷新默认状态下的文字，默认：继续下拉刷新
+			refresherDefaultText: {
+				type: String,
+				default: '继续下拉刷新'
+			},
+			// 自定义下拉刷新松手立即刷新状态下的文字，默认：松开立即刷新
+			refresherPullingText: {
+				type: String,
+				default: '松开立即刷新'
+			},
+			// 自定义下拉刷新刷新中状态下的文字，默认：正在刷新...
+			refresherRefreshingText: {
+				type: String,
+				default: '正在刷新...'
 			},
 			// 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新
 			useCustomRefresher: {
@@ -76,6 +95,26 @@ by ZXLee
 			loadMoreEnabled: {
 				type: Boolean,
 				default: true
+			},
+			//滑动到底部"默认"文字，默认：点击加载更多
+			loadMoreDefaultText: {
+				type: String,
+				default: '点击加载更多'
+			},
+			//滑动到底部"加载中"文字，默认：正在加载...
+			loadMoreLoadingText: {
+				type: String,
+				default: '正在加载...'
+			},
+			//滑动到底部"没有更多"文字，默认：没有更多了
+			loadMoreNoMoreText: {
+				type: String,
+				default: '没有更多了'
+			},
+			//滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
+			loadMoreFailText: {
+				type: String,
+				default: '加载失败，点击重新加载'
 			},
 			// mounted后自动调用reload方法(mounted后自动调用接口)，默认为是
 			auto: {

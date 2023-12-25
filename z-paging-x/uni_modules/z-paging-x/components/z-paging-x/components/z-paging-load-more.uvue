@@ -14,11 +14,31 @@
 		name: 'z-paging-load-more',
 		components: { zPagingLoading },
 		props: {
+			// 下拉刷新状态
 			status: {
 				type: Number,
 				default: Enum.More.Default,
-			}
-			
+			},
+			// 滑动到底部"默认"文字，默认：点击加载更多
+			defaultText: {
+				type: String,
+				default: '点击加载更多'
+			},
+			// 滑动到底部"加载中"文字，默认：正在加载...
+			loadingText: {
+				type: String,
+				default: '正在加载...'
+			},
+			// 滑动到底部"没有更多"文字，默认：没有更多了
+			noMoreText: {
+				type: String,
+				default: '没有更多了'
+			},
+			// 滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
+			failText: {
+				type: String,
+				default: '加载失败，点击重新加载'
+			},
 		},
 		data() {
 			return {
@@ -33,7 +53,7 @@
 				return this.status === Enum.More.NoMore;
 			},
 			statusText(): string {
-				const statusTextArr: string[] = ['点击加载更多', '加载中...', '没有更多了', '加载失败'];
+				const statusTextArr: string[] = [this.defaultText, this.loadingText, this.noMoreText, this.failText];
 				return statusTextArr[this.status];
 			}
 		},
