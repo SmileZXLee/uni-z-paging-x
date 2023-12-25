@@ -1,4 +1,4 @@
-<!-- [z-paging]上拉加载更多view -->
+<!-- [z-paging-x]上拉加载更多view -->
 <template name="z-paging-load-more">
 	<view class="zpx-l-container"  @click="onClickMore">
 		<view v-if="isNoMore" class="zpx-l-line" />

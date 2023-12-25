@@ -1,3 +1,4 @@
+<!-- [z-paging-x]loading -->
 <template name="z-paging-loading">
 	<image class="zpx-loading-img" id="z-paging-loading-img" :src="base64Flower"></image>
 </template>

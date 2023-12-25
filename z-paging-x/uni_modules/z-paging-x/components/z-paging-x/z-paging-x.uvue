@@ -28,7 +28,7 @@ by ZXLee
 			<list-item slot="refresher">
 				<view class="zpx-list-refresher">
 					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-					<z-paging-refresher :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus"/>
+					<z-paging-refresher :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey"/>
 				</view>
 			</list-item>
 			<list-item :class="{'zpx-flex1': showEmpty}">
@@ -44,6 +44,7 @@ by ZXLee
 	import zPagingLoadMore from './components/z-paging-load-more.uvue'
 	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
 	import Enum from './enums/index.uts'
+	import { updateRefesrherTime } from './utils/index.uts'
 	export default {
 		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
 		props: {
@@ -102,27 +103,37 @@ by ZXLee
 				type: Boolean,
 				default: false
 			},
+			// 是否显示最后更新时间，默认为否
+			showRefresherUpdateTime: {
+				type: Boolean,
+				default: false
+			},
+			// 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串
+			refresherUpdateTimeKey: {
+				type: String,
+				default: 'default'
+			},
 			// 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据)，默认为是
 			loadMoreEnabled: {
 				type: Boolean,
 				default: true
 			},
-			//滑动到底部"默认"文字，默认：点击加载更多
+			// 滑动到底部"默认"文字，默认：点击加载更多
 			loadMoreDefaultText: {
 				type: String,
 				default: '点击加载更多'
 			},
-			//滑动到底部"加载中"文字，默认：正在加载...
+			// 滑动到底部"加载中"文字，默认：正在加载...
 			loadMoreLoadingText: {
 				type: String,
 				default: '正在加载...'
 			},
-			//滑动到底部"没有更多"文字，默认：没有更多了
+			// 滑动到底部"没有更多"文字，默认：没有更多了
 			loadMoreNoMoreText: {
 				type: String,
 				default: '没有更多了'
 			},
-			//滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
+			// 滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
 			loadMoreFailText: {
 				type: String,
 				default: '加载失败，点击重新加载'
@@ -196,6 +207,7 @@ by ZXLee
 			})
 		},
 		methods: {
+			// 刷新列表数据
 			reload() {
 				this.pageNo = this.defaultPageNo;
 				if (this.showRefresherWhenReload) {
@@ -204,10 +216,11 @@ by ZXLee
 					})
 					return;
 				}
+				// 清空数组会有一个空指针异常，很诡异，因此先注释掉
 				// this.totalData = [];
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
-			//请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
+			// 请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
 			complete(data: Array<any>) {
 				this.isLoading = false;
 				// 设置下拉刷新状态为结束
@@ -222,8 +235,15 @@ by ZXLee
 					this.loadMoreStatus = Enum.More.NoMore;
 				}
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
-				this.totalData = this.pageNo === this.defaultPageNo ? currentData : this.totalData.concat(currentData);
+				if (this.pageNo === this.defaultPageNo) {
+					this.totalData = currentData;
+					// 更新数据刷新时间
+					updateRefesrherTime(this.refresherUpdateTimeKey);
+				} else {
+					this.totalData = this.totalData.concat(currentData);
+				}
 			},
+			// 滚动到顶部
 			scrollToTop() {
 				this.scrollTop = this.oldScrollTop;
 				this.$nextTick(() => {
