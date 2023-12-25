@@ -17,9 +17,10 @@ by ZXLee
 	<view :class="{'zpx-content':true, 'zpx-content-fixed':fixed}" :style="[pagingStyle]">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<list-view class="zpx-list-view zpx-flex1" 
-		:refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true"
-		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower">
+		<list-view class="zpx-list-view zpx-flex1"
+		:refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true" :refresher-background="refresherBackground"
+		:scroll-top="scrollTop"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll">
 			<slot />
 			<list-item>
 			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
@@ -86,10 +87,20 @@ by ZXLee
 				type: String,
 				default: '正在刷新...'
 			},
+			// 下拉刷新区域背景颜色
+			refresherBackground: {
+				type: String,
+				default: '#FFF'
+			},
 			// 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新
 			useCustomRefresher: {
 				type: Boolean,
 				default: true
+			},
+			// 列表刷新时自动显示下拉刷新view，默认为否
+			showRefresherWhenReload: {
+				type: Boolean,
+				default: false
 			},
 			// 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据)，默认为是
 			loadMoreEnabled: {
@@ -140,7 +151,11 @@ by ZXLee
 				// 设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
 				refresherTriggered: false,
 				// 是否是加载中状态
-				isLoading: false,
+				isLoading: true,
+				// 竖向滚动条位置
+				scrollTop: 0,
+				// 记录当前滚动位置
+				oldScrollTop: 0,
 				refresherNodeHeight: 0 as number,
 				currentData: [] as Array<any>,
 				totalData: [] as Array<any>,
@@ -168,8 +183,9 @@ by ZXLee
 		mounted() {
 			this.pageNo = this.defaultPageNo;
 			if (this.auto) {
-				this._emitQuery(this.pageNo, this.pageSize);
+				this.reload();
 			}
+			// 更新缓存的refresher高度
 			this.$nextTick(() => {
 				uni.createSelectorQuery().select('.zpx-list-refresher').boundingClientRect().exec((ret) => {
 					if (ret.length > 0) {
@@ -182,6 +198,12 @@ by ZXLee
 		methods: {
 			reload() {
 				this.pageNo = this.defaultPageNo;
+				if (this.showRefresherWhenReload) {
+					this.$nextTick(() => {
+						this.refresherTriggered = true;
+					})
+					return;
+				}
 				// this.totalData = [];
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
@@ -202,19 +224,29 @@ by ZXLee
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
 				this.totalData = this.pageNo === this.defaultPageNo ? currentData : this.totalData.concat(currentData);
 			},
-			
+			scrollToTop() {
+				this.scrollTop = this.oldScrollTop;
+				this.$nextTick(() => {
+					this.scrollTop = 0
+				})
+			},
 			
 			// 下拉刷新控件被下拉事件
 			_onRefresherpulling(e: RefresherEvent) {
 				this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
 			},
 			// 下拉刷新被触发事件
-			_onRefresherrefresh(_ : RefresherEvent) {
+			_onRefresherrefresh(_: RefresherEvent) {
 				_handleRefresh();
 			},
 			// 滚动到底部事件
 			_onScrolltolower() {
 				this._handleLoadMore();
+			},
+			// 列表正在滚动事件
+			_onScroll(e: ScrollEvent) {
+				this.$emit('scroll', e);
+				this.oldScrollTop = e.detail.scrollTop;
 			},
 			// 处理用户下拉刷新
 			_handleRefresh() {
