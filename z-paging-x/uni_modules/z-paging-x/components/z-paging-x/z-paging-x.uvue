@@ -31,11 +31,17 @@ by ZXLee
 					<z-paging-refresher :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey"/>
 				</view>
 			</list-item>
-			<list-item :class="{'zpx-flex1': showEmpty}">
-				<z-paging-x-empty v-if="showEmpty"/>
+			<list-item class="zpx-flex1">
+				<z-paging-x-empty :empty-text="emptyText" :empty-img="emptyImg" v-if="showEmpty"/>
 			</list-item>
 		</list-view>
+		<!-- 底部固定的slot -->
 		<slot name="bottom" />
+		<!-- 点击返回顶部view -->
+		<view v-if="showBackToTopClass" :class="backToTopClass" :style="[backToTopStyle]" @click.stop="_onBackToTopClick">
+			<slot v-if="$slots['backToTop']" name="backToTop" />
+			<image v-else class="zpx-back-to-top-img" :src="backToTopImg.length > 0 ? backToTopImg : base64BackToTop" />
+		</view>
 	</view>
 </template>
 
@@ -44,6 +50,7 @@ by ZXLee
 	import zPagingLoadMore from './components/z-paging-load-more.uvue'
 	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
 	import Enum from './enums/index.uts'
+	import { base64BackToTop } from './static/index.uts'
 	import { updateRefesrherTime } from './utils/index.uts'
 	export default {
 		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
@@ -68,7 +75,7 @@ by ZXLee
 				type: Boolean,
 				default: true
 			},
-			// 设置自定义下拉刷新阈值，默认等于refresher高度
+			// 设置自定义下拉刷新阈值，默认等于refresher高度，单位为px
 			refresherThreshold: {
 				type: Number,
 				default: 0
@@ -148,28 +155,68 @@ by ZXLee
 				type: Boolean,
 				default: true
 			},
+			// 空数据描述文字
+			emptyText: {
+				type: String,
+				default: '没有数据哦~'
+			},
+			// 空数据图片
+			emptyImg: {
+				type: String,
+				default: ''
+			},
+			//自动显示点击返回顶部按钮，默认为否
+			showBackToTop: {
+				type: Boolean,
+				default: true
+			},
+			//点击返回顶部按钮显示/隐藏的阈值(滚动距离)，单位为px，默认为200px
+			backToTopThreshold: {
+				type: Number,
+				default: 300
+			},
+			//点击返回顶部按钮的自定义图片地址，默认使用z-paging内置的图片
+			backToTopImg: {
+				type: String,
+				default: ''
+			},
+			// 点击返回顶部按钮的style
+			backToTopStyle: {
+				type: Object,
+				default: {},
+			},
 		},
 		data() {
 			return {
 				// 下拉刷新状态
 				refresherStatus: Enum.Refresher.Default,
-				// 底部加载更多状态
-				loadMoreStatus: Enum.More.Default,
-				// 当前页
-				pageNo: 1,
-				// 当前pageSize
-				pageSize: 10,
 				// 设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
 				refresherTriggered: false,
+				// refresher节点高度
+				refresherNodeHeight: 0 as number,
+				// 底部加载更多状态
+				loadMoreStatus: Enum.More.Default,
+				
 				// 是否是加载中状态
 				isLoading: true,
 				// 竖向滚动条位置
 				scrollTop: 0,
 				// 记录当前滚动位置
 				oldScrollTop: 0,
-				refresherNodeHeight: 0 as number,
-				currentData: [] as Array<any>,
+				
+				// 当前页
+				pageNo: 1,
+				// 当前pageSize
+				pageSize: 10,
+				// 当前列表总数据
 				totalData: [] as Array<any>,
+				
+				// 默认的点击返回顶部图片
+				base64BackToTop: base64BackToTop,
+				backToTopClass: 'zpx-back-to-top zpx-back-to-top-hide',
+				lastBackToTopShowTime: 0,
+				showBackToTopClass: false,
+				
 			}
 		},
 		computed: {
@@ -249,6 +296,7 @@ by ZXLee
 				this.$nextTick(() => {
 					this.scrollTop = 0
 				})
+				this._checkShouldShowBackToTop(this.scrollTop);
 			},
 			
 			// 下拉刷新控件被下拉事件
@@ -267,6 +315,7 @@ by ZXLee
 			_onScroll(e: ScrollEvent) {
 				this.$emit('scroll', e);
 				this.oldScrollTop = e.detail.scrollTop;
+				this._checkShouldShowBackToTop(this.oldScrollTop);
 			},
 			// 处理用户下拉刷新
 			_handleRefresh() {
@@ -287,6 +336,49 @@ by ZXLee
 			_emitQuery(pageNo: number, pageSize: number){
 				this.isLoading = true;
 				this.$emit('query', pageNo, pageSize);
+			},
+			
+			//判断是否要显示返回顶部按钮
+			_checkShouldShowBackToTop(scrollTop: number) {
+				if (!this.showBackToTop) {
+					this.showBackToTopClass = false;
+					return;
+				}
+				if (scrollTop > this.backToTopThreshold) {
+					if (!this.showBackToTopClass) {
+						this.showBackToTopClass = true;
+						this.lastBackToTopShowTime = new Date().getTime();
+						setTimeout(() => {
+							this.backToTopClass = 'zpx-back-to-top zpx-back-to-top-show';
+						}, 300)
+					}
+				} else {
+					if (this.showBackToTopClass) {
+						this.backToTopClass = 'zpx-back-to-top zpx-back-to-top-hide';
+						setTimeout(() => {
+							this.showBackToTopClass = false;
+						}, new Date().getTime() - this.lastBackToTopShowTime < 500 ? 0 : 300)
+					}
+				}
+			},
+			//点击返回顶部
+			_onBackToTopClick() {
+				let callbacked: boolean = false;
+				this.$emit('backToTopClick', (toTop: boolean) => {
+					if (toTop != false) {
+						this._handleToTop();
+					}
+					callbacked = true;
+				});
+				this.$nextTick(() => {
+					if (!callbacked) {
+						this._handleToTop();
+					}
+				})
+			},
+			//处理滚动到顶部
+			_handleToTop() {
+				this.scrollToTop();
 			},
 		}
 	}

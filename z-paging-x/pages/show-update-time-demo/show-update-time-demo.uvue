@@ -1,0 +1,46 @@
+<template>
+	<z-paging-x ref="pagingX" :show-refresher-update-time="true" v-model="dataList" @query="queryList">
+		<template #top>
+			<common-tabs :list="tabList" @change="tabChange" />
+		</template>
+		<list-item v-for="(item, index) in dataList" :key="index">
+			<view class="list-item">
+				<text class="list-item-title">{{item.title}}</text>
+				<text class="list-item-type">{{item.detail}}</text>
+			</view>
+		</list-item>
+	</z-paging-x>
+</template>
+
+<script lang="uts">
+	import { requestList, ListItem } from '@/http/request.uts'
+	export default {
+		data() {
+			return {
+				tabList: ['测试1','测试2','测试3','测试4'] as Array<string>,
+				tabIndex: 0,
+				dataList: [] as Array<ListItem>
+			}
+		},
+		methods: {
+			tabChange(index: number) {
+				this.tabIndex = index;
+				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
+			},
+			queryList(pageNo: number, pageSize: number) {
+				const params = {
+					pageNo: pageNo,
+					pageSize: pageSize,
+					type: this.tabIndex + 1
+				}
+				requestList(params).then((res: UTSJSONObject) => {
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	
+</style>

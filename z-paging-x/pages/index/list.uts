@@ -20,5 +20,9 @@ export default {
 		title: '滑动切换选项卡演示',
 		file: 'swiper-demo',
 		subTitle: ''
+	},{
+		title: '下拉刷新显示最后更新时间演示',
+		file: 'show-update-time-demo',
+		subTitle: ''
 	}]
 } as List

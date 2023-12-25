@@ -29,6 +29,14 @@
 				"navigationBarTitleText" : "滑动切换选项卡演示",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/show-update-time-demo/show-update-time-demo",
+			"style" : 
+			{
+				"navigationBarTitleText" : "下拉刷新显示最后更新时间演示",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {
