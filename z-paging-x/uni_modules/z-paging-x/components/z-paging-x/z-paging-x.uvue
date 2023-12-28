@@ -28,7 +28,7 @@ by ZXLee
 			<list-item slot="refresher">
 				<view class="zpx-list-refresher">
 					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-					<z-paging-refresher :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey"/>
+					<z-paging-refresher ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
 				</view>
 			</list-item>
 			<list-item class="zpx-flex1">
@@ -51,7 +51,7 @@ by ZXLee
 	import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
 	import Enum from './enums/index.uts'
 	import { base64BackToTop } from './static/index.uts'
-	import { updateRefesrherTime } from './utils/index.uts'
+	import { updateRefesrherTime, getTime } from './utils/index.uts'
 	export default {
 		components: { zPagingRefresher, zPagingLoadMore, zPagingXEmpty },
 		props: {
@@ -194,6 +194,8 @@ by ZXLee
 				refresherTriggered: false,
 				// refresher节点高度
 				refresherNodeHeight: 0 as number,
+				// 下拉刷新最后更新时间更新的时间戳
+				refresherTimeTextTimestamp: 0,
 				// 底部加载更多状态
 				loadMoreStatus: Enum.More.Default,
 				
@@ -284,8 +286,11 @@ by ZXLee
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
 				if (this.pageNo === this.defaultPageNo) {
 					this.totalData = currentData;
-					// 更新数据刷新时间
-					updateRefesrherTime(this.refresherUpdateTimeKey);
+					if (this.showRefresherUpdateTime) {
+						// 更新数据刷新时间
+						updateRefesrherTime(this.refresherUpdateTimeKey);
+						this.refresherTimeTextTimestamp = getTime();
+					}
 				} else {
 					this.totalData = this.totalData.concat(currentData);
 				}

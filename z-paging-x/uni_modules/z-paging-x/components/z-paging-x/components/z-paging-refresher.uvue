@@ -45,10 +45,15 @@
 				type: Boolean,
 				default: false
 			},
-			// 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串
+			// 用户区分不同z-paging-x组件的最后更新时间
 			updateTimeKey: {
 				type: String,
 				default: 'default'
+			},
+			// 最后更新时间更新的时间戳
+			timeTextTimestamp: {
+				type: Number,
+				default: 0
 			},
 		},
 		data() {
@@ -70,7 +75,7 @@
 				return statusTextArr[this.status];
 			},
 			refresherTimeText(): string {
-				this.statusText;
+				this.timeTextTimestamp;
 				return getRefesrherFormatTimeByKey(this.updateTimeKey); 
 			},
 			showRefresherTimeText(): boolean {
