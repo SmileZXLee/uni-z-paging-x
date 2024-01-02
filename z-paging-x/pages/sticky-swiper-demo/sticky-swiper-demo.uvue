@@ -24,9 +24,12 @@
 	export default {
 		data() {
 			return {
+				// 当前最外层scroll-view节点
 				$pageScrollView: null as null | Element,
+				// header高度
 				$headerHeight: 0,
-				nestedScrollChildId: '测试1',
+				// 嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件
+				nestedScrollChildId: '',
 				tabList: ['测试1','测试2','测试3','测试4'],
 				current: 0
 			}

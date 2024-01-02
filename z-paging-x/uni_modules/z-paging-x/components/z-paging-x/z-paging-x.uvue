@@ -19,7 +19,7 @@ by ZXLee
 		<slot name="top" />
 		<component :is="listIs" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true" :refresher-background="refresherBackground" 
-		:scroll-top="scrollTop"
+		:rebound="rebound" :scroll-top="scrollTop"
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll">
 			<slot />
 			<component :is="listItemIs">
@@ -198,6 +198,11 @@ by ZXLee
 				type: String,
 				default: '',
 			},
+			// 控制是否回弹效果
+			rebound: {
+				type: Boolean,
+				default: true,
+			}
 		},
 		data() {
 			return {
