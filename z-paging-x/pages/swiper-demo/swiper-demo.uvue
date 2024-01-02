@@ -44,4 +44,8 @@
 	.swiper {
 		flex: 1;
 	}
+	
+	.swiper-item {
+		flex: 1;
+	}
 </style>

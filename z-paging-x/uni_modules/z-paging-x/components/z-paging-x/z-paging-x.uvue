@@ -14,27 +14,30 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{'zpx-content':true, 'zpx-content-fixed':fixed}" :style="[pagingStyle]">
+	<view :class="{ 'zpx-content':true, 'zpx-content-fixed':fixed }" :style="[pagingStyle]">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<list-view class="zpx-list-view zpx-flex1"
-		:refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true" :refresher-background="refresherBackground"
+		<component :is="listIs" class="zpx-list-view zpx-flex1"
+		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true" :refresher-background="refresherBackground" 
 		:scroll-top="scrollTop"
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll">
 			<slot />
-			<list-item>
-			    <z-paging-load-more v-if="showLoadMore" :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
-			</list-item>
-			<list-item slot="refresher">
+			<component :is="listItemIs">
+				<template v-if="showLoadMore">
+					<slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
+					<z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
+				</template>
+			</component>
+			<component :is="listItemIs" slot="refresher">
 				<view class="zpx-list-refresher">
 					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
 					<z-paging-refresher ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
 				</view>
-			</list-item>
-			<list-item class="zpx-flex1">
+			</component>
+			<component :is="listItemIs" class="zpx-flex1">
 				<z-paging-x-empty :empty-text="emptyText" :empty-img="emptyImg" v-if="showEmpty"/>
-			</list-item>
-		</list-view>
+			</component>
+		</component>
 		<!-- 底部固定的slot -->
 		<slot name="bottom" />
 		<!-- 点击返回顶部view -->
@@ -185,6 +188,16 @@ by ZXLee
 				type: Object,
 				default: {},
 			},
+			// list的类型：list-view或scroll-view，默认为list-view
+			listIs: {
+				type: String,
+				default: 'list-view',
+			},
+			// list的id
+			listId: {
+				type: String,
+				default: '',
+			},
 		},
 		data() {
 			return {
@@ -230,6 +243,9 @@ by ZXLee
 			},
 			showLoadMore(): boolean {
 				return this.loadMoreEnabled && (!isLoading || totalData.length > 0) && !this.showEmpty;
+			},
+			listItemIs(): String {
+				return this.listIs === 'list-view' ? 'list-item' : 'view';
 			}
 		},
 		watch: {

@@ -37,6 +37,14 @@
 				"navigationBarTitleText" : "下拉刷新显示最后更新时间演示",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/sticky-swiper-demo/sticky-swiper-demo",
+			"style" : 
+			{
+				"navigationBarTitleText" : "滑动切换选项卡+吸顶演示",
+				"enablePullDownRefresh" : true
+			}
 		}
 	],
 	"globalStyle": {

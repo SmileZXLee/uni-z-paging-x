@@ -1,14 +1,12 @@
 <template>
-	<view>
-		<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" :refresher-enabled="false" :fixed="false" v-model="dataList" @query="queryList">
-			<list-item v-for="(item, index) in dataList" :key="index">
-				<view class="list-item">
-					<text class="list-item-title">{{item.title}}</text>
-					<text class="list-item-type">{{item.detail}}</text>
-				</view>
-			</list-item>
-		</z-paging-x>
-	</view>
+	<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" :list-view-id="id" :refresher-enabled="false" :fixed="false" v-model="dataList" @query="queryList">
+		<list-item v-for="(item, index) in dataList" :key="index">
+			<view class="list-item">
+				<text class="list-item-title">{{item.title}}</text>
+				<text class="list-item-type">{{item.detail}}</text>
+			</view>
+		</list-item>
+	</z-paging-x>
 </template>
 
 <script>
@@ -21,7 +19,9 @@
 				// 当前组件是否已经加载过了
 				firstLoaded: false,
 				// 是否滚动到当前页
-				isCurrentPage: false
+				isCurrentPage: false,
+				// 列表刷新结束回调
+				refreshComplete: null as (() => void) | null
 			};
 		},
 		props:{
@@ -34,6 +34,11 @@
 			currentIndex: {
 				type: Number,
 				default: 0
+			},
+			// listView的id
+			id: {
+				type: String,
+				default: ''
 			}
 		},
 		watch: {
@@ -52,6 +57,10 @@
 			},
 		},
 		methods: {
+			refresh(refreshComplete : (() => void) | null) {
+				this.refreshComplete = refreshComplete;
+				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
+			},
 			queryList(pageNo: number, pageSize: number) {
 				const params = {
 					pageNo: pageNo,
@@ -60,6 +69,10 @@
 				}
 				requestList(params).then((res: UTSJSONObject) => {
 					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+					// 通知页面结束下拉刷新
+					if (pageNo === 1 && this.refreshComplete != null) {
+						this.refreshComplete!();
+					}
 					// 设置当前组件已经加载过了，必须设置
 					this.firstLoaded = true;
 				})

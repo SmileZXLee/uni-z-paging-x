@@ -24,5 +24,9 @@ export default {
 		title: '下拉刷新显示最后更新时间演示',
 		file: 'show-update-time-demo',
 		subTitle: ''
+	},{
+		title: '滑动切换选项卡+吸顶演示',
+		file: 'sticky-swiper-demo',
+		subTitle: ''
 	}]
 } as List

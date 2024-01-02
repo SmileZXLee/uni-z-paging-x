@@ -1,0 +1,113 @@
+<template>
+	<scroll-view ref="pageScrollView" class="sticky-swiper-demo" :scroll-y="true" :rebound="false"
+		@startnestedscroll="onStartNestedScroll" @nestedprescroll="onNestedPreScroll"
+		:nested-scroll-child="nestedScrollChildId">
+		<view ref="header" class="banner-view" style="height: 250rpx;">
+			<text style="font-size: 40rpx;font-weight: 700;color: white;">这是一个banner</text>
+			<text style="font-size: 28rpx;margin-top: 10rpx;color: white;">下方tab滚动时可吸附在顶部</text>
+		</view>
+		<view class="list-view-container">
+			<common-tabs ref="tabs" :list="tabList" @change="tabChange" />
+			<swiper class="swiper" :current="current" @transition="onSwiperTransition"
+				@animationfinish="onSwiperAnimationfinish">
+				<swiper-item class="swiper-item" v-for="(_, index) in tabList" :key="index">
+					<!-- 这里的stick-swiper-list-item为demo中为演示用定义的组件，列表及分页代码在stick-swiper-list-item组件内 -->
+					<!-- 请注意，stick-swiper-list-item非z-paging-x内置组件，在自己的项目中必须自己创建，若未创建则会报组件不存在的错误 -->
+					<stick-swiper-list-item ref="listItem" :tabIndex="index" :currentIndex="current"></stick-swiper-list-item>
+				</swiper-item>
+			</swiper>
+		</view>
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				$pageScrollView: null as null | Element,
+				$headerHeight: 0,
+				nestedScrollChildId: '测试1',
+				tabList: ['测试1','测试2','测试3','测试4'],
+				current: 0
+			}
+		},
+		onReady() {
+			this.$pageScrollView = this.$refs['pageScrollView'] as Element;
+			this.$headerHeight = (this.$refs['header'] as Element).offsetHeight;
+			this.nestedScrollChildId = this.tabList[0];
+		},
+		// 页面下拉刷新时触发
+		onPullDownRefresh() {
+			// 触发当前子组件刷新，子组件内会触发z-paging-x的列表刷新
+			(this.$refs["listItem"]! as ComponentPublicInstance[])[this.current].$callMethod('refresh', () => {
+				// 当下拉刷新结束，终止页面下拉刷新
+				uni.stopPullDownRefresh()
+			})
+		},
+		methods: {
+			// 子元素开始滚动时触发, return ture表示与子元素开启滚动协商
+			onStartNestedScroll(_ : StartNestedScrollEvent) : boolean {
+				return true;
+			},
+			// 子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
+			onNestedPreScroll(event : NestedPreScrollEvent) {
+				const deltaY = event.deltaY
+				const scrollTop = this.$pageScrollView!.scrollTop
+				if (deltaY > 0) {
+					// 向上滚动，如果父容器 header scrollTop < offsetHeight，先滚动父容器
+					if (scrollTop < this.$headerHeight) {
+						const difference = this.$headerHeight - scrollTop - deltaY;
+						// 使得最外层scroll-view滚动到指定位置
+						if (difference > 0) {
+							this.$pageScrollView!.scrollBy(event.deltaX, deltaY);
+							event.consumed(event.deltaX, deltaY);
+						} else {
+							const top: number = deltaY + difference;
+							event.consumed(event.deltaX, top.toFloat());
+							this.$pageScrollView!.scrollBy(event.deltaX, top.toFloat());
+						}
+					}
+				}
+			},
+			// tabs切换
+			tabChange(index: number) {
+				this.current = index;
+				this.nestedScrollChildId = this.tabList[index];
+			},
+			// swiper滑动中
+			onSwiperTransition(e : SwiperTransitionEvent) {
+			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
+			},
+			// swiper滑动动画结束
+			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
+			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
+			  this.current = e.detail.current;
+			},
+		}
+	}
+</script>
+
+<style>
+	.sticky-swiper-demo {
+		flex: 1;
+	}
+	
+	.banner-view {
+		background-color: #007AFF;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.list-view-container {
+		height: 100%;
+	}
+
+	.swiper {
+		flex: 1;
+	}
+	
+	.swiper-item {
+		flex: 1;
+	}
+</style>
