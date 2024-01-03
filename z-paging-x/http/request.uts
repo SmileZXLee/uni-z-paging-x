@@ -24,7 +24,7 @@ function _queryList(data: UTSJSONObject, listCount: number): Promise<UTSJSONObje
 	let pageSize = data['pageSize'] as number;
 	let type = data['type'] as number;
 	if (pageNo < 0 || pageSize <= 0) {
-		return _callQueryResult([] as Array<ListItem>);
+		return _callQueryResult([] as ListItem[]);
 	}
 	if (showLog) {
 		console.log('%c\n----------请求开始--------', 'color:green;');
@@ -37,7 +37,7 @@ function _queryList(data: UTSJSONObject, listCount: number): Promise<UTSJSONObje
 	if (pageNo == 0) {
 		pageNo = 1;
 	}
-	var totalPagingList: Array<ListItem> = [];
+	var totalPagingList: ListItem[] = [];
 	for (let i = 0; i < listCount; i++) {
 		const item = {
 			'title': `标题${i + 1}`,
@@ -51,11 +51,11 @@ function _queryList(data: UTSJSONObject, listCount: number): Promise<UTSJSONObje
 	} else if (pageNoIndex < totalPagingList.length) {
 		return _callQueryResult(totalPagingList.splice(pageNoIndex, totalPagingList.length - pageNoIndex));
 	} else {
-		return _callQueryResult([] as Array<ListItem>);
+		return _callQueryResult([] as ListItem[]);
 	}
 }
 
-function _callQueryResult(arg: Array<ListItem>): Promise<UTSJSONObject> {
+function _callQueryResult(arg: ListItem[]): Promise<UTSJSONObject> {
 	return new Promise((resolve, _) => {
 		setTimeout(() => {
 			uni.hideLoading();

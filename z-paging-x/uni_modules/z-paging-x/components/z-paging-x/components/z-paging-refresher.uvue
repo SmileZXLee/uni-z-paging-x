@@ -1,4 +1,4 @@
-<!-- [z-paging]上拉加载更多view -->
+<!-- [z-paging-x]上拉加载更多view -->
 <template name="z-paging-refresher">
 	<view class="zpx-r-container">
 		<z-paging-loading v-if="isLoading"/>

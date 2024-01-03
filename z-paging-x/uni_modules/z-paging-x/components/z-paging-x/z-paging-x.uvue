@@ -5,7 +5,7 @@
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
           |_|          |___/         |___/ -X
 		  
-v0.1.0 (2024-01-01)
+v0.1.2 (2024-01-03)
 by ZXLee
 -->
 <!-- 文档地址：https://z-paging.zxlee.cn -->
@@ -17,10 +17,11 @@ by ZXLee
 	<view :class="{ 'zpx-content':true, 'zpx-content-fixed':fixed }" :style="[pagingStyle]">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<component :is="listIs" class="zpx-list-view zpx-flex1"
-		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="true" :refresher-background="refresherBackground" 
-		:rebound="rebound" :scroll-top="scrollTop"
-		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll">
+		<component ref="zpxList" :is="listIs" class="zpx-list-view zpx-flex1"
+		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
+		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll"
+		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
 			<slot />
 			<component :is="listItemIs">
 				<template v-if="showLoadMore">
@@ -35,7 +36,7 @@ by ZXLee
 				</view>
 			</component>
 			<component :is="listItemIs" class="zpx-flex1">
-				<z-paging-x-empty :empty-text="emptyText" :empty-img="emptyImg" v-if="showEmpty"/>
+				<z-paging-x-empty v-if="showEmpty" :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
 			</component>
 		</component>
 		<!-- 底部固定的slot -->
@@ -163,8 +164,18 @@ by ZXLee
 				type: String,
 				default: '没有数据哦~'
 			},
+			// 空数据加载失败文字
+			emptyErrorText: {
+				type: String,
+				default: '很抱歉，加载失败'
+			},
 			// 空数据图片
 			emptyImg: {
+				type: String,
+				default: ''
+			},
+			// 空数据加载失败图片
+			emptyErrorImg: {
 				type: String,
 				default: ''
 			},
@@ -198,14 +209,36 @@ by ZXLee
 				type: String,
 				default: '',
 			},
+			// 控制是否出现滚动条
+			showScrollbar: {
+				type: Boolean,
+				default: true,
+			},
 			// 控制是否回弹效果
 			rebound: {
 				type: Boolean,
 				default: true,
-			}
+			},
+			// (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
+			customNestedScroll: {
+				type: Boolean,
+				default: false,
+			},
+			// (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
+			startNestedScroll: {
+				type: Boolean,
+				default: false,
+			},
+			// (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件，嵌套子元素需要设置custom-nested-scroll = true
+			nestedScrollChild: {
+				type: String,
+				default: '',
+			},
 		},
 		data() {
 			return {
+				// z-paging-x中list-view或scroll-view的节点
+				$zpxList: null as null | Element,
 				// 下拉刷新状态
 				refresherStatus: Enum.Refresher.Default,
 				// 设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
@@ -216,6 +249,8 @@ by ZXLee
 				refresherTimeTextTimestamp: 0,
 				// 底部加载更多状态
 				loadMoreStatus: Enum.More.Default,
+				// 是否是加载失败
+				isLoadFailed: false,
 				
 				// 是否是加载中状态
 				isLoading: true,
@@ -229,12 +264,15 @@ by ZXLee
 				// 当前pageSize
 				pageSize: 10,
 				// 当前列表总数据
-				totalData: [] as Array<any>,
+				totalData: [] as any[],
 				
 				// 默认的点击返回顶部图片
 				base64BackToTop: base64BackToTop,
+				// 点击返回顶部class
 				backToTopClass: 'zpx-back-to-top zpx-back-to-top-hide',
+				// 上次点击返回顶部的时间
 				lastBackToTopShowTime: 0,
+				// 点击返回顶部显示的class是否在展示中，使得按钮展示/隐藏过度效果更自然
 				showBackToTopClass: false,
 				
 			}
@@ -247,7 +285,7 @@ by ZXLee
 				return this.totalData.length == 0 && !this.isLoading;
 			},
 			showLoadMore(): boolean {
-				return this.loadMoreEnabled && (!isLoading || totalData.length > 0) && !this.showEmpty;
+				return this.loadMoreEnabled && (!this.isLoading || this.totalData.length > 0) && !this.showEmpty;
 			},
 			listItemIs(): String {
 				return this.listIs === 'list-view' ? 'list-item' : 'view';
@@ -257,11 +295,12 @@ by ZXLee
 			defaultPageSize(newVal: number) {
 				this.pageSize = newVal;
 			},
-			totalData(newVal: Array<any>) {
+			totalData(newVal: any[]) {
 				this.$emit('update:modelValue', newVal);
 			}
 		},
 		mounted() {
+			this.$zpxList = this.$refs['zpxList'] as Element;
 			this.pageNo = this.defaultPageNo;
 			if (this.auto) {
 				this.reload();
@@ -291,13 +330,12 @@ by ZXLee
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
 			// 请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
-			complete(data: Array<any>) {
-				this.isLoading = false;
-				// 设置下拉刷新状态为结束
-				this.refresherTriggered = false;
-				this.refresherStatus = Enum.Refresher.Default;
-				const currentData: Array<any> = [...data];
-				if (data.length >= this.defaultPageSize) {
+			complete(data: null | any[]) {
+				const finalData: any[] = data === null ? [] : data;
+				this.isLoadFailed = false;
+				this.endRefresh();
+				const currentData: any[] = [...finalData];
+				if (finalData.length >= this.defaultPageSize) {
 					// 将底部加载更多状态设置为默认状态
 					this.loadMoreStatus = Enum.More.Default;
 				} else {
@@ -316,6 +354,18 @@ by ZXLee
 					this.totalData = this.totalData.concat(currentData);
 				}
 			},
+			// 请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
+			completeByError() {
+				this.isLoadFailed = true;
+				this.endRefresh();
+			},
+			// 直接结束下拉刷新状态
+			endRefresh() {
+				// 设置下拉刷新状态为结束
+				this.refresherTriggered = false;
+				this.refresherStatus = Enum.Refresher.Default;
+				this.isLoading = false;
+			},
 			// 滚动到顶部
 			scrollToTop() {
 				this.scrollTop = this.oldScrollTop;
@@ -325,13 +375,24 @@ by ZXLee
 				this._checkShouldShowBackToTop(this.scrollTop);
 			},
 			
+			// (仅listIs = scroll-view有效)子元素开始滚动时触发, return ture表示与子元素开启滚动协商
+			_onStartNestedScroll(_: StartNestedScrollEvent) : boolean {
+				return this.startNestedScroll;
+			},
+			// (仅listIs = scroll-view有效)子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
+			_onNestedPreScroll(event: NestedPreScrollEvent) {
+				if (this.$zpxList != null) {
+					this.$emit('nestedprescroll', event, this.$zpxList!);
+				}
+			},
 			// 下拉刷新控件被下拉事件
 			_onRefresherpulling(e: RefresherEvent) {
 				this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
 			},
 			// 下拉刷新被触发事件
 			_onRefresherrefresh(_: RefresherEvent) {
-				_handleRefresh();
+				this.$emit('refresh');
+				this._handleRefresh();
 			},
 			// 滚动到底部事件
 			_onScrolltolower() {

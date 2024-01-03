@@ -17,9 +17,9 @@
 	export default {
 		data() {
 			return {
-				tabList: ['测试1','测试2','测试3','测试4'] as Array<string>,
+				tabList: ['测试1','测试2','测试3','测试4'],
 				tabIndex: 0,
-				dataList: [] as Array<ListItem>
+				dataList: [] as ListItem[]
 			}
 		},
 		methods: {
@@ -34,7 +34,7 @@
 					type: this.tabIndex + 1
 				}
 				requestList(params).then((res: UTSJSONObject) => {
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
 				})
 			}
 		}

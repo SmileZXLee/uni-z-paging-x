@@ -18,13 +18,13 @@
 	export default {
 		data() {
 			return {
-				list: [] as Array<Item>
+				list: [] as Item[]
 			}
 		},
 		onLoad() {
 			this.list = indexList.list;
 			uni.setNavigationBarTitle({
-				title: 'z-paging-x v0.1.0'
+				title: 'z-paging-X v0.1.2'
 			})
 		},
 		methods: {
@@ -63,7 +63,7 @@
 	
 	.demo-item-file-text {
 		margin-top: 20rpx;
-		background-color: #01c301;;
+		background-color: #007AFF;
 		color: white;
 		font-size: 28rpx;
 		padding: 5rpx 10rpx;

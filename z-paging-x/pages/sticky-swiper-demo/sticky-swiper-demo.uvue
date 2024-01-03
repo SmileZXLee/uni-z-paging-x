@@ -1,11 +1,18 @@
 <template>
-	<scroll-view ref="pageScrollView" class="sticky-swiper-demo" :scroll-y="true" :rebound="false"
-		@startnestedscroll="onStartNestedScroll" @nestedprescroll="onNestedPreScroll"
-		:nested-scroll-child="nestedScrollChildId">
+	<!-- 最外层滚动的z-paging-x容器 -->
+	<z-paging-x ref="pagingX" class="sticky-swiper-demo" 
+	list-is="scroll-view" :rebound="false" :start-nested-scroll="true" :nested-scroll-child="nestedScrollChildId" 
+	@nestedprescroll="onNestedPreScroll" @refresh="onRefresh">
+		<!-- 自定义下拉刷新view(非必须) -->
+		<template #refresher="{ refresherStatus }">
+			<custom-refresher :status="refresherStatus"/>
+		</template>
+		<!-- 顶部跟着滚动的banner -->
 		<view ref="header" class="banner-view" style="height: 250rpx;">
 			<text style="font-size: 40rpx;font-weight: 700;color: white;">这是一个banner</text>
 			<text style="font-size: 28rpx;margin-top: 10rpx;color: white;">下方tab滚动时可吸附在顶部</text>
 		</view>
+		<!-- tabs + swiper列表容器 -->
 		<view class="list-view-container">
 			<common-tabs ref="tabs" :list="tabList" @change="tabChange" />
 			<swiper class="swiper" :current="current" @transition="onSwiperTransition"
@@ -17,15 +24,13 @@
 				</swiper-item>
 			</swiper>
 		</view>
-	</scroll-view>
+	</z-paging-x>
 </template>
 
 <script>
 	export default {
 		data() {
 			return {
-				// 当前最外层scroll-view节点
-				$pageScrollView: null as null | Element,
 				// header高度
 				$headerHeight: 0,
 				// 嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件
@@ -35,39 +40,36 @@
 			}
 		},
 		onReady() {
-			this.$pageScrollView = this.$refs['pageScrollView'] as Element;
+			// 获取顶部跟着滚动的banner的高度
 			this.$headerHeight = (this.$refs['header'] as Element).offsetHeight;
+			// 设置当前滚动的子组件列表的id
 			this.nestedScrollChildId = this.tabList[0];
 		},
-		// 页面下拉刷新时触发
-		onPullDownRefresh() {
-			// 触发当前子组件刷新，子组件内会触发z-paging-x的列表刷新
-			(this.$refs["listItem"]! as ComponentPublicInstance[])[this.current].$callMethod('refresh', () => {
-				// 当下拉刷新结束，终止页面下拉刷新
-				uni.stopPullDownRefresh()
-			})
-		},
 		methods: {
-			// 子元素开始滚动时触发, return ture表示与子元素开启滚动协商
-			onStartNestedScroll(_ : StartNestedScrollEvent) : boolean {
-				return true;
+			// 页面下拉刷新时触发
+			onRefresh() {
+				// 触发当前子组件刷新，子组件内会触发z-paging-x的列表刷新
+				(this.$refs["listItem"]! as ComponentPublicInstance[])[this.current].$callMethod('refresh', () => {
+					// 当下拉刷新结束，终止页面下拉刷新
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete([]);
+				})
 			},
 			// 子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
-			onNestedPreScroll(event : NestedPreScrollEvent) {
+			onNestedPreScroll(event: NestedPreScrollEvent, scrollViewTarget: Element) {
 				const deltaY = event.deltaY
-				const scrollTop = this.$pageScrollView!.scrollTop
+				const scrollTop = scrollViewTarget.scrollTop
 				if (deltaY > 0) {
 					// 向上滚动，如果父容器 header scrollTop < offsetHeight，先滚动父容器
 					if (scrollTop < this.$headerHeight) {
 						const difference = this.$headerHeight - scrollTop - deltaY;
 						// 使得最外层scroll-view滚动到指定位置
 						if (difference > 0) {
-							this.$pageScrollView!.scrollBy(event.deltaX, deltaY);
+							scrollViewTarget.scrollBy(event.deltaX, deltaY);
 							event.consumed(event.deltaX, deltaY);
 						} else {
 							const top: number = deltaY + difference;
 							event.consumed(event.deltaX, top.toFloat());
-							this.$pageScrollView!.scrollBy(event.deltaX, top.toFloat());
+							scrollViewTarget.scrollBy(event.deltaX, top.toFloat());
 						}
 					}
 				}
@@ -75,15 +77,16 @@
 			// tabs切换
 			tabChange(index: number) {
 				this.current = index;
+				// 设置当前滚动的子组件列表的id
 				this.nestedScrollChildId = this.tabList[index];
 			},
 			// swiper滑动中
 			onSwiperTransition(e : SwiperTransitionEvent) {
-			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
+			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).swiperTransition(e);
 			},
 			// swiper滑动动画结束
 			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
-			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
+			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).swiperAnimationfinish(e);
 			  this.current = e.detail.current;
 			},
 		}

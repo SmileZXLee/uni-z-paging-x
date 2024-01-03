@@ -17,7 +17,7 @@
 		name:"swiper-list-item",
 		data() {
 			return {
-				dataList: [] as Array<ListItem>,
+				dataList: [] as ListItem[],
 				// 当前组件是否已经加载过了
 				firstLoaded: false,
 				// 是否滚动到当前页
@@ -59,7 +59,7 @@
 					type: this.tabIndex + 1
 				}
 				requestList(params).then((res: UTSJSONObject) => {
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
 					// 设置当前组件已经加载过了，必须设置
 					this.firstLoaded = true;
 				})

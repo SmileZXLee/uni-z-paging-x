@@ -74,7 +74,7 @@ npm update z-paging-x
 				// 此处请求仅为演示，请替换为自己项目中的请求
 				requestList(params).then((res: UTSJSONObject) => {
 					// 将请求结果通过complete传给z-paging处理，同时也代表请求结束，这一行必须调用
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
 				})
 			}
 		}

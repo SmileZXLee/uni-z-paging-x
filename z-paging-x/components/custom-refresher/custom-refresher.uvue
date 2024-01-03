@@ -34,7 +34,7 @@
 		/* #ifndef UNI-APP-X */
 		display: flex;
 		/* #endif */
-		height: 150rpx;
+		height: 180rpx;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;

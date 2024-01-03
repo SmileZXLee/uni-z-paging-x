@@ -25,11 +25,11 @@
 			},
 			// swiper滑动中
 			onSwiperTransition(e : SwiperTransitionEvent) {
-			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
+			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).swiperTransition(e);
 			},
 			// swiper滑动动画结束
 			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
-			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
+			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).swiperAnimationfinish(e);
 			  this.current = e.detail.current;
 			},
 		}

@@ -1,6 +1,6 @@
 <!-- [z-paging-x]loading -->
 <template name="z-paging-loading">
-	<image class="zpx-loading-img" id="z-paging-loading-img" :src="base64Flower"></image>
+	<image class="zpx-loading-img" id="z-paging-loading-img" :src="base64Flower" @transitionend="doRotate"></image>
 </template>
 
 <script>
@@ -8,19 +8,28 @@
 	export default {
 		data() {
 			return {
+				times: 0,
+				element: null as Element | null,
 				base64Flower: base64Flower
 			}
 		},
 		mounted() {
 			this.$nextTick(() => {
 				setTimeout(() => {
-					const ele = uni.getElementById('z-paging-loading-img');
-					if (ele !== null) {
-						ele.style.setProperty('transform', 'rotate(360deg)');
-						ele.style.setProperty('transition-duration', '1000');
-					}
+					this.element = uni.getElementById('z-paging-loading-img');
+					this.doRotate();
 				}, 10)
 			})
+		},
+		methods: {
+			// 旋转动画执行
+			doRotate() {
+				if (this.element !== null) {
+					this.times = this.times + 1;
+					this.element!.style.setProperty('transform', 'rotate(' + this.times * 360 + 'deg)');
+					this.element!.style.setProperty('transition-duration', '1000');
+				}
+			}
 		}
 	}
 </script>

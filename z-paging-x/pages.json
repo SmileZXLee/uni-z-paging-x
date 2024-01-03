@@ -43,7 +43,7 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "滑动切换选项卡+吸顶演示",
-				"enablePullDownRefresh" : true
+				"enablePullDownRefresh" : false
 			}
 		}
 	],

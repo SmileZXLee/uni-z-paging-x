@@ -79,7 +79,7 @@
 			onTabClick(index : number) {
 				this.setSwiperIndex(index, true)
 			},
-			onSwiperTransition(e : SwiperTransitionEvent) {
+			swiperTransition(e : SwiperTransitionEvent) {
 				// 微信 skyline 每项完成触发 Animationfinish，偏移值重置
 				// 微信 webview 全部完成触发 Animationfinish，偏移值累加
 				// 在滑动到下一个项的过程中，再次反向滑动，偏移值递减
@@ -109,7 +109,7 @@
 			/**
 			 * Swiper滑动动画结束事件.
 			 */
-			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
+			swiperAnimationfinish(e : SwiperAnimationFinishEvent) {
 				this.setSwiperIndex(e.detail.current, true)
 
 				// 记录上次的索引位置

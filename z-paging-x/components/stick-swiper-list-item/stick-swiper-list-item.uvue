@@ -1,5 +1,7 @@
 <template>
-	<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" :list-view-id="id" :refresher-enabled="false" :fixed="false" v-model="dataList" @query="queryList">
+	<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" v-model="dataList" 
+	:list-view-id="id" :refresher-enabled="false" :fixed="false" :custom-nested-scroll="true"
+	@query="queryList">
 		<list-item v-for="(item, index) in dataList" :key="index">
 			<view class="list-item">
 				<text class="list-item-title">{{item.title}}</text>
@@ -15,7 +17,7 @@
 		name:"swiper-list-item",
 		data() {
 			return {
-				dataList: [] as Array<ListItem>,
+				dataList: [] as ListItem[],
 				// 当前组件是否已经加载过了
 				firstLoaded: false,
 				// 是否滚动到当前页
@@ -68,9 +70,9 @@
 					type: this.tabIndex + 1
 				}
 				requestList(params).then((res: UTSJSONObject) => {
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as Array<any>);
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
 					// 通知页面结束下拉刷新
-					if (pageNo === 1 && this.refreshComplete != null) {
+					if (pageNo == 1 && this.refreshComplete != null) {
 						this.refreshComplete!();
 					}
 					// 设置当前组件已经加载过了，必须设置
