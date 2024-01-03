@@ -95,6 +95,18 @@ npm update z-paging-x
 | auto              | mounted后自动调用reload方法(mounted后自动调用接口)           | Boolean | true   | false  |
 | paging-style      | 自定义组件的样式                                             | Object  | {}     | -      |
 
+#### list-view&scroll-view相关配置
+
+| 参数                 | 说明                                                         | 类型    | 默认值    | 可选值      |
+| :------------------- | :----------------------------------------------------------- | :------ | :-------- | :---------- |
+| list-is              | list的类型：`list-view`或`scroll-view`                       | String  | list-view | scroll-view |
+| list-id              | list的id                                                     | String  | ''        | -           |
+| show-scrollbar       | 控制是否出现滚动条                                           | Boolean | true      | false       |
+| rebound              | 控制是否回弹效果                                             | Boolean | true      | false       |
+| custom-nested-scroll | (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理 | Boolean | false     | true        |
+| start-nested-scroll  | (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商 | Boolean | false     | true        |
+| nested-scroll-child  | (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的`nestedprescroll`事件，嵌套子元素需要设置`custom-nested-scroll` = true | String  | ''        | -           |
+
 #### 下拉刷新配置
 
 | 参数                       | 说明                                                         | 类型    | 默认值       | 可选值 |
@@ -121,10 +133,12 @@ npm update z-paging-x
 
 #### 空数据图配置
 
-| 参数       | 说明                                   | 类型   | 默认值      | 可选值 |
-| :--------- | :------------------------------------- | :----- | :---------- | :----- |
-| empty-text | 空数据描述文字                         | String | 没有数据哦~ | -      |
-| empty-img  | 空数据图片，默认使用z-paging内置的图片 | String | -           | -      |
+| 参数             | 说明                                             | 类型   | 默认值           | 可选值 |
+| :--------------- | :----------------------------------------------- | :----- | :--------------- | :----- |
+| empty-text       | 空数据描述文字                                   | String | 没有数据哦~      | -      |
+| empty-img        | 空数据图片，默认使用z-paging-x内置的图片         | String | -                | -      |
+| empty-error-text | 空数据加载失败文字                               | String | 很抱歉，加载失败 | -      |
+| empty-error-img  | 空数据加载失败图片，默认使用z-paging-x内置的图片 | String | -                | -      |
 
 #### 点击返回顶部配置
 
@@ -140,16 +154,19 @@ npm update z-paging-x
 | 事件名          | 说明                                                         | 回调参数                                                     |
 | --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | @query          | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
+| @refresh        | 下拉刷新被触发                                               | -                                                            |
 | @scroll         | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#scrollevent)) => void |
 | @backToTopClick |                                                              | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
 
 ### methods
 
-| 方法名      | 说明                                                         | 参数                         |
-| ----------- | ------------------------------------------------------------ | ---------------------------- |
-| reload      | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                            |
-| complete    | 请求结束(成功或者失败)调用此方法，将请求的结果传递给`z-paging-x`处理，会自动判断是否有更多数据(当通过`complete`传进去的数组长度小于`pageSize`时，则判定为没有更多了)。 | `参数1(必填)`:请求结果数组； |
-| scrollToTop | 滚动到顶部                                                   | -                            |
+| 方法名          | 说明                                                         | 参数                         |
+| --------------- | ------------------------------------------------------------ | ---------------------------- |
+| reload          | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                            |
+| complete        | 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理 | `参数1(必填)`:请求结果数组； |
+| completeByError | 请求结束(失败)调用此方法，将自动展示失败页面                 | -                            |
+| scrollToTop     | 滚动到顶部                                                   |                              |
+
 
 ### slots
 
@@ -158,4 +175,5 @@ npm update z-paging-x
 | top       | 可以将自定义导航栏、tab-view等需要固定的`(不需要跟着滚动的)`元素放入`slot="top"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="top"`。需要固定在顶部的view请勿设置`position: fixed;` |
 | bottom    | 可以将需要固定在底部的`(不需要跟着滚动的)`元素放入`slot="bottom"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="bottom"`。需要固定在底部的view请勿设置`position: fixed;`。 |
 | refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ refresherStatus(0-默认状态 1.松手立即刷新 2.刷新中 3.刷新成功) }" |
+| loadMore  | 自定义底部加载更多view，设置后则不使用z-paging-x内置的下拉刷新view。<br/>slot-scope="{ loadMoreStatus(0-默认状态 1.加载中 2.没有更多数据 3.加载失败) }" |
 | backToTop | 自定义点击返回顶部view                                       |

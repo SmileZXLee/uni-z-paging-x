@@ -329,7 +329,7 @@ by ZXLee
 				// this.totalData = [];
 				this._emitQuery(this.pageNo, this.pageSize);
 			},
-			// 请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
+			// 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理
 			complete(data: null | any[]) {
 				const finalData: any[] = data === null ? [] : data;
 				this.isLoadFailed = false;
@@ -354,7 +354,7 @@ by ZXLee
 					this.totalData = this.totalData.concat(currentData);
 				}
 			},
-			// 请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否成功(默认是是）
+			// 请求结束(失败)调用此方法，将自动展示失败页面
 			completeByError() {
 				this.isLoadFailed = true;
 				this.endRefresh();
