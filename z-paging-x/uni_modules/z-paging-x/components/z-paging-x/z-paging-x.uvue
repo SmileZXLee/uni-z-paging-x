@@ -19,7 +19,7 @@ by ZXLee
 		<slot name="top" />
 		<component ref="zpxList" :is="listIs" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
-		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar"
+		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll"
 		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
 			<slot />
@@ -199,6 +199,11 @@ by ZXLee
 				type: Object,
 				default: {},
 			},
+			// 在设置滚动条位置时使用动画过渡，默认为否
+			scrollWithAnimation: {
+				type: Boolean,
+				default: false
+			},
 			// list的类型：list-view或scroll-view，默认为list-view
 			listIs: {
 				type: String,
@@ -274,6 +279,8 @@ by ZXLee
 				lastBackToTopShowTime: 0,
 				// 点击返回顶部显示的class是否在展示中，使得按钮展示/隐藏过度效果更自然
 				showBackToTopClass: false,
+				// z-paging-x内部判断的滚动是否有动画效果，-1代表采取默认状态，1代表有动画效果，0代表没有动画效果
+				privateScrollWithAnimation: -1
 				
 			}
 		},
@@ -286,6 +293,14 @@ by ZXLee
 			},
 			showLoadMore(): boolean {
 				return this.loadMoreEnabled && (!this.isLoading || this.totalData.length > 0) && !this.showEmpty;
+			},
+			finalScrollWithAnimation(): boolean {
+				if (this.privateScrollWithAnimation !== -1) {
+					const scrollWithAnimation = this.privateScrollWithAnimation === 1;
+					this.privateScrollWithAnimation = -1;
+					return scrollWithAnimation;
+				}
+				return this.scrollWithAnimation;
 			},
 			listItemIs(): String {
 				return this.listIs === 'list-view' ? 'list-item' : 'view';
@@ -368,13 +383,20 @@ by ZXLee
 			},
 			// 滚动到顶部
 			scrollToTop() {
+				this.scrollToY(0);
+				this._checkShouldShowBackToTop(0);
+			},
+			// 滚动到底部
+			scrollToBottom() {
+				this.scrollToY(99999999);
+			},
+			// 滚动到指定位置，y为与顶部的距离，单位为px
+			scrollToY(y: number) {
 				this.scrollTop = this.oldScrollTop;
 				this.$nextTick(() => {
-					this.scrollTop = 0
+					this.scrollTop = y;
 				})
-				this._checkShouldShowBackToTop(this.scrollTop);
 			},
-			
 			// (仅listIs = scroll-view有效)子元素开始滚动时触发, return ture表示与子元素开启滚动协商
 			_onStartNestedScroll(_: StartNestedScrollEvent) : boolean {
 				return this.startNestedScroll;
