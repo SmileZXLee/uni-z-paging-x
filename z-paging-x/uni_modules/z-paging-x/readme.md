@@ -2,7 +2,7 @@
 
 > z-paging uniapp x版
 
-[![version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
+[![version](https://img.shields.io/badge/version-0.1.3-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
 [![license](https://img.shields.io/github/license/SmileZXLee/uni-z-paging-x)](https://en.wikipedia.org/wiki/MIT_License)
 
 ***
@@ -83,6 +83,20 @@ npm update z-paging-x
 ```
 
 ### props
+#### 支持全局配置（非必须）
+* 在`main.uts`中
+```uts
+import { setZPXConfig } from '@/uni_modules/z-paging-x/components/z-paging-x/config/index.uts'
+
+setZPXConfig({
+	//配置分页默认pageSize为15
+	'default-page-size': 15,
+	//配置空数据图默认描述文字为：空空如也~~
+	'empty-text': '空空如也~~',
+	//...
+});
+```
+
 
 #### 数据&布局配置
 
@@ -165,7 +179,9 @@ npm update z-paging-x
 | reload          | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                            |
 | complete        | 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理 | `参数1(必填)`:请求结果数组； |
 | completeByError | 请求结束(失败)调用此方法，将自动展示失败页面                 | -                            |
-| scrollToTop     | 滚动到顶部                                                   |                              |
+| scrollToTop     | 滚动到顶部                                                   | -                            |
+| scrollToBottom  | 滚动到底部                                                   | -                            |
+| scrollToY       | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置   |
 
 
 ### slots

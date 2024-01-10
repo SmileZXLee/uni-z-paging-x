@@ -34,7 +34,7 @@
 					type: this.tabIndex + 1
 				}
 				requestList(params).then((res: UTSJSONObject) => {
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
+					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete([]);
 				})
 			}
 		}
