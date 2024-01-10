@@ -1,6 +1,20 @@
 import App from './App.uvue'
 
 import { createSSRApp } from 'vue'
+
+// z-paging-x全局配置，写在setZPXConfig内（局部配置可覆盖全局配置）
+/*
+import { setZPXConfig } from '@/uni_modules/z-paging-x/components/z-paging-x/config/index.uts'
+
+setZPXConfig({
+	//配置分页默认pageSize为15
+	'default-page-size': 15,
+	//配置空数据图默认描述文字为：空空如也~~
+	'empty-text': '空空如也~~',
+	//...
+});
+*/
+
 export function createApp() {
 	const app = createSSRApp(App)
 	return {
