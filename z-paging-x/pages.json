@@ -45,6 +45,14 @@
 				"navigationBarTitleText" : "滑动切换选项卡+吸顶演示",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/part-demo/part-demo",
+			"style" : 
+			{
+				"navigationBarTitleText" : "局部区域使用演示",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

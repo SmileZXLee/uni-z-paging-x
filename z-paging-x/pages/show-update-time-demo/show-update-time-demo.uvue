@@ -1,3 +1,5 @@
+<!-- 下拉刷新显示最后更新时间演示 -->
+
 <template>
 	<z-paging-x ref="pagingX" :show-refresher-update-time="true" v-model="dataList" @query="queryList">
 		<template #top>

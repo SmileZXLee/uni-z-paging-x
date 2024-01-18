@@ -1,3 +1,5 @@
+<!-- 普通模式演示 -->
+
 <template>
 	<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
 		<template #top>

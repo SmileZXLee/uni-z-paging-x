@@ -1,3 +1,5 @@
+<!-- 滑动切换选项卡演示 -->
+
 <template>
 	<view class="swiper-demo">
 		<common-tabs ref="tabs" :list="tabList" @change="tabChange"/>

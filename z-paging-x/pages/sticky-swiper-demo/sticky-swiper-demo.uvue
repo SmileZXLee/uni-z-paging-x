@@ -1,3 +1,5 @@
+<!-- 滑动切换选项卡+吸顶演示 -->
+
 <template>
 	<!-- 最外层滚动的z-paging-x容器 -->
 	<z-paging-x ref="pagingX" class="sticky-swiper-demo" 

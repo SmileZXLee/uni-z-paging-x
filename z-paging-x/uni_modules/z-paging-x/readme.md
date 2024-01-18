@@ -84,7 +84,7 @@ npm update z-paging-x
 
 ### props
 #### 支持全局配置（非必须）
-* 在`main.uts`中
+在`main.uts`中  
 ```uts
 import { setZPXConfig } from '@/uni_modules/z-paging-x/components/z-paging-x/config/index.uts'
 
