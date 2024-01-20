@@ -5,7 +5,7 @@
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
           |_|          |___/         |___/ X
 		  
-v0.1.4 (2024-01-17)
+v0.1.5 (2024-01-20)
 by ZXLee
 -->
 <!-- 文档地址：https://z-paging.zxlee.cn -->
@@ -257,6 +257,8 @@ by ZXLee
 				loadMoreStatus: Enum.More.Default,
 				// 是否是加载失败
 				isLoadFailed: false,
+				// 是否是开发者自定义的加载更多，-1代表交由z-paging自行判断；1代表没有更多了；0代表还有更多数据
+				customNoMore: -1,
 				
 				// 是否是加载中状态
 				isLoading: true,
@@ -284,6 +286,9 @@ by ZXLee
 			}
 		},
 		computed: {
+			isFirstPage(): boolean {
+				return this.pageNo === this.defaultPageNo;
+			},
 			finalRefresherThreshold(): number {
 				return this.refresherThreshold > 0 ? this.refresherThreshold : this.refresherNodeHeight > 0 ? this.refresherNodeHeight : 40;
 			},
@@ -346,15 +351,21 @@ by ZXLee
 				this.isLoadFailed = false;
 				this.endRefresh();
 				const currentData: any[] = [...finalData];
-				if (finalData.length >= this.defaultPageSize) {
-					// 将底部加载更多状态设置为默认状态
-					this.loadMoreStatus = Enum.More.Default;
+				
+				// customNoMore：-1代表交由z-paging-x自行判断；1代表没有更多了；0代表还有更多数据
+				if (this.customNoMore != -1) {
+					// 如果customNoMore等于1 或者 customNoMore不是0并且新增数组长度为0(也就是不是明确的还有更多数据并且新增的数组长度为0)，则没有更多数据了
+					if (this.customNoMore == 1 || (this.customNoMore != 0 && finalData.length == 0)) {
+						this.loadMoreStatus = Enum.More.NoMore;
+					}
 				} else {
-					// 将底部加载更多状态设置为没有更多数据
-					this.loadMoreStatus = Enum.More.NoMore;
+					// 如果新增的数据数组长度为0 或者 新增的数组长度小于默认的pageSize，则没有更多数据了
+					if (finalData.length == 0 || (finalData.length > 0 && finalData.length < this.defaultPageSize)) {
+						this.loadMoreStatus = Enum.More.NoMore;
+					}
 				}
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
-				if (this.pageNo === this.defaultPageNo) {
+				if (this.isFirstPage) {
 					this.totalData = currentData;
 					if (this.showRefresherUpdateTime) {
 						// 更新数据刷新时间
@@ -364,6 +375,31 @@ by ZXLee
 				} else {
 					this.totalData = this.totalData.concat(currentData);
 				}
+			},
+			//【通过total判断是否有更多数据】请求成功调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为total(列表总数)
+			completeByTotal(data: null | any[], total: number) {
+				const finalData: any[] = data === null ? [] : data;
+				this.$nextTick(() => {
+					let nomore = false;
+					const realTotalDataCount = this.isFirstPage ? 0 : this.totalData.length;
+					const dataLength = finalData.length;
+					let exceedCount = realTotalDataCount + dataLength - total;
+					// 没有更多数据了
+					if (exceedCount >= 0) {
+						nomore = true;
+						// 仅截取total内部分的数据
+						exceedCount = this.defaultPageSize - exceedCount;
+						if (exceedCount > 0 && exceedCount < finalData.length) {
+							data = finalData.splice(0, exceedCount);
+						}
+					}
+					this.completeByNoMore(data, nomore);
+				})
+			},
+			//【自行判断是否有更多数据】请求成功调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否没有更多数据
+			completeByNoMore(data: null | any[], nomore: boolean) {
+				this.customNoMore = nomore == true ? 1 : 0;
+				this.complete(data);
 			},
 			// 请求结束(失败)调用此方法，将自动展示失败页面
 			completeByError() {

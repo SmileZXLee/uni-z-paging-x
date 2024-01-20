@@ -2,7 +2,7 @@
 
 > z-paging uniapp x版
 
-[![version](https://img.shields.io/badge/version-0.1.3-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
+[![version](https://img.shields.io/badge/version-0.1.5-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
 [![license](https://img.shields.io/github/license/SmileZXLee/uni-z-paging-x)](https://en.wikipedia.org/wiki/MIT_License)
 
 ***
@@ -174,14 +174,16 @@ setZPXConfig({
 
 ### methods
 
-| 方法名          | 说明                                                         | 参数                         |
-| --------------- | ------------------------------------------------------------ | ---------------------------- |
-| reload          | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                            |
-| complete        | 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理 | `参数1(必填)`:请求结果数组； |
-| completeByError | 请求结束(失败)调用此方法，将自动展示失败页面                 | -                            |
-| scrollToTop     | 滚动到顶部                                                   | -                            |
-| scrollToBottom  | 滚动到底部                                                   | -                            |
-| scrollToY       | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置   |
+| 方法名           | 说明                                                         | 参数                                                         |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| reload           | 重新加载分页数据，pageNo恢复为默认值，相当于下拉刷新的效果   | -                                                            |
+| complete         | 请求成功调用此方法，将请求的结果数组传递给z-paging-x处理     | `参数1(必填)`:请求结果数组；                                 |
+| completeByTotal  | 【通过total判断是否有更多数据】请求成功调用此方法(将此方法替换`complete`方法即可，此方法为`complete`方法的功能扩展，遵循`complete`原有规则) | `参数1(必填)`:请求结果数组；`参数2(必填)`:列表总长度；       |
+| completeByNoMore | 【自行判断是否有更多数据】请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理(将此方法替换`complete`方法即可，此方法为`complete`方法的功能扩展，遵循`complete`原有规则) | `参数1(必填)`:请求结果数组；`参数2(必填)`:是否没有更多数据，若为true则代表没有更多数据了； |
+| completeByError  | 请求结束(失败)调用此方法，将自动展示失败页面                 | -                                                            |
+| scrollToTop      | 滚动到顶部                                                   | -                                                            |
+| scrollToBottom   | 滚动到底部                                                   | -                                                            |
+| scrollToY        | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置                                   |
 
 
 ### slots

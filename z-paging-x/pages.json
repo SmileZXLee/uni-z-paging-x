@@ -53,6 +53,14 @@
 				"navigationBarTitleText" : "局部区域使用演示",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/empty-demo/empty-demo",
+			"style" : 
+			{
+				"navigationBarTitleText" : "空数据&加载失败演示",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

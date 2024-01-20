@@ -92,8 +92,8 @@
 	}
 
 	.zpx-main-image {
-		width: 220rpx;
-		height: 220rpx;
+		width: 240rpx;
+		height: 240rpx;
 	}
 
 	.zpx-main-title {

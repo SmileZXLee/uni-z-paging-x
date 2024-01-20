@@ -1,0 +1,68 @@
+<!-- 空数据&加载失败演示 -->
+
+<template>
+	<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
+		<template #top>
+			<view class="top">
+				<text style="margin-right: 20rpx;">暂无数据</text>
+				<switch class="switch-checked" :checked="emptyChecked" @change="onEmptyCheckedChange"/>
+				<text style="margin-left: 50rpx; margin-right: 20rpx;">加载失败</text>
+				<switch class="switch-checked" :checked="errorChecked" @change="onErrorCheckedChange"/>
+			</view>
+		</template>
+		<list-item v-for="(item, index) in dataList" :key="index">
+			<view class="list-item">
+				<text class="list-item-title">{{item.title}}</text>
+				<text class="list-item-type">{{item.detail}}</text>
+			</view>
+		</list-item>
+	</z-paging-x>
+</template>
+
+<script lang="uts">
+	import { requestList, ListItem } from '@/http/request.uts'
+	export default {
+		data() {
+			return {
+				emptyChecked: true,
+				errorChecked: false,
+				dataList: [] as ListItem[]
+			}
+		},
+		methods: {
+			onEmptyCheckedChange() {
+				this.emptyChecked = !this.emptyChecked;
+				this.errorChecked = !this.errorChecked;
+				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
+			},
+			onErrorCheckedChange() {
+				this.errorChecked = !this.errorChecked;
+				this.emptyChecked = !this.emptyChecked;
+				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
+			},
+			queryList(pageNo: number, pageSize: number) {
+				const params = {
+					pageNo: pageNo,
+					pageSize: pageSize,
+					type:1
+				}
+				requestList(params).then((_: UTSJSONObject) => {
+					if (this.emptyChecked) {
+						(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete([]);
+					} else if (this.errorChecked)  {
+						(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).completeByError();
+					}
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.top {
+		background-color: white;
+		padding: 20rpx 30rpx;
+		flex-direction: row;
+		align-items: center;
+	}
+</style>

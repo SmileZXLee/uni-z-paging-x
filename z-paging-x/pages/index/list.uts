@@ -29,6 +29,10 @@ export default {
 		file: 'show-update-time-demo',
 		subTitle: ''
 	},{
+		title: '空数据&加载失败演示',
+		file: 'empty-demo',
+		subTitle: ''
+	},{
 		title: '滑动切换选项卡+吸顶演示',
 		file: 'sticky-swiper-demo',
 		subTitle: ''
