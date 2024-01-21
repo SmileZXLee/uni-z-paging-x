@@ -1,5 +1,9 @@
 # z-paging-x
 
+<p align="center">
+    <img alt="logo" src="https://z-paging.zxlee.cn/img/title-logo-x.png" height="100" style="margin-bottom: 50px;">
+</p>
+
 > z-paging uniapp x版
 
 [![version](https://img.shields.io/badge/version-0.1.5-blue)](https://github.com/SmileZXLee/uni-z-paging-x)

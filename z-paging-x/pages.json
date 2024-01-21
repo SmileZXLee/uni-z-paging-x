@@ -3,7 +3,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "z-paging x"
+				"navigationBarTitleText": "z-paging x",
+				"navigationStyle": "custom"
 			}
 		},
 		{

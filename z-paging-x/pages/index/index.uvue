@@ -1,16 +1,17 @@
 <template>
-	<view class="content">
-		<view class="demo-list">
-			<view class="demo-item" v-for="(item,index) in list" :key="index" @click="itemClick(item)">
-				<view class="demo-item-main">
-					<text class="demo-item-title">{{item.title}}</text>
-					<text class="demo-item-subtitle" v-if="item.subTitle.length">{{item.subTitle}}</text>
-					<text class="demo-item-file-text">{{item.file + '.uvue'}}</text>
-				</view>
-				<image class="demo-item-more-img" src="../../static/more_icon.png"></image>
+	<z-paging-x :refresher-enabled="false">
+		<template #top>
+			<index-nav />
+		</template>
+		<list-item class="demo-item" v-for="(item,index) in list" :key="index" @click="itemClick(item)">
+			<view class="demo-item-main">
+				<text class="demo-item-title">{{item.title}}</text>
+				<text class="demo-item-subtitle" v-if="item.subTitle.length">{{item.subTitle}}</text>
+				<text class="demo-item-file-text">{{item.file + '.uvue'}}</text>
 			</view>
-		</view>
-	</view>
+			<image class="demo-item-more-img" src="../../static/more_icon.png"></image>
+		</list-item>
+	</z-paging-x>
 </template>
 
 <script lang="uts">
@@ -42,6 +43,7 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
+		align-items: center;
 		border-bottom: #eeeeee solid 1px;
 		padding: 20rpx 30rpx;
 	}
