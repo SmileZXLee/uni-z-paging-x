@@ -2,7 +2,7 @@
   "id": "z-paging-x",
   "name": "z-paging-x",
   "displayName": "【z-paging-x下拉刷新、上拉加载】z-paging uniappx版已上线！",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "分页全自动处理，支持自定义下拉刷新、上拉加载更多、自动管理空数据图、点击返回顶部等，持续完善中",
   "keywords": [
     "z-paging、分页、下拉刷新、上拉加载"
