@@ -174,7 +174,7 @@ setZPXConfig({
 | @query          | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
 | @refresh        | 下拉刷新被触发                                               | -                                                            |
 | @scroll         | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#scrollevent)) => void |
-| @backToTopClick |                                                              | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
+| @backToTopClick | 点击了返回到顶部                                             | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
 
 ### methods
 
