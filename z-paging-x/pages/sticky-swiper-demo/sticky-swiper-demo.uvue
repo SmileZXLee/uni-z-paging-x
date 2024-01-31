@@ -43,7 +43,7 @@
 		},
 		onReady() {
 			// 获取顶部跟着滚动的banner的高度
-			this.$headerHeight = (this.$refs['header'] as Element).offsetHeight;
+			this.$headerHeight = (this.$refs['header'] as UniElement).offsetHeight;
 			// 设置当前滚动的子组件列表的id
 			this.nestedScrollChildId = this.tabList[0];
 		},
@@ -57,7 +57,7 @@
 				})
 			},
 			// 子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
-			onNestedPreScroll(event: NestedPreScrollEvent, scrollViewTarget: Element) {
+			onNestedPreScroll(event: NestedPreScrollEvent, scrollViewTarget: UniElement) {
 				const deltaY = event.deltaY
 				const scrollTop = scrollViewTarget.scrollTop
 				if (deltaY > 0) {

@@ -44,7 +44,7 @@ by ZXLee
 		<!-- 点击返回顶部view -->
 		<view v-if="showBackToTopClass" :class="backToTopClass" :style="[backToTopStyle]" @click.stop="_onBackToTopClick">
 			<slot v-if="$slots['backToTop']" name="backToTop" />
-			<image v-else class="zpx-back-to-top-img" :src="backToTopImg.length > 0 ? backToTopImg : base64BackToTop" />
+			<image v-else class="zpx-back-to-top-img" :src="backToTopImg.length > 0 ? backToTopImg : base64BackToTopImg" />
 		</view>
 	</view>
 </template>
@@ -63,188 +63,188 @@ by ZXLee
 			// 自定义初始的pageNo，默认为1
 			defaultPageNo: {
 				type: Number,
-				default: gc('default-page-no', 1)
+				default: gc<number>('default-page-no', 1)
 			},
 			// 自定义pageSize，默认为10
 			defaultPageSize: {
 				type: Number,
-				default: gc('default-page-size', 10)
+				default: gc<number>('default-page-size', 10)
 			},
 			// 设置组件的style
 			pagingStyle: {
 				type: Object,
-				default: gc('paging-style', {})
+				default: gc<object>('paging-style', {})
 			},
 			// 是否开启自定义下拉刷新，默认为是
 			refresherEnabled: {
 				type: Boolean,
-				default: gc('refresher-enabled', true)
+				default: gc<boolean>('refresher-enabled', true)
 			},
 			// 设置自定义下拉刷新阈值，默认等于refresher高度，单位为px
 			refresherThreshold: {
 				type: Number,
-				default: gc('refresher-threshold', 0)
+				default: gc<number>('refresher-threshold', 0)
 			},
 			// 自定义下拉刷新默认状态下的文字，默认：继续下拉刷新
 			refresherDefaultText: {
 				type: String,
-				default: gc('refresher-default-text', '继续下拉刷新')
+				default: gc<string>('refresher-default-text', '继续下拉刷新')
 			},
 			// 自定义下拉刷新松手立即刷新状态下的文字，默认：松开立即刷新
 			refresherPullingText: {
 				type: String,
-				default: gc('refresher-pulling-text', '松开立即刷新')
+				default: gc<string>('refresher-pulling-text', '松开立即刷新')
 			},
 			// 自定义下拉刷新刷新中状态下的文字，默认：正在刷新...
 			refresherRefreshingText: {
 				type: String,
-				default: gc('refresher-refreshing-text', '正在刷新...')
+				default: gc<string>('refresher-refreshing-text', '正在刷新...')
 			},
 			// 下拉刷新区域背景颜色
 			refresherBackground: {
 				type: String,
-				default: gc('refresher-background', '#FFF')
+				default: gc<string>('refresher-background', '#FFF')
 			},
 			// 是否使用自定义的下拉刷新，默认为是，即使用z-paging-x的下拉刷新。设置为false即代表使用unix自带的下拉刷新
 			useCustomRefresher: {
 				type: Boolean,
-				default: gc('use-custom-refresher', true)
+				default: gc<boolean>('use-custom-refresher', true)
 			},
 			// 列表刷新时自动显示下拉刷新view，默认为否
 			showRefresherWhenReload: {
 				type: Boolean,
-				default: gc('show-refresher-when-reload', false)
+				default: gc<boolean>('show-refresher-when-reload', false)
 			},
 			// 是否显示最后更新时间，默认为否
 			showRefresherUpdateTime: {
 				type: Boolean,
-				default: gc('show-refresher-update-time', false)
+				default: gc<boolean>('show-refresher-update-time', false)
 			},
 			// 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串
 			refresherUpdateTimeKey: {
 				type: String,
-				default: gc('refresher-update-time-key', 'default')
+				default: gc<string>('refresher-update-time-key', 'default')
 			},
 			// 是否启用加载更多数据(含滑动到底部加载更多数据和点击加载更多数据)，默认为是
 			loadMoreEnabled: {
 				type: Boolean,
-				default: gc('load-more-enabled', true)
+				default: gc<boolean>('load-more-enabled', true)
 			},
 			// 滑动到底部"默认"文字，默认：点击加载更多
 			loadMoreDefaultText: {
 				type: String,
-				default: gc('load-more-default-text', '点击加载更多')
+				default: gc<string>('load-more-default-text', '点击加载更多')
 			},
 			// 滑动到底部"加载中"文字，默认：正在加载...
 			loadMoreLoadingText: {
 				type: String,
-				default: gc('load-more-loading-text', '正在加载...')
+				default: gc<string>('load-more-loading-text', '正在加载...')
 			},
 			// 滑动到底部"没有更多"文字，默认：没有更多了
 			loadMoreNoMoreText: {
 				type: String,
-				default: gc('load-more-no-more-text', '没有更多了')
+				default: gc<string>('load-more-no-more-text', '没有更多了')
 			},
 			// 滑动到底部"加载失败"文字，默认：加载失败，点击重新加载
 			loadMoreFailText: {
 				type: String,
-				default: gc('load-more-fail-text', '加载失败，点击重新加载')
+				default: gc<string>('load-more-fail-text', '加载失败，点击重新加载')
 			},
 			// mounted后自动调用reload方法(mounted后自动调用接口)，默认为是
 			auto: {
 				type: Boolean,
-				default: gc('auto', true)
+				default: gc<boolean>('auto', true)
 			},
 			// 是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认为100%，默认为是
 			fixed: {
 				type: Boolean,
-				default: gc('fixed', true)
+				default: gc<boolean>('fixed', true)
 			},
 			// 空数据描述文字
 			emptyText: {
 				type: String,
-				default: gc('empty-text', '没有数据哦~')
+				default: gc<string>('empty-text', '没有数据哦~')
 			},
 			// 空数据加载失败文字
 			emptyErrorText: {
 				type: String,
-				default: gc('empty-error-text', '很抱歉，加载失败')
+				default: gc<string>('empty-error-text', '很抱歉，加载失败')
 			},
 			// 空数据图片
 			emptyImg: {
 				type: String,
-				default: gc('empty-img', '')
+				default: gc<string>('empty-img', '')
 			},
 			// 空数据加载失败图片
 			emptyErrorImg: {
 				type: String,
-				default: gc('empty-error-img', '')
+				default: gc<string>('empty-error-img', '')
 			},
 			//自动显示点击返回顶部按钮，默认为否
 			showBackToTop: {
 				type: Boolean,
-				default: gc('show-back-to-top', false)
+				default: gc<boolean>('show-back-to-top', false)
 			},
 			//点击返回顶部按钮显示/隐藏的阈值(滚动距离)，单位为px，默认为300px
 			backToTopThreshold: {
 				type: Number,
-				default: gc('back-to-top-threshold', 300)
+				default: gc<number>('back-to-top-threshold', 300)
 			},
 			//点击返回顶部按钮的自定义图片地址，默认使用z-paging内置的图片
 			backToTopImg: {
 				type: String,
-				default: gc('back-to-top-img', '')
+				default: gc<string>('back-to-top-img', '')
 			},
 			// 点击返回顶部按钮的style
 			backToTopStyle: {
 				type: Object,
-				default: gc('back-to-top-style', {}),
+				default: gc<object>('back-to-top-style', {}),
 			},
 			// 在设置滚动条位置时使用动画过渡，默认为否
 			scrollWithAnimation: {
 				type: Boolean,
-				default: gc('scroll-with-animation', false),
+				default: gc<boolean>('scroll-with-animation', false),
 			},
 			// list的类型：list-view或scroll-view，默认为list-view
 			listIs: {
 				type: String,
-				default: gc('list-is', 'list-view'),
+				default: gc<string>('list-is', 'list-view'),
 			},
 			// list的id
 			listId: {
 				type: String,
-				default: gc('list-id', ''),
+				default: gc<string>('list-id', ''),
 			},
 			// 控制是否出现滚动条
 			showScrollbar: {
 				type: Boolean,
-				default: gc('show-scrollbar', true),
+				default: gc<boolean>('show-scrollbar', true),
 			},
 			// 控制是否回弹效果
 			rebound: {
 				type: Boolean,
-				default: gc('rebound', true),
+				default: gc<boolean>('rebound', true),
 			},
 			// (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
 			customNestedScroll: {
 				type: Boolean,
-				default: gc('custom-nested-scroll', false),
+				default: gc<boolean>('custom-nested-scroll', false),
 			},
 			// (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
 			startNestedScroll: {
 				type: Boolean,
-				default: gc('start-nested-scroll', false),
+				default: gc<boolean>('start-nested-scroll', false),
 			},
 			// (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件，嵌套子元素需要设置custom-nested-scroll = true
 			nestedScrollChild: {
 				type: String,
-				default: gc('nested-scroll-child', ''),
+				default: gc<string>('nested-scroll-child', ''),
 			},
 		},
 		data() {
 			return {
 				// z-paging-x中list-view或scroll-view的节点
-				$zpxList: null as null | Element,
+				$zpxList: null as null | UniElement,
 				// 下拉刷新状态
 				refresherStatus: Enum.Refresher.Default,
 				// 设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
@@ -273,7 +273,7 @@ by ZXLee
 				totalData: [] as any[],
 				
 				// 默认的点击返回顶部图片
-				base64BackToTop: base64BackToTop,
+				base64BackToTopImg: base64BackToTop,
 				// 点击返回顶部class
 				backToTopClass: 'zpx-back-to-top zpx-back-to-top-hide',
 				// 上次点击返回顶部的时间
@@ -316,7 +316,7 @@ by ZXLee
 			}
 		},
 		mounted() {
-			this.$zpxList = this.$refs['zpxList'] as Element;
+			this.$zpxList = this.$refs['zpxList'] as UniElement;
 			this.pageNo = this.defaultPageNo;
 			if (this.auto) {
 				this.reload();

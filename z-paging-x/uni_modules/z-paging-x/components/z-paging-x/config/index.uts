@@ -3,7 +3,7 @@
 let config: null | UTSJSONObject = null;
 
 // 获取默认配置信息
-export function gc(key: string, defaultValue: any): any {
+export function gc<T>(key: string, defaultValue: T): T {
 	// 如果全局配置不存在，则返回默认值
 	if (config == null) return defaultValue;
 	const value: null | any = config![key];

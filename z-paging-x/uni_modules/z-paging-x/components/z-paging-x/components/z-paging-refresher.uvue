@@ -2,7 +2,7 @@
 <template name="z-paging-refresher">
 	<view class="zpx-r-container">
 		<z-paging-loading v-if="isLoading"/>
-		<image v-else class="zpx-r-image" :class="{'zpx-r-arrow-down': isDefault}" :src="base64Arrow"></image>
+		<image v-else class="zpx-r-image" :class="{'zpx-r-arrow-down': isDefault}" :src="base64ArrowImg"></image>
 		<view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '25rpx' : '10rpx'}">
 			<text class="zpx-r-text">{{statusText}}</text>
 			<text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text">
@@ -59,7 +59,7 @@
 		data() {
 			return {
 				times: 0,
-				base64Arrow: base64Arrow
+				base64ArrowImg: base64Arrow
 			};
 		},
 		computed: {

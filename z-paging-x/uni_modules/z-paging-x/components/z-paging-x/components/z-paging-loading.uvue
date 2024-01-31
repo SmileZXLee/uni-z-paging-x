@@ -1,6 +1,6 @@
 <!-- [z-paging-x]loading -->
 <template name="z-paging-loading">
-	<image class="zpx-loading-img" id="z-paging-loading-img" :src="base64Flower" @transitionend="doRotate"></image>
+	<image class="zpx-loading-img" id="z-paging-loading-img" :src="base64FlowerImg" @transitionend="doRotate"></image>
 </template>
 
 <script>
@@ -9,8 +9,8 @@
 		data() {
 			return {
 				times: 0,
-				element: null as Element | null,
-				base64Flower: base64Flower
+				element: null as UniElement | null,
+				base64FlowerImg: base64Flower
 			}
 		},
 		mounted() {
@@ -38,7 +38,7 @@
 	.zpx-loading-img {
 		width: 34rpx;
 		height: 34rpx;
-		transition-duration: 2000;
+		transition-duration: 2s;
 		transition-property: transform;
 		transition-timing-function: linear;
 		transform: rotate(0deg);

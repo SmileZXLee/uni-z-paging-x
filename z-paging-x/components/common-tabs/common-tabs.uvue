@@ -40,29 +40,29 @@
 				default: [] as Array<string>
 			},
 			current: {
-				type: number,
+				type: Number,
 				default: 0
 			},
 		},
 		data() {
 			return {
 				swiperIndex: -1,
-				$tabScrollView: null as null | Element,
-				$indicatorNode: null as null | Element,
+				$tabScrollView: null as null | UniElement,
+				$indicatorNode: null as null | UniElement,
 				$animationFinishIndex: 0,
 				$swiperWidth: 0,
 				$swiperTabsRect: [] as SwiperTabsItem[]
 			}
 		},
 		watch: {
-			current(newVal) {
+			current(newVal: number) {
 				this.onTabClick(newVal);
 			}
 		},
 		mounted() {
 			this.$nextTick(() => {
-				this.$tabScrollView = this.$refs['tabScroll'] as Element
-				this.$indicatorNode = this.$refs['indicator'] as Element
+				this.$tabScrollView = this.$refs['tabScroll'] as UniElement
+				this.$indicatorNode = this.$refs['indicator'] as UniElement
 				this.$swiperWidth = uni.getWindowInfo().windowWidth
 				setTimeout(() => {
 					this.cacheTabItemsSize()
@@ -120,7 +120,7 @@
 			 */
 			cacheTabItemsSize() {
 				this.$swiperTabsRect.length = 0;
-				const tabs = this.$refs["swipertab"] as Element[]
+				const tabs = this.$refs["swipertab"] as UniElement[]
 				tabs.forEach((node) => {
 					this.$swiperTabsRect.push({
 						x: node.offsetLeft,
