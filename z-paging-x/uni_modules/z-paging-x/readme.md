@@ -6,7 +6,7 @@
 
 > z-paging uniapp x版
 
-[![version](https://img.shields.io/badge/version-0.1.5-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
+[![version](https://img.shields.io/badge/version-0.2.0-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
 [![license](https://img.shields.io/github/license/SmileZXLee/uni-z-paging-x)](https://en.wikipedia.org/wiki/MIT_License)
 
 ***
