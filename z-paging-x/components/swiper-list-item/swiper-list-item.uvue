@@ -1,14 +1,12 @@
 <template>
-	<view>
-		<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" :refresher-enabled="false" :fixed="false" v-model="dataList" @query="queryList">
-			<list-item v-for="(item, index) in dataList" :key="index">
-				<view class="list-item">
-					<text class="list-item-title">{{item.title}}</text>
-					<text class="list-item-type">{{item.detail}}</text>
-				</view>
-			</list-item>
-		</z-paging-x>
-	</view>
+	<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" :fixed="false" v-model="dataList" @query="queryList">
+		<list-item v-for="(item, index) in dataList" :key="index">
+			<view class="list-item">
+				<text class="list-item-title">{{item.title}}</text>
+				<text class="list-item-type">{{item.detail}}</text>
+			</view>
+		</list-item>
+	</z-paging-x>
 </template>
 
 <script>

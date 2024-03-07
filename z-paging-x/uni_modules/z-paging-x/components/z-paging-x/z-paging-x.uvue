@@ -341,8 +341,7 @@ by ZXLee
 					})
 					return;
 				}
-				// 清空数组会有一个空指针异常，很诡异，因此先注释掉
-				// this.totalData = [];
+				this.totalData = [];
 				this._emitQuery(this.pageNo, this.defaultPageSize);
 			},
 			// 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理
