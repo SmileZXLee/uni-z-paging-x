@@ -361,6 +361,8 @@ by ZXLee
 					// 如果新增的数据数组长度为0 或者 新增的数组长度小于默认的pageSize，则没有更多数据了
 					if (finalData.length == 0 || (finalData.length > 0 && finalData.length < this.defaultPageSize)) {
 						this.loadMoreStatus = Enum.More.NoMore;
+					} else {
+						this.loadMoreStatus = Enum.More.Default;
 					}
 				}
 				// 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
