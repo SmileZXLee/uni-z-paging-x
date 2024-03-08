@@ -125,6 +125,12 @@ setZPXConfig({
 | start-nested-scroll  | (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商 | Boolean | false     | true        |
 | nested-scroll-child  | (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的`nestedprescroll`事件，嵌套子元素需要设置`custom-nested-scroll` = true | String  | ''        | -           |
 
+#### reload相关配置
+| 参数                           | 说明                                                         | 类型    | 默认值 | 可选值 |
+| :----------------------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
+| auto-scroll-to-top-when-reload | reload时自动滚动到顶部(如果reload时list被清空导致占位消失也可能会自动返回到顶部，因此如果是这种情况还需要将`auto-clean-list-when-reload`设置为false) | Boolean | true   | false  |
+| auto-clean-list-when-reload    | reload时立即自动清空原list，若立即自动清空，则在reload之后、请求回调之前页面是空白的 | Boolean | true   | false  |
+
 #### 下拉刷新配置
 
 | 参数                       | 说明                                                         | 类型    | 默认值       | 可选值 |
