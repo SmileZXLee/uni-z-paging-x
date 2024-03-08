@@ -160,6 +160,16 @@ by ZXLee
 				type: Boolean,
 				default: gc<boolean>('fixed', true)
 			},
+			// reload时自动滚动到顶部，默认为是
+			autoScrollToTopWhenReload: {
+				type: Boolean,
+				default: gc<boolean>('autoScrollToTopWhenReload', true)
+			},
+			// reload时立即自动清空原list，默认为是，若立即自动清空，则在reload之后、请求回调之前页面是空白的
+			autoCleanListWhenReload: {
+				type: Boolean,
+				default: gc<boolean>('autoCleanListWhenReload', true)
+			},
 			// 空数据描述文字
 			emptyText: {
 				type: String,
@@ -341,7 +351,12 @@ by ZXLee
 					})
 					return;
 				}
-				this.totalData = [];
+				if (this.autoCleanListWhenReload) {
+					this.totalData = [];
+				}
+				if (this.autoScrollToTopWhenReload) {
+					this.scrollToTop();
+				}
 				this._emitQuery(this.pageNo, this.defaultPageSize);
 			},
 			// 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理
