@@ -161,14 +161,14 @@ by ZXLee
 				default: gc<boolean>('fixed', true)
 			},
 			// reload时自动滚动到顶部，默认为是
-			autoScrollToTopWhenReload: {
+			scrollToTopWhenReload: {
 				type: Boolean,
-				default: gc<boolean>('autoScrollToTopWhenReload', true)
+				default: gc<boolean>('scrollToTopWhenReload', true)
 			},
 			// reload时立即自动清空原list，默认为是，若立即自动清空，则在reload之后、请求回调之前页面是空白的
-			autoCleanListWhenReload: {
+			cleanListWhenReload: {
 				type: Boolean,
-				default: gc<boolean>('autoCleanListWhenReload', true)
+				default: gc<boolean>('cleanListWhenReload', true)
 			},
 			// 空数据描述文字
 			emptyText: {
@@ -351,10 +351,10 @@ by ZXLee
 					})
 					return;
 				}
-				if (this.autoCleanListWhenReload) {
+				if (this.cleanListWhenReload) {
 					this.totalData = [];
 				}
-				if (this.autoScrollToTopWhenReload) {
+				if (this.scrollToTopWhenReload) {
 					this.scrollToTop();
 				}
 				this._emitQuery(this.pageNo, this.defaultPageSize);
