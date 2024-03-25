@@ -3,7 +3,7 @@
         <view class="index-nav-inner" :style="navbarStyle">
             <view class="index-nav-content" >
                 <image class="index-nav-image" src="/static/title-logo-x.png" mode="aspectFit"></image>
-				<text class="index-nav-version">0.2.0</text>
+				<text class="index-nav-version">0.2.1</text>
             </view>
         </view>
     </view>
