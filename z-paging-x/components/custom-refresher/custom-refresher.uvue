@@ -34,7 +34,8 @@
 		/* #ifndef UNI-APP-X */
 		display: flex;
 		/* #endif */
-		height: 180rpx;
+		/* 这里下拉刷新view高度需要用px，否则在iOS中下拉刷新view会被展示在最底部 */
+		height: 90px;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;

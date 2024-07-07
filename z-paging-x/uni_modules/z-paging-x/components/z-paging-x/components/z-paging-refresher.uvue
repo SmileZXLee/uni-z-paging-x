@@ -87,7 +87,8 @@
 
 <style scoped>
 	.zpx-r-container {
-		height: 80rpx;
+		/* 这里下拉刷新view高度需要用px，否则在iOS中下拉刷新view会被展示在最底部 */
+		height: 40px;
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;

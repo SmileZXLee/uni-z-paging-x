@@ -1,3 +1,5 @@
+## 0.2.2（2024-07-08）
+增加对iOS的支持
 ## 0.2.1（2024-03-10）
 1.`新增` `scroll-to-top-when-reload`和`clean-list-when-reload`，支持控制reload时是否自动滚动到顶部&reload时是否立即自动清空原list。  
 2.`修复` 在HBuilderX4.0+ 中loading动画失效的问题。  
