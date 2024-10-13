@@ -1,6 +1,6 @@
 <template>
 	<z-paging-x v-if="firstLoaded || isCurrentPage" ref="pagingX" v-model="dataList" 
-	:list-view-id="id" :refresher-enabled="false" :fixed="false" :custom-nested-scroll="true" :clean-list-when-reload="false"
+	:list-view-id="id" :refresher-enabled="false" :custom-nested-scroll="true" :clean-list-when-reload="false"
 	@query="queryList">
 		<list-item v-for="(item, index) in dataList" :key="index">
 			<view class="list-item">

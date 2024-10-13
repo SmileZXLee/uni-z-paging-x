@@ -109,7 +109,6 @@ setZPXConfig({
 | v-model           | 绑定最终的列表渲染变量(页面data中声明的值)，当列表数据改变时，所绑定的变量会跟着改变 | Array   | -      | -      |
 | default-page-no   | 自定义初始的pageNo(从第几页开始)                             | Number  | 1      | -      |
 | default-page-size | 自定义pageSize(每页显示多少条)                               | Number  | 10     | -      |
-| fixed             | z-paging-x是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认铺满屏幕，页面中的view请放在z-paging-x标签内，需要固定在顶部的view使用`slot="top"`包住，需要固定在底部的view使用`slot="bottom"`包住。 | Boolean | true   | false  |
 | auto              | mounted后自动调用reload方法(mounted后自动调用接口)           | Boolean | true   | false  |
 | paging-style      | 自定义组件的样式                                             | Object  | {}     | -      |
 

@@ -14,10 +14,10 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{ 'zpx-content':true, 'zpx-content-fixed':fixed }" :style="[pagingStyle]">
+	<view :class="{ 'zpx-content':true }" >
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<component ref="zpxList" :is="listIs" class="zpx-list-view zpx-flex1"
+		<list-view ref="zpxList" :is="listIs" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
 		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll"
@@ -38,7 +38,7 @@ by ZXLee
 			<component :is="listItemIs" class="zpx-flex1">
 				<z-paging-x-empty v-if="showEmpty" :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
 			</component>
-		</component>
+		</list-view>
 		<!-- 底部固定的slot -->
 		<slot name="bottom" />
 		<!-- 点击返回顶部view -->
@@ -155,11 +155,6 @@ by ZXLee
 				type: Boolean,
 				default: gc<boolean>('auto', true)
 			},
-			// 是否使用fixed布局，若使用fixed布局，则z-paging-x的父view无需固定高度，z-paging-x高度默认为100%，默认为是
-			fixed: {
-				type: Boolean,
-				default: gc<boolean>('fixed', true)
-			},
 			// reload时自动滚动到顶部，默认为是
 			scrollToTopWhenReload: {
 				type: Boolean,
@@ -253,6 +248,8 @@ by ZXLee
 		},
 		data() {
 			return {
+				// 系统信息
+				systemInfo: null,
 				// z-paging-x中list-view或scroll-view的节点
 				$zpxList: null as null | UniElement,
 				// 下拉刷新状态
@@ -339,6 +336,7 @@ by ZXLee
 						this.refresherNodeHeight = refresherNode.height ?? 0;
 					}
 				})
+				this.systemInfo = uni.getSystemInfoSync();
 			})
 		},
 		methods: {
