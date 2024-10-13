@@ -1,16 +1,17 @@
 <!-- 此组件由uniapp官方项目hello-uniapp-x改造而来。地址：/hello-uniapp-x/pages/template/swiper-list-->
 
 <template>
-	<view class="swiper-list">
-		<scroll-view ref="tabScroll" class="swiper-tabs" :scroll-x="true" :show-scrollbar="false">
-			<view class="flex-row">
-				<text ref="swipertab" class="swiper-tabs-item"
-					:class="swiperIndex==index ? 'swiper-tabs-item-active' : ''" v-for="(item, index) in list"
-					:key="index" @click="onTabClick(index)">
-					{{item}}
-				</text>
-			</view>
-			<view ref="indicator" class="swiper-tabs-indicator"></view>
+	<view ref="cTabs" class="c-tabs">
+		<scroll-view ref="tabScroll" class="swiper-tabs" direction="horizontal" :show-scrollbar="false">
+		  <view class="flex-row">
+		    <text ref="swipertab" space="nbsp" class="swiper-tabs-item" :class="swiperIndex==index ? 'swiper-tabs-item-active' : ''"
+		      v-for="(item, index) in list" :key="index" @click="onTabClick(index)">
+		      {{ item }}
+		    </text>
+		  </view>
+		  <view ref="indicator" class="swiper-tabs-indicator">
+			  <view class="swiper-tabs-indicator-line" />
+		  </view>
 		</scroll-view>
 	</view>
 </template>
@@ -46,12 +47,12 @@
 		},
 		data() {
 			return {
-				swiperIndex: -1,
-				$tabScrollView: null as null | UniElement,
-				$indicatorNode: null as null | UniElement,
-				$animationFinishIndex: 0,
-				$swiperWidth: 0,
-				$swiperTabsRect: [] as SwiperTabsItem[]
+				swiperIndex: 0,
+				tabScrollView: null as null | UniElement,
+				indicatorNode: null as null | UniElement,
+				animationFinishIndex: 0,
+				swiperWidth: 0,
+				swiperTabsRect: [] as SwiperTabsItem[]
 			}
 		},
 		watch: {
@@ -61,13 +62,11 @@
 		},
 		mounted() {
 			this.$nextTick(() => {
-				this.$tabScrollView = this.$refs['tabScroll'] as UniElement
-				this.$indicatorNode = this.$refs['indicator'] as UniElement
-				this.$swiperWidth = uni.getWindowInfo().windowWidth
-				setTimeout(() => {
-					this.cacheTabItemsSize()
-					this.setSwiperIndex(0, true)
-				}, 300);
+				this.tabScrollView = this.$refs['tabScroll'] as UniElement
+				this.indicatorNode = this.$refs['indicator'] as UniElement
+				this.swiperWidth = (this.$refs["cTabs"] as UniElement).getBoundingClientRect().width
+				this.cacheTabItemsSize()
+				this.updateTabIndicator(this.swiperIndex, this.swiperIndex, 1)
 			})
 		},
 		methods: {
@@ -77,56 +76,59 @@
 			 * @param {number} index - 当前索引，该值应介于 0 和 最大数量之间.
 			 */
 			onTabClick(index : number) {
-				this.setSwiperIndex(index, true)
+			  this.setSwiperIndex(index, true)
+			  this.$emit('change', index);
 			},
-			swiperTransition(e : SwiperTransitionEvent) {
-				// 微信 skyline 每项完成触发 Animationfinish，偏移值重置
-				// 微信 webview 全部完成触发 Animationfinish，偏移值累加
-				// 在滑动到下一个项的过程中，再次反向滑动，偏移值递减
-				// uni-app-x 和 微信 webview 行为一致
-
-				const offset_x = e.detail.dx
-
-				// 计算当前索引并重置差异
-				const current_offset_x = offset_x % this.$swiperWidth
-				const current_offset_i = offset_x / this.$swiperWidth
-				const current_index = this.$animationFinishIndex + current_offset_i.toInt()
-
-				// 计算目标索引及边界检查
-				let move_to_index = current_index
-				if (current_offset_x > 0 && move_to_index < this.list.length - 1) {
-					move_to_index += 1
-				} else if (current_offset_x < 0 && move_to_index > 0) {
-					move_to_index -= 1
-				}
-
-				// 计算偏移百分比
-				const percentage = Math.abs(current_offset_x) / this.$swiperWidth
-
-				// 通知更新指示线
-				this.updateTabIndicator(current_index, move_to_index, percentage)
+			onSwiperTransition(e : SwiperTransitionEvent) {
+			  // 微信 skyline 每项完成触发 Animationfinish，偏移值重置
+			  // 微信 webview 全部完成触发 Animationfinish，偏移值累加
+			  // 在滑动到下一个项的过程中，再次反向滑动，偏移值递减
+			  // uni-app-x 和 微信 webview 行为一致
+			
+			  const offset_x = e.detail.dx
+			
+			  // 计算当前索引并重置差异
+			  const current_offset_x = offset_x % this.swiperWidth
+			  const current_offset_i = offset_x / this.swiperWidth
+			  const current_index = this.animationFinishIndex + parseInt(current_offset_i + '')
+			
+			  // 计算目标索引及边界检查
+			  let move_to_index = current_index
+			  if (current_offset_x > 0 && move_to_index < this.list.length - 1) {
+			    move_to_index += 1
+			  } else if (current_offset_x < 0 && move_to_index > 0) {
+			    move_to_index -= 1
+			  }
+			
+			  // 计算偏移百分比
+			  const percentage = Math.abs(current_offset_x) / this.swiperWidth
+			
+			  // 通知更新指示线
+			  if (current_index != move_to_index) {
+			    this.updateTabIndicator(current_index, move_to_index, percentage)
+			  }
 			},
 			/**
 			 * Swiper滑动动画结束事件.
 			 */
-			swiperAnimationfinish(e : SwiperAnimationFinishEvent) {
-				this.setSwiperIndex(e.detail.current, true)
-
-				// 记录上次的索引位置
-				this.$animationFinishIndex = e.detail.current
+			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
+			  this.setSwiperIndex(e.detail.current, true)
+			
+			  // 记录上次的索引位置
+			  this.animationFinishIndex = e.detail.current
 			},
 			/**
 			 * 缓存所有页签的左边距和宽度，用于计算指示线在移动过程中的线性变化.
 			 */
 			cacheTabItemsSize() {
-				this.$swiperTabsRect.length = 0;
-				const tabs = this.$refs["swipertab"] as UniElement[]
-				tabs.forEach((node) => {
-					this.$swiperTabsRect.push({
-						x: node.offsetLeft,
-						w: node.offsetWidth
-					} as SwiperTabsItem)
-				})
+			  this.swiperTabsRect.length = 0;
+			  const tabs = this.$refs["swipertab"] as UniElement[]
+			  tabs.forEach((node) => {
+			    this.swiperTabsRect.push({
+			      x: node.offsetLeft,
+			      w: node.offsetWidth
+			    } as SwiperTabsItem)
+			  })
 			},
 			/**
 			 * 设置当前 swiper 选中的索引值.
@@ -135,19 +137,15 @@
 			 * @param {boolean} updateIndicator - 是否更新指示线.
 			 */
 			setSwiperIndex(index : number, updateIndicator : boolean) {
-				if (this.swiperIndex === index) {
-					return
-				}
-
-				if (this.swiperIndex >= 0) {
-					this.$emit('change', index);
-				}
-
-				this.swiperIndex = index
-
-				if (updateIndicator) {
-					this.updateTabIndicator(index, index, 1)
-				}
+			  if (this.swiperIndex === index) {
+			    return
+			  }
+			
+			  this.swiperIndex = index
+			
+			  if (updateIndicator) {
+			    this.updateTabIndicator(index, index, 1)
+			  }
 			},
 			/**
 			 * 更新页签指示线的位置和宽度.
@@ -157,22 +155,28 @@
 			 * @param {number} percentage - 偏移百分比，应介于 0 和 1 之间，用于计算在移动过程中的线性值.
 			 */
 			updateTabIndicator(current_index : number, move_to_index : number, percentage : number) {
-				const current_size = this.$swiperTabsRect[current_index]
-				const move_to_size = this.$swiperTabsRect[move_to_index]
-
-				// 计算指示线 位置 和 宽度 在移动过程中的线性值
-				const indicator_line_x = lerpNumber(current_size.x, move_to_size.x, percentage)
-				const indicator_line_w = lerpNumber(current_size.w, move_to_size.w, percentage)
-
-				// 通过 transform 更新指示线，避免重排版
-				const x = indicator_line_x + indicator_line_w / 2
-				this.$indicatorNode!.style.setProperty('transform', `translateX(${x}px) scaleX(${indicator_line_w - 120})`)
-
-				// 滚动到水平中心位置
-				const scroll_x = x - this.$swiperWidth / 2
-				if (this.$tabScrollView !== null) {
-					this.$tabScrollView!.scrollLeft = scroll_x
-				}
+			  const current_size = this.swiperTabsRect[current_index]
+			  const move_to_size = this.swiperTabsRect[move_to_index]
+			
+			  // 计算指示线 位置 和 宽度 在移动过程中的线性值
+			  const indicator_line_x = lerpNumber(current_size.x, move_to_size.x, percentage)
+			  const indicator_line_w = lerpNumber(current_size.w, move_to_size.w, percentage)
+			
+			  // 通过 transform 更新指示线，避免重排版
+			  // #ifdef APP
+			  const x = indicator_line_x + indicator_line_w / 2
+			  this.indicatorNode?.style?.setProperty('transform', `translateX(${x}px) scaleX(${indicator_line_w})`)
+			  // #endif
+			  // #ifdef WEB
+			  // TODO chrome windows系统 transform scaleX渲染bug
+			  const x = indicator_line_x
+			  this.indicatorNode?.style?.setProperty('width', `${indicator_line_w}px`)
+			  this.indicatorNode?.style?.setProperty('transform', `translateX(${x}px)`)
+			  // #endif
+			
+			  // 滚动到水平中心位置
+			  const scroll_x = x - this.swiperWidth / 2
+			  this.tabScrollView!.scrollLeft = scroll_x
 			}
 		}
 	}
@@ -201,6 +205,11 @@
 	.swiper-tabs-indicator {
 		width: 1px;
 		height: 2px;
+		align-items: center;
+	}
+	.swiper-tabs-indicator-line {
 		background-color: #007AFF;
+		height: 100%;
+		width: 30%;
 	}
 </style>
