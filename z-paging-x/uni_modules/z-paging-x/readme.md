@@ -4,6 +4,8 @@
     <img alt="logo" src="https://z-paging.zxlee.cn/img/title-logo-x.png" height="100" style="margin-bottom: 50px;">
 </p>
 
+## <p>请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</p>
+
 > z-paging uniapp x版
 
 [![version](https://img.shields.io/badge/version-0.2.2-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
@@ -29,9 +31,9 @@
 //若项目之前未使用npm管理依赖（项目根目录下无package.json文件），先在项目根目录执行命令初始化npm工程
 npm init -y
 
-//安装
+// 安装
 npm install z-paging-x --save
-//更新
+// 更新
 npm update z-paging-x
 ```
 
@@ -116,7 +118,7 @@ setZPXConfig({
 
 | 参数                 | 说明                                                         | 类型    | 默认值    | 可选值      |
 | :------------------- | :----------------------------------------------------------- | :------ | :-------- | :---------- |
-| list-is              | list的类型：`list-view`或`scroll-view`                       | String  | list-view | scroll-view |
+| list-is              | list的类型：`list-view`或`scroll-view`(暂时废弃，使用内置的`list-view`)                       | String  | list-view | scroll-view |
 | list-id              | list的id                                                     | String  | ''        | -           |
 | show-scrollbar       | 控制是否出现滚动条                                           | Boolean | true      | false       |
 | rebound              | 控制是否回弹效果                                             | Boolean | true      | false       |

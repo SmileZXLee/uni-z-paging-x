@@ -14,7 +14,7 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{ 'zpx-content':true }" >
+	<view :class="{ 'zpx-content':true }" :style="[pagingStyle]">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
 		<list-view ref="zpxList" :is="listIs" class="zpx-list-view zpx-flex1"
