@@ -373,7 +373,7 @@ by ZXLee
 					this.totalData = [];
 				}
 				if (this.scrollToTopWhenReload) {
-					this.scrollToTop();
+					this.scrollToTop(false);
 				}
 				this._emitQuery(this.pageNo, this.defaultPageSize);
 			},
@@ -448,16 +448,17 @@ by ZXLee
 				this.isLoading = false;
 			},
 			// 滚动到顶部
-			scrollToTop() {
-				this.scrollToY(0);
+			scrollToTop(animate: boolean) {
+				this.scrollToY(0, animate);
 				this._checkShouldShowBackToTop(0);
 			},
 			// 滚动到底部
-			scrollToBottom() {
-				this.scrollToY(99999999);
+			scrollToBottom(animate: boolean) {
+				this.scrollToY(99999999, animate);
 			},
 			// 滚动到指定位置，y为与顶部的距离，单位为px
-			scrollToY(y: number) {
+			scrollToY(y: number, animate: boolean) {
+				this.privateScrollWithAnimation = animate ? 1 : 0;
 				this.scrollTop = this.oldScrollTop;
 				this.$nextTick(() => {
 					this.scrollTop = y;
@@ -553,7 +554,7 @@ by ZXLee
 			},
 			//处理滚动到顶部
 			_handleToTop() {
-				this.scrollToTop();
+				this.scrollToTop(true);
 			},
 		}
 	}
