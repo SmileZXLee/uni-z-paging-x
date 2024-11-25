@@ -4,7 +4,7 @@
     <img alt="logo" src="https://z-paging.zxlee.cn/img/title-logo-x.png" height="100" style="margin-bottom: 50px;">
 </p>
 
-## <p>请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</p>
+<h2 style="color: red">请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</h2>
 
 > z-paging uniapp x版
 
@@ -13,7 +13,7 @@
 
 ***
 
-### 反馈qq群(点击加群)：[371624008](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=avPmibADf2TNi4LxkIwjCE5vbfXpa-r1&authKey=dQ%2FVDAR87ONxI4b32Py%2BvmXbhnopjHN7%2FJPtdsqJdsCPFZB6zDQ17L06Uh0kITUZ&noverify=0&group_code=371624008)
+### 反馈qq群(点击加群)：[114310688](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=bnN7Q8UClrMxaI0pD3-Pyq6d-CzRrjqz&authKey=IWwyKQR77IJcNfUeV5UHmUG%2Bc0tiFeWZrY8rFeg7xDNFH%2BIpNlCUCXZxdj9c3quY&noverify=0&group_code=114310688)
 
 ***
 
