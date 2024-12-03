@@ -4,6 +4,7 @@
     <img alt="logo" src="https://z-paging.zxlee.cn/img/title-logo-x.png" height="100" style="margin-bottom: 50px;">
 </p>
 
+
 <h2 style="color: red">请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</h2>
 
 > z-paging uniapp x版
@@ -89,8 +90,11 @@ npm update z-paging-x
 ```
 
 ### props
+
 #### 支持全局配置（非必须）
+
 在`main.uts`中  
+
 ```uts
 import { setZPXConfig } from '@/uni_modules/z-paging-x/components/z-paging-x/config/index.uts'
 
@@ -127,8 +131,9 @@ setZPXConfig({
 | nested-scroll-child  | (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的`nestedprescroll`事件，嵌套子元素需要设置`custom-nested-scroll` = true | String  | ''        | -           |
 
 #### reload相关配置
-| 参数                           | 说明                                                         | 类型    | 默认值 | 可选值 |
-| :----------------------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
+
+| 参数                      | 说明                                                         | 类型    | 默认值 | 可选值 |
+| :------------------------ | :----------------------------------------------------------- | :------ | :----- | :----- |
 | scroll-to-top-when-reload | reload时自动滚动到顶部(如果reload时list被清空导致占位消失也可能会自动返回到顶部，因此如果是这种情况还需要将`clean-list-when-reload`设置为false) | Boolean | true   | false  |
 | clean-list-when-reload    | reload时立即自动清空原list，若立即自动清空，则在reload之后、请求回调之前页面是空白的 | Boolean | true   | false  |
 
@@ -176,12 +181,19 @@ setZPXConfig({
 
 ### events
 
-| 事件名          | 说明                                                         | 回调参数                                                     |
-| --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| @query          | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
-| @refresh        | 下拉刷新被触发                                               | -                                                            |
-| @scroll         | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#scrollevent)) => void |
-| @backToTopClick | 点击了返回到顶部                                             | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
+| 事件名                 | 说明                                                         | 回调参数                                                     |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| @query                 | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
+| @refresherpulling      | 下拉刷新控件被下拉事件                                       | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
+| @refresherrefresh      | 下拉刷新被触发事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
+| @refresherrestore      | 下拉刷新被复位事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
+| @refresherabort        | 下拉刷新被中止事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
+| @scroll                | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrollevent)) => void |
+| @scrolltolower         | 滚动到底部/右边，会触发 scrolltolower 事件                   | `参数1`:(event: [ScrollToLowerEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltolowerevent)) => void |
+| @scrolltoupper         | 滚动到顶部/左边，会触发 scrolltoupper 事件                   | `参数1`:(event: [ScrollToUpperEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltoupperevent)) => void |
+| @backToTopClick        | 点击了返回到顶部                                             | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
+| @refresherStatusChange | 下拉刷新状态改变                                             | `参数1`:下拉刷新状态：0.默认状态 1.松手立即刷新 2.刷新中 3.刷新结束 |
+| @loadMoreStatusChange  | 底部加载更多状态改变                                         | `参数1`:底部加载更多状态：0.默认状态 1.加载中 2.没有更多数据 3.加载失败 |
 
 ### methods
 
@@ -192,9 +204,9 @@ setZPXConfig({
 | completeByTotal  | 【通过total判断是否有更多数据】请求成功调用此方法(将此方法替换`complete`方法即可，此方法为`complete`方法的功能扩展，遵循`complete`原有规则) | `参数1(必填)`:请求结果数组；`参数2(必填)`:列表总长度；       |
 | completeByNoMore | 【自行判断是否有更多数据】请求结束(成功或者失败)调用此方法，将请求的结果传递给z-paging-x处理(将此方法替换`complete`方法即可，此方法为`complete`方法的功能扩展，遵循`complete`原有规则) | `参数1(必填)`:请求结果数组；`参数2(必填)`:是否没有更多数据，若为true则代表没有更多数据了； |
 | completeByError  | 请求结束(失败)调用此方法，将自动展示失败页面                 | -                                                            |
-| scrollToTop      | 滚动到顶部                                                   | -                                                            |
-| scrollToBottom   | 滚动到底部                                                   | -                                                            |
-| scrollToY        | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置                                   |
+| scrollToTop      | 滚动到顶部                                                   | `参数1(必填)`:是否有动画效果                                 |
+| scrollToBottom   | 滚动到底部                                                   | `参数1(必填)`:是否有动画效果                                 |
+| scrollToY        | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置；`参数2(必填)`:是否有动画效果     |
 
 
 ### slots

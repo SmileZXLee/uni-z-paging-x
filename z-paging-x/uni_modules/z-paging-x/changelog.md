@@ -1,3 +1,7 @@
+## 0.3.1（2024-12-03）
+1.`新增` events：`@refresherpulling`、`@refresherrefresh`、`@refresherrestore`、`@refresherabort`、`@scrolltolower`、`@scrolltoupper`、`@refresherStatusChange`、`@loadMoreStatusChange`。  
+2.`新增` slot="empty"。  
+3.`新增` `scrollToTop`、`scrollToBottom`、`scrollToY`添加是否展示滚动动画参数。  
 ## 0.3.0（2024-10-13）
 1.`新增` 添加编译到web的支持。  
 2.`优化` 布局方式，使布局更灵活。  

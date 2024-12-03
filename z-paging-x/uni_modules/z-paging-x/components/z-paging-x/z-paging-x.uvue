@@ -5,7 +5,7 @@
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
           |_|          |___/         |___/ X
 		  
-v0.3.0 (2024-07-08)
+v0.3.1 (2024-12-03)
 by ZXLee
 -->
 <!-- 文档地址：https://z-paging.zxlee.cn -->
@@ -21,7 +21,7 @@ by ZXLee
 		<list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
 		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
-		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
 		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
 			<slot />
 			<component :is="listItemIs">
@@ -36,14 +36,15 @@ by ZXLee
 					<z-paging-refresher ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
 				</view>
 			</component>
-			<component :is="listItemIs" class="zpx-flex1">
-				<z-paging-x-empty v-if="showEmpty" :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+			<component v-if="showEmpty" :is="listItemIs" class="zpx-flex1">
+				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
 			</component>
 		</list-view>
 		<scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
 		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
-		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @scrolltolower="_onScrolltolower" @scroll="_onScroll"
+		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
 		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
 			<slot />
 			<component :is="listItemIs">
@@ -341,7 +342,13 @@ by ZXLee
 		watch: {
 			totalData(newVal: any[]) {
 				this.$emit('update:modelValue', newVal);
-			}
+			},
+			refresherStatus(newVal: number) {
+				this.$emit('refresherStatusChange', newVal);
+			},
+			loadMoreStatus(newVal: number) {
+				this.$emit('loadMoreStatusChange', newVal);
+			},
 		},
 		mounted() {
 			this.$zpxList = this.$refs['zpxList'] as UniElement;
@@ -476,16 +483,30 @@ by ZXLee
 			},
 			// 下拉刷新控件被下拉事件
 			_onRefresherpulling(e: RefresherEvent) {
+				this.$emit('refresherpulling', e);
 				this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
 			},
 			// 下拉刷新被触发事件
-			_onRefresherrefresh(_: RefresherEvent) {
-				this.$emit('refresh');
+			_onRefresherrefresh(e: RefresherEvent) {
+				this.$emit('refresherrefresh', e);
 				this._handleRefresh();
 			},
+			// 下拉刷新被复位事件
+			_onRefresherrestore(e: RefresherEvent) {
+				this.$emit('refresherrestore', e);
+			},
+			// 下拉刷新被中止事件
+			_onRefresherabort(e: RefresherEvent) {
+				this.$emit('refresherabort', e);
+			},
 			// 滚动到底部事件
-			_onScrolltolower() {
+			_onScrolltolower(e: ScrollToLowerEvent) {
 				this._handleLoadMore();
+				this.$emit('scrolltolower', e);
+			},
+			// 滚动到顶部事件
+			_onScrolltoupper(e: ScrollToUpperEvent) {
+				this.$emit('scrolltoupper', e);
 			},
 			// 列表正在滚动事件
 			_onScroll(e: ScrollEvent) {

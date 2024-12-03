@@ -2,7 +2,7 @@
   "id": "z-paging-x",
   "name": "z-paging-x",
   "displayName": "【z-paging-x下拉刷新、上拉加载】z-paging uniappx版已上线！",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "分页全自动处理，支持自定义下拉刷新、上拉加载更多、自动管理空数据图、点击返回顶部、下拉显示最后更新时间等，持续完善中",
   "keywords": [
     "uniapp-x",
@@ -50,6 +50,9 @@
           "vue3": "y"
         },
         "App": {
+            "app-android": "u",
+            "app-harmony": "u",
+            "app-ios": "u"
         },
         "H5-mobile": {
           "Safari": "u",
