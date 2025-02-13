@@ -64,9 +64,12 @@
 			this.$nextTick(() => {
 				this.tabScrollView = this.$refs['tabScroll'] as UniElement
 				this.indicatorNode = this.$refs['indicator'] as UniElement
-				this.swiperWidth = (this.$refs["cTabs"] as UniElement).getBoundingClientRect().width
-				this.cacheTabItemsSize()
-				this.updateTabIndicator(this.swiperIndex, this.swiperIndex, 1)
+				(this.$refs["cTabs"] as UniElement).getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+					this.swiperWidth = rect.width
+					this.cacheTabItemsSize()
+					this.updateTabIndicator(this.swiperIndex, this.swiperIndex, 1)
+				})
+				
 			})
 		},
 		methods: {

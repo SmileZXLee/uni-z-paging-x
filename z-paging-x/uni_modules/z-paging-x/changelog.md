@@ -1,3 +1,7 @@
+## 0.3.2（2025-02-13）
+1.`新增` 添加编译到微信小程序的支持。  
+2.`优化` 在web平台刷新列表是【点击加载更多】闪动然后消失的问题。  
+3.`优化` 其他细节调整。
 ## 0.3.1（2024-12-03）
 1.`新增` events：`@refresherpulling`、`@refresherrefresh`、`@refresherrestore`、`@refresherabort`、`@scrolltolower`、`@scrolltoupper`、`@refresherStatusChange`、`@loadMoreStatusChange`。  
 2.`新增` slot="empty"。  

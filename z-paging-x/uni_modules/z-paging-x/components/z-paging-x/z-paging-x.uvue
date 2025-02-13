@@ -5,7 +5,7 @@
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
           |_|          |___/         |___/ X
 		  
-v0.3.1 (2024-12-03)
+v0.3.2 (2025-02-13)
 by ZXLee
 -->
 <!-- 文档地址：https://z-paging.zxlee.cn -->
@@ -14,32 +14,43 @@ by ZXLee
 <!-- 反馈QQ群：371624008 -->
 
 <template name="z-paging-x">
-	<view :class="{ 'zpx-content':true }" :style="[pagingStyle]">
+	<view ref="zPagingX" :class="{ 'zpx-content':true }" :style="[pagingStyle]">
 		<!-- 顶部固定的slot -->
 		<slot name="top" />
-		<!-- 因使用component :is的时候设置的list-view在web端无法正常渲染，因此目前只能先写死list-view和scroll-view节点，通过v-if切换 -->
+		<!-- 因使用component :is的时候设置的list-view在web端无法正常渲染，且不支持微信小程序，因此目前只能先写死list-view和scroll-view节点，通过v-if切换 -->
 		<list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
 		:rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
 		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
 			<slot />
-			<component :is="listItemIs">
+			<list-item>
 				<template v-if="showLoadMore">
 					<slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
 					<z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
 				</template>
-			</component>
+			</list-item>
+			<!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
+			<!-- #ifdef WEB -->
 			<component :is="listItemIs" slot="refresher">
-				<view class="zpx-list-refresher">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			<list-item slot="refresher">
+			<!-- #endif -->
+				<view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
 					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-					<z-paging-refresher ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+					<z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
 				</view>
+			<!-- #ifdef WEB -->
 			</component>
-			<component v-if="showEmpty" :is="listItemIs" class="zpx-flex1">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			</list-item>
+			<!-- #endif -->
+			<list-item v-if="showEmpty" class="zpx-flex1">
 				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
 				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-			</component>
+			</list-item>
 		</list-view>
 		<scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
@@ -47,21 +58,33 @@ by ZXLee
 		@refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
 		@startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
 			<slot />
-			<component :is="listItemIs">
+			<view>
 				<template v-if="showLoadMore">
 					<slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
 					<z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
 				</template>
-			</component>
+			</view>
+			<!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
+			<!-- #ifdef WEB -->
 			<component :is="listItemIs" slot="refresher">
-				<view class="zpx-list-refresher">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			<view slot="refresher">
+			<!-- #endif -->
+				<view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
 					<slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-					<z-paging-refresher ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" v-else :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+					<z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
 				</view>
+			<!-- #ifdef WEB -->
 			</component>
-			<component :is="listItemIs" class="zpx-flex1">
-				<z-paging-x-empty v-if="showEmpty" :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-			</component>
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			</view>
+			<!-- #endif -->
+			<view v-if="showEmpty" class="zpx-flex1">
+				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+			</view>
 		</scroll-view>
 		<!-- 底部固定的slot -->
 		<slot name="bottom" />
@@ -288,6 +311,10 @@ by ZXLee
 				isLoadFailed: false,
 				// 是否是开发者自定义的加载更多，-1代表交由z-paging自行判断；1代表没有更多了；0代表还有更多数据
 				customNoMore: -1,
+				// 是否强制隐藏当前加载更多
+				forceHideLoadMore: false,
+				// 内容宽度
+				contentWidth: 0,
 				
 				// 是否是加载中状态
 				isLoading: true,
@@ -325,7 +352,7 @@ by ZXLee
 				return this.totalData.length == 0 && !this.isLoading;
 			},
 			showLoadMore(): boolean {
-				return this.loadMoreEnabled && (!this.isLoading || this.totalData.length > 0) && !this.showEmpty;
+				return this.loadMoreEnabled && !this.forceHideLoadMore && (!this.isLoading || this.totalData.length > 0) && !this.showEmpty;
 			},
 			finalScrollWithAnimation(): boolean {
 				if (this.privateScrollWithAnimation != -1) {
@@ -358,18 +385,27 @@ by ZXLee
 			}
 			// 更新缓存的refresher高度
 			this.$nextTick(() => {
-				uni.createSelectorQuery().select('.zpx-list-refresher').boundingClientRect().exec((ret) => {
-					if (ret.length > 0) {
-						const refresherNode = ret[0] as NodeInfo;
-						this.refresherNodeHeight = refresherNode.height ?? 0;
-					}
-				})
+				const refresherEle = this.$refs["zpxListRefresher"] as UniElement | null;
+				if (refresherEle !== null) {
+					refresherEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+						this.refresherNodeHeight = rect.height;
+					})
+				}
+				
+				const zPagingXEle = this.$refs["zPagingX"] as UniElement | null;
+				if (zPagingXEle !== null) {
+					zPagingXEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+						this.contentWidth = rect.width;
+					})
+				}
 			})
+			
 		},
 		methods: {
 			// 刷新列表数据
 			reload() {
 				this.pageNo = this.defaultPageNo;
+				this.forceHideLoadMore = true;
 				if (this.showRefresherWhenReload) {
 					this.$nextTick(() => {
 						this.refresherTriggered = true;
@@ -416,6 +452,11 @@ by ZXLee
 				} else {
 					this.totalData = this.totalData.concat(currentData);
 				}
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.forceHideLoadMore = false;
+					}, 100)
+				})
 			},
 			//【通过total判断是否有更多数据】请求成功调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为total(列表总数)
 			completeByTotal(data: null | any[], total: number) {

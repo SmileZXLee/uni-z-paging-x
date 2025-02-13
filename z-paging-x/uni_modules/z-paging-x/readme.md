@@ -217,4 +217,5 @@ setZPXConfig({
 | bottom    | 可以将需要固定在底部的`(不需要跟着滚动的)`元素放入`slot="bottom"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="bottom"`。需要固定在底部的view请勿设置`position: fixed;`。 |
 | refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ refresherStatus(0-默认状态 1.松手立即刷新 2.刷新中 3.刷新成功) }" |
 | loadMore  | 自定义底部加载更多view，设置后则不使用z-paging-x内置的下拉刷新view。<br/>slot-scope="{ loadMoreStatus(0-默认状态 1.加载中 2.没有更多数据 3.加载失败) }" |
+| empty     | 自定义空数据占位view。<br/>slot-scope="{ isLoadFailed(true: 加载失败，false: 加载成功) }" |
 | backToTop | 自定义点击返回顶部view                                       |
