@@ -11,7 +11,7 @@
 	export default {
 		props: {
 			status: {
-				type: Number,
+				type: String,
 				default: 0,
 			},
 		},
@@ -22,8 +22,13 @@
 		},
 		computed: {
 			statusText(): string {
-				const statusTextArr = ['哎呀，用点力继续下拉！', '拉疼我啦，松手刷新~~', '正在努力刷新中...', '刷新成功啦~'];
-				return statusTextArr[this.status];
+				const statusTextMap = {
+					'default': '哎呀，用点力继续下拉！',
+					'release-to-refresh': '拉疼我啦，松手刷新~~',
+					'loading': '正在努力刷新中...',
+					'complete': '刷新成功啦~'
+				};
+				return statusTextMap[this.status] as string;
 			}
 		}
 	}

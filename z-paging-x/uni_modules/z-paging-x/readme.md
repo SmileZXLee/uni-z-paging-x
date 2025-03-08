@@ -5,6 +5,7 @@
 </p>
 
 
+
 <h2 style="color: red">请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</h2>
 
 > z-paging uniapp x版
@@ -183,7 +184,7 @@ setZPXConfig({
 
 | 事件名                 | 说明                                                         | 回调参数                                                     |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| @query                 | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改) |
+| @query                 | 下拉刷新或滚动到底部时会自动触发此方法。`z-paging-x`加载时也会触发(若要禁止，请设置`:auto="false"`)。pageNo和pageSize会自动计算好，直接传给服务器即可。 | `参数1`:pageNo(当前第几页)；<br/>`参数2`:pageSize(每页多少条)(pageSize必须与传给服务器的一致，如果需要修改pageSize，请通过`:default-page-size="15"`修改)<br />`参数3`:from(@query的触发来源：user-pull-down:用户主动下拉刷新；reload:通过reload触发；load-more:通过滚动到底部加载更多或点击底部加载更多触发) |
 | @refresherpulling      | 下拉刷新控件被下拉事件                                       | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherrefresh      | 下拉刷新被触发事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherrestore      | 下拉刷新被复位事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
@@ -192,8 +193,8 @@ setZPXConfig({
 | @scrolltolower         | 滚动到底部/右边，会触发 scrolltolower 事件                   | `参数1`:(event: [ScrollToLowerEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltolowerevent)) => void |
 | @scrolltoupper         | 滚动到顶部/左边，会触发 scrolltoupper 事件                   | `参数1`:(event: [ScrollToUpperEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltoupperevent)) => void |
 | @backToTopClick        | 点击了返回到顶部                                             | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
-| @refresherStatusChange | 下拉刷新状态改变                                             | `参数1`:下拉刷新状态：0.默认状态 1.松手立即刷新 2.刷新中 3.刷新结束 |
-| @loadMoreStatusChange  | 底部加载更多状态改变                                         | `参数1`:底部加载更多状态：0.默认状态 1.加载中 2.没有更多数据 3.加载失败 |
+| @refresherStatusChange | 下拉刷新状态改变                                             | `参数1`:下拉刷新状态：default:默认状态；<br/>release-to-refresh:松手立即刷新；<br/>loading:刷新中；<br/>complete:刷新结束 |
+| @loadMoreStatusChange  | 底部加载更多状态改变                                         | `参数1`:底部加载更多状态：default:默认状态；<br/>loading:加载中；<br/>no-more:没有更多数据；<br/>fail:加载失败 |
 
 ### methods
 
@@ -215,7 +216,7 @@ setZPXConfig({
 | :-------- | ------------------------------------------------------------ |
 | top       | 可以将自定义导航栏、tab-view等需要固定的`(不需要跟着滚动的)`元素放入`slot="top"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="top"`。需要固定在顶部的view请勿设置`position: fixed;` |
 | bottom    | 可以将需要固定在底部的`(不需要跟着滚动的)`元素放入`slot="bottom"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="bottom"`。需要固定在底部的view请勿设置`position: fixed;`。 |
-| refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ refresherStatus(0-默认状态 1.松手立即刷新 2.刷新中 3.刷新成功) }" |
-| loadMore  | 自定义底部加载更多view，设置后则不使用z-paging-x内置的下拉刷新view。<br/>slot-scope="{ loadMoreStatus(0-默认状态 1.加载中 2.没有更多数据 3.加载失败) }" |
+| refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ rrefresherStatus(default:默认状态；release-to-refresh:松手立即刷新；loading:刷新中；complete:刷新结束 }" |
+| loadMore  | 自定义底部加载更多view，设置后则不使用z-paging-x内置的下拉刷新view。<br/>slot-scope="{ loadMoreStatus(default:默认状态；loading:加载中；no-more:没有更多数据；fail:加载失败) }" |
 | empty     | 自定义空数据占位view。<br/>slot-scope="{ isLoadFailed(true: 加载失败，false: 加载成功) }" |
 | backToTop | 自定义点击返回顶部view                                       |

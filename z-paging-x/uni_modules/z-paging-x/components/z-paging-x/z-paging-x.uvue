@@ -307,6 +307,8 @@ by ZXLee
 				refresherTimeTextTimestamp: 0,
 				// 底部加载更多状态
 				loadMoreStatus: Enum.More.Default,
+				// 触发query来源
+				queryFrom: '',
 				// 是否是加载失败
 				isLoadFailed: false,
 				// 是否是开发者自定义的加载更多，-1代表交由z-paging自行判断；1代表没有更多了；0代表还有更多数据
@@ -370,10 +372,10 @@ by ZXLee
 			totalData(newVal: any[]) {
 				this.$emit('update:modelValue', newVal);
 			},
-			refresherStatus(newVal: number) {
+			refresherStatus(newVal: string) {
 				this.$emit('refresherStatusChange', newVal);
 			},
-			loadMoreStatus(newVal: number) {
+			loadMoreStatus(newVal: string) {
 				this.$emit('loadMoreStatusChange', newVal);
 			},
 		},
@@ -418,6 +420,7 @@ by ZXLee
 				if (this.scrollToTopWhenReload) {
 					this.scrollToTop(false);
 				}
+				this.queryFrom = Enum.QueryFrom.Reload;
 				this._emitQuery(this.pageNo, this.defaultPageSize);
 			},
 			// 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理
@@ -560,6 +563,7 @@ by ZXLee
 				this.refresherStatus = Enum.Refresher.Loading;
 				this.refresherTriggered = true;
 				this.pageNo = this.defaultPageNo;
+				this.queryFrom = Enum.QueryFrom.UserPullDown;
 				this._emitQuery(this.pageNo, this.defaultPageSize);
 			},
 			// 处理加载更多数据
@@ -568,12 +572,13 @@ by ZXLee
 				// 将底部加载更多状态设置为加载中
 				this.loadMoreStatus = Enum.More.Loading;
 				this.pageNo ++;
+				this.queryFrom = Enum.QueryFrom.LoadMore;
 				this._emitQuery(this.pageNo, this.defaultPageSize);
 			},
 			// emit query事件
 			_emitQuery(pageNo: number, pageSize: number){
 				this.isLoading = true;
-				this.$emit('query', pageNo, pageSize);
+				this.$emit('query', pageNo, pageSize, this.queryFrom);
 			},
 			
 			//判断是否要显示返回顶部按钮

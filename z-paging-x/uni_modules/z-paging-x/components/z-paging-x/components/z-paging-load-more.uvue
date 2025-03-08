@@ -16,7 +16,7 @@
 		props: {
 			// 下拉刷新状态
 			status: {
-				type: Number,
+				type: String,
 				default: Enum.More.Default,
 			},
 			// 滑动到底部"默认"文字，默认：点击加载更多
@@ -46,15 +46,31 @@
 			};
 		},
 		computed: {
+			isDefault(): boolean {
+				return this.status === Enum.More.Default;
+			},
 			isLoading(): boolean {
 				return this.status === Enum.More.Loading;
 			},
 			isNoMore(): boolean {
 				return this.status === Enum.More.NoMore;
 			},
+			isFail(): boolean {
+				return this.status === Enum.More.Fail;
+			},
 			statusText(): string {
-				const statusTextArr: string[] = [this.defaultText, this.loadingText, this.noMoreText, this.failText];
-				return statusTextArr[this.status];
+				// 底部加载更多状态 default:默认状态 loading:加载中 no-more:没有更多数据 fail:加载失败
+				if (this.isDefault) {
+					return this.defaultText;
+				} else if (this.isLoading) {
+					return this.loadingText;
+				} else if (this.isNoMore) {
+					return this.noMoreText;
+				} else if (this.isFail) {
+					return this.failText;
+				} else {
+					return '';
+				}
 			}
 		},
 		methods: {
