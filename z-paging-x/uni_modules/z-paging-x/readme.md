@@ -6,11 +6,12 @@
 
 
 
+
 <h2 style="color: red">请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</h2>
 
 > z-paging uniapp x版
 
-[![version](https://img.shields.io/badge/version-0.3.0-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
+[![version](https://img.shields.io/badge/version-0.3.5-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
 [![license](https://img.shields.io/github/license/SmileZXLee/uni-z-paging-x)](https://en.wikipedia.org/wiki/MIT_License)
 
 ***
@@ -220,3 +221,5 @@ setZPXConfig({
 | loadMore  | 自定义底部加载更多view，设置后则不使用z-paging-x内置的下拉刷新view。<br/>slot-scope="{ loadMoreStatus(default:默认状态；loading:加载中；no-more:没有更多数据；fail:加载失败) }" |
 | empty     | 自定义空数据占位view。<br/>slot-scope="{ isLoadFailed(true: 加载失败，false: 加载成功) }" |
 | backToTop | 自定义点击返回顶部view                                       |
+| loading   | 自定义页面reload时的加载view                                 |
+

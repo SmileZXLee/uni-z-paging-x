@@ -51,6 +51,9 @@ by ZXLee
 				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
 				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
 			</list-item>
+			<list-item v-if="showLoading" class="zpx-flex1">
+				<slot name="loading" />
+			</list-item>
 		</list-view>
 		<scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
@@ -84,6 +87,9 @@ by ZXLee
 			<view v-if="showEmpty" class="zpx-flex1">
 				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
 				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+			</view>
+			<view v-if="showLoading" class="zpx-flex1">
+				<slot name="loading" />
 			</view>
 		</scroll-view>
 		<!-- 底部固定的slot -->
@@ -352,6 +358,9 @@ by ZXLee
 			},
 			showEmpty(): boolean {
 				return this.totalData.length == 0 && !this.isLoading;
+			},
+			showLoading(): boolean {
+				return this.$slots['loading'] != null && this.isLoading && this.totalData.length == 0;
 			},
 			showLoadMore(): boolean {
 				return this.loadMoreEnabled && !this.forceHideLoadMore && (!this.isLoading || this.totalData.length > 0) && !this.showEmpty;
