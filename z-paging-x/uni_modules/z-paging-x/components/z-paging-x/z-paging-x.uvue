@@ -3,12 +3,12 @@
  |_  /____| '_ \ / _` |/ _` | | '_ \ / _` |
   / /_____| |_) | (_| | (_| | | | | | (_| |
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
-          |_|          |___/         |___/ X
+          |_|          |___/         |___/ -X
 		  
 v0.3.2 (2025-02-13)
 by ZXLee
 -->
-<!-- 文档地址：https://z-paging.zxlee.cn -->
+<!-- 文档地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
 <!-- github地址：https://github.com/SmileZXLee/uni-z-paging-x -->
 <!-- dcloud地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
 <!-- 反馈QQ群：371624008 -->
@@ -47,13 +47,24 @@ by ZXLee
 			<!-- #ifndef WEB -->
 			</list-item>
 			<!-- #endif -->
-			<list-item v-if="showEmpty" class="zpx-flex1">
-				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
-				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+			
+			<!-- #ifdef WEB -->
+			<component :is="listItemIs" class="zpx-flex1">
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
+			<list-item class="zpx-flex1">
+			<!-- #endif -->
+				<template v-if="showEmpty">
+					<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+					<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+				</template>
+				<slot v-if="showLoading" name="loading" />
+			<!-- #ifdef WEB -->
+			</component>
+			<!-- #endif -->
+			<!-- #ifndef WEB -->
 			</list-item>
-			<list-item v-if="showLoading" class="zpx-flex1">
-				<slot name="loading" />
-			</list-item>
+			<!-- #endif -->
 		</list-view>
 		<scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
 		:id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground" 
@@ -84,12 +95,12 @@ by ZXLee
 			<!-- #ifndef WEB -->
 			</view>
 			<!-- #endif -->
-			<view v-if="showEmpty" class="zpx-flex1">
-				<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
-				<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-			</view>
-			<view v-if="showLoading" class="zpx-flex1">
-				<slot name="loading" />
+			<view class="zpx-flex1">
+				<template v-if="showEmpty">
+					<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+					<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+				</template>
+				<slot v-if="showLoading" name="loading" />
 			</view>
 		</scroll-view>
 		<!-- 底部固定的slot -->
