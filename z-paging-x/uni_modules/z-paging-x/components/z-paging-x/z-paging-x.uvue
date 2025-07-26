@@ -396,12 +396,15 @@ by ZXLee
 			}
 			// 更新缓存的refresher高度
 			this.$nextTick(() => {
-				const refresherEle = this.$refs["zpxListRefresher"] as UniElement | null;
-				if (refresherEle !== null) {
-					refresherEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
-						this.refresherNodeHeight = rect.height;
-					})
+				if (this.refresherEnabled) {
+					const refresherEle = this.$refs["zpxListRefresher"] as UniElement | null;
+					if (refresherEle !== null) {
+						refresherEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+							this.refresherNodeHeight = rect.height;
+						})
+					}
 				}
+				
 				
 				const zPagingXEle = this.$refs["zPagingX"] as UniElement | null;
 				if (zPagingXEle !== null) {
