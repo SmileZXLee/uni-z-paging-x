@@ -30,5 +30,5 @@ npm install z-paging-x --save
 npm update z-paging-x
 ```
 
-### 文档
-[z-paging-x文档](https://github.com/SmileZXLee/uni-z-paging-x/blob/main/z-paging-x/uni_modules/z-paging-x/readme.md)
+### 使用文档
+[使用文档](https://github.com/SmileZXLee/uni-z-paging-x/blob/main/z-paging-x/uni_modules/z-paging-x/readme.md)
