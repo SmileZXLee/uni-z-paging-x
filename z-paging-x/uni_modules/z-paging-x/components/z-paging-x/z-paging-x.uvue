@@ -49,10 +49,10 @@ by ZXLee
 			<!-- #endif -->
 			
 			<!-- #ifdef WEB -->
-			<component :is="listItemIs" class="zpx-flex1">
+			<component :is="listItemIs" :class="showEmpty ? 'zpx-flex1' : ''">
 			<!-- #endif -->
 			<!-- #ifndef WEB -->
-			<list-item class="zpx-flex1">
+			<list-item :class="showEmpty ? 'zpx-flex1' : ''">
 			<!-- #endif -->
 				<template v-if="showEmpty">
 					<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
@@ -95,7 +95,7 @@ by ZXLee
 			<!-- #ifndef WEB -->
 			</view>
 			<!-- #endif -->
-			<view class="zpx-flex1">
+			<view :class="showEmpty ? 'zpx-flex1' : ''">
 				<template v-if="showEmpty">
 					<slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
 					<z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
@@ -550,8 +550,10 @@ by ZXLee
 			},
 			// 下拉刷新控件被下拉事件
 			_onRefresherpulling(e: RefresherEvent) {
-				this.$emit('refresherpulling', e);
-				this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
+				this.$emit('refresherpulling', e.detail.dy);
+				if (!this.isLoading) {
+					this.refresherStatus = e.detail.dy < this.finalRefresherThreshold ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
+				}
 			},
 			// 下拉刷新被触发事件
 			_onRefresherrefresh(e: RefresherEvent) {
@@ -561,6 +563,7 @@ by ZXLee
 			// 下拉刷新被复位事件
 			_onRefresherrestore(e: RefresherEvent) {
 				this.$emit('refresherrestore', e);
+				this.refresherStatus = Enum.Refresher.Default;
 			},
 			// 下拉刷新被中止事件
 			_onRefresherabort(e: RefresherEvent) {
