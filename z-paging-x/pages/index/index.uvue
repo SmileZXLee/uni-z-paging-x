@@ -1,5 +1,5 @@
 <template>
-  <z-paging-x :refresher-enabled="false">
+  <z-paging-x ref="pagingX" layout-only @onRefresh="onRefresh">
     <template #top>
       <index-nav />
     </template>
@@ -29,6 +29,11 @@
       })
     },
     methods: {
+      onRefresh() {
+        setTimeout(() => {
+          (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).endRefresh();
+        }, 200)
+      },
       itemClick(item: Item) {
         uni.navigateTo({
           url: `../${item.file}/${item.file}`
