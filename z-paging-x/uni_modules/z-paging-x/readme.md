@@ -7,7 +7,7 @@
 
 
 
-<h2 style="color: red">请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用z-paging！</h2>
+## 请注意，此插件仅支持uniappx！！！若您为uniapp项目请使用[z-paging](https://ext.dcloud.net.cn/plugin?id=3935)！
 
 > z-paging uniapp x版
 
