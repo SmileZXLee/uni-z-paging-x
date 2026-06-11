@@ -620,6 +620,24 @@ by ZXLee
     isLoadFailed.value = true;
     endRefresh();
   }
+  // 刷新列表数据，pageNo和pageSize不会重置，列表数据会重新从服务端获取
+  // 调用此方法时会自动触发queryList，pageNo=1，pageSize=总条数（前N页的总量）
+  // 刷新完成后继续滚动到底部，pageNo会继续累加
+  const refresh = () => {
+    // 没有数据时降级为reload
+    if (totalData.value.length == 0) {
+      reload();
+      return;
+    }
+    // 计算目标总条数（从第1页开始刷新，pageSize扩大到覆盖当前所有数据）
+    const targetTotal = pageNo.value * props.defaultPageSize;
+    isLoading.value = true;
+    // 重置pageNo为1，pageSize扩大为覆盖所有数据
+    pageNo.value = props.defaultPageNo;
+    // 触发query事件，from为refresh
+    queryFrom.value = Enum.QueryFrom.Refresh;
+    _emitQuery(props.defaultPageNo, targetTotal);
+  }
   // (仅listIs = scroll-view有效)子元素开始滚动时触发, return ture表示与子元素开启滚动协商
   const _onStartNestedScroll = (_: StartNestedScrollEvent): boolean => {
     return props.startNestedScroll;
@@ -738,6 +756,7 @@ by ZXLee
 
   defineExpose({
     reload,
+    refresh,
     complete,
     completeByTotal,
     completeByNoMore,
