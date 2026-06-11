@@ -39,7 +39,7 @@ by ZXLee
       <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
           <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
         </view>
       <!-- #ifdef WEB -->
       </component>
@@ -87,7 +87,7 @@ by ZXLee
       <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
           <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
         </view>
       <!-- #ifdef WEB -->
       </component>
@@ -163,6 +163,21 @@ by ZXLee
     refresherRefreshingText: {
       type: String,
       default: gc<string>('refresher-refreshing-text', '正在刷新...')
+    },
+    // 自定义下拉刷新刷新结束状态下的文字
+    refresherCompleteText: {
+      type: String,
+      default: gc<string>('refresher-complete-text', '刷新完成')
+    },
+    // 自定义下拉刷新结束以后延迟回弹的时间，单位为毫秒，默认为0
+    refresherCompleteDelay: {
+      type: Number,
+      default: gc<number>('refresher-complete-delay', 0)
+    },
+    // 自定义下拉刷新结束回弹动画时间，单位为毫秒，默认为300
+    refresherCompleteDuration: {
+      type: Number,
+      default: gc<number>('refresher-complete-duration', 300)
     },
     // 下拉刷新区域背景颜色
     refresherBackground: {
@@ -344,6 +359,10 @@ by ZXLee
   const refresherNodeHeight = ref(0)
   // 下拉刷新最后更新时间更新的时间戳
   const refresherTimeTextTimestamp = ref(0)
+  // 下拉刷新complete状态的延迟定时器（使用ref避免闭包捕获导致的smart cast问题）
+  const refresherCompleteDelayTimer = ref<number | null>(null)
+  // 下拉刷新回弹动画的定时器
+  const refresherEndAnimateTimer = ref<number | null>(null)
   // 底部加载更多状态
   const loadMoreStatus = ref(Enum.More.Default)
   // 触发query来源
@@ -462,8 +481,27 @@ by ZXLee
     isLoading.value = true;
     emit('query', pageNoValue, pageSizeValue, queryFrom.value);
   }
+  // 清理下拉刷新complete延迟定时器
+  const _cleanRefresherCompleteDelayTimer = () => {
+    if (refresherCompleteDelayTimer.value !== null) {
+      clearTimeout(refresherCompleteDelayTimer.value!);
+      refresherCompleteDelayTimer.value = null;
+    }
+  }
+
+  // 清理下拉刷新回弹动画定时器
+  const _cleanRefresherEndAnimateTimer = () => {
+    if (refresherEndAnimateTimer.value !== null) {
+      clearTimeout(refresherEndAnimateTimer.value!);
+      refresherEndAnimateTimer.value = null;
+    }
+  }
+
   // 刷新列表数据
   const reload = () => {
+    // 清理可能正在进行的complete延迟定时器
+    _cleanRefresherCompleteDelayTimer()
+    _cleanRefresherEndAnimateTimer()
     pageNo.value = props.defaultPageNo;
     forceHideLoadMore.value = true;
     if (props.showRefresherWhenReload) {
@@ -483,6 +521,9 @@ by ZXLee
   }
   // 直接结束下拉刷新状态
   const endRefresh = () => {
+    // 清理定时器
+    _cleanRefresherCompleteDelayTimer()
+    _cleanRefresherEndAnimateTimer()
     // 设置下拉刷新状态为结束
     refresherTriggered.value = false;
     refresherStatus.value = Enum.Refresher.Default;
@@ -492,7 +533,30 @@ by ZXLee
   const complete = (data: null | any[]) => {
     const finalData: any[] = data === null ? [] : data;
     isLoadFailed.value = false;
-    endRefresh();
+
+    // 计算是否需要显示complete状态（refresherCompleteDelay > 0 且是用户主动下拉刷新或showRefresherWhenReload时为true）
+    const needCompleteDelay = props.refresherCompleteDelay > 0 && (queryFrom.value === Enum.QueryFrom.UserPullDown || props.showRefresherWhenReload);
+
+    if (needCompleteDelay) {
+      // 先设置为complete状态，显示完成文字和成功图标
+      refresherStatus.value = Enum.Refresher.Complete;
+      // 不立即结束刷新，等待延迟时间后执行回弹动画
+      _cleanRefresherCompleteDelayTimer();
+      _cleanRefresherEndAnimateTimer();
+      refresherCompleteDelayTimer.value = setTimeout(() => {
+        // 触发系统收回动画（refresher-triggered=false），此时仍保持Complete状态显示成功图标和文字
+        refresherTriggered.value = false;
+        // 等收回动画结束后，再将状态切回default，箭头变回原来的样子
+        refresherEndAnimateTimer.value = setTimeout(() => {
+          refresherStatus.value = Enum.Refresher.Default;
+          isLoading.value = false;
+        }, props.refresherCompleteDuration);
+      }, props.refresherCompleteDelay);
+    } else {
+      // 无需延迟，直接结束
+      endRefresh();
+    }
+
     const currentData: any[] = [...finalData];
 
     // customNoMore：-1代表交由z-paging-x自行判断；1代表没有更多了；0代表还有更多数据
@@ -575,6 +639,9 @@ by ZXLee
   }
   // 处理用户下拉刷新
   const _handleRefresh = () => {
+    // 清理可能正在进行的complete延迟定时器
+    _cleanRefresherCompleteDelayTimer()
+    _cleanRefresherEndAnimateTimer()
     refresherStatus.value = Enum.Refresher.Loading;
     refresherTriggered.value = true;
     pageNo.value = props.defaultPageNo;
@@ -589,7 +656,10 @@ by ZXLee
   // 下拉刷新被复位事件
   const _onRefresherrestore = (e: RefresherEvent) => {
     emit('refresherrestore', e);
-    refresherStatus.value = Enum.Refresher.Default;
+    // 如果当前正处于complete延迟状态，不要立即切回default，等动画完成后再切
+    if (refresherStatus.value !== Enum.Refresher.Complete) {
+      refresherStatus.value = Enum.Refresher.Default;
+    }
   }
   // 下拉刷新被中止事件
   const _onRefresherabort = (e: RefresherEvent) => {

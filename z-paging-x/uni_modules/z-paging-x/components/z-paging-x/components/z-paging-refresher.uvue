@@ -1,8 +1,8 @@
-<!-- [z-paging-x]上拉加载更多view -->
+<!-- [z-paging-x]下拉刷新view -->
 <template name="z-paging-refresher">
   <view class="zpx-r-container" :style="{height: showUpdateTime ? '60px' : '40px'}">
     <z-paging-loading v-if="isLoading"/>
-    <image v-else class="zpx-r-image" :class="{'zpx-r-arrow-down': isDefault}" :src="base64ArrowImg"></image>
+    <image v-else class="zpx-r-image" :class="getLeftImageClass" :src="getLeftImageSrc" />
     <view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '25rpx' : '10rpx'}">
       <text class="zpx-r-text">{{statusText}}</text>
       <text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text">
@@ -13,7 +13,7 @@
 </template>
 <script setup lang="uts">
   import { ref, computed } from 'vue'
-  import { base64Arrow } from '../static/index.uts'
+  import { base64Arrow, base64Flower, base64Success } from '../static/index.uts'
   import zPagingLoading from '../components/z-paging-loading.uvue'
   import Enum from '../enums/index.uts'
   import { getRefesrherFormatTimeByKey } from '../utils/index.uts'
@@ -43,6 +43,11 @@
       type: String,
       default: '正在刷新...'
     },
+    // 自定义下拉刷新刷新结束状态下的文字
+    completeText: {
+      type: String,
+      default: '刷新完成'
+    },
     // 是否显示最后更新时间，默认为否
     showUpdateTime: {
       type: Boolean,
@@ -61,6 +66,8 @@
   })
 
   const base64ArrowImg = ref(base64Arrow)
+  const base64FlowerImg = ref(base64Flower)
+  const base64SuccessImg = ref(base64Success)
 
   const isDefault = computed((): boolean => {
     return props.status === Enum.Refresher.Default;
@@ -71,14 +78,45 @@
   const isLoading = computed((): boolean => {
     return props.status === Enum.Refresher.Loading;
   })
+  const isComplete = computed((): boolean => {
+    return props.status === Enum.Refresher.Complete;
+  })
+
+  // 获取左侧图片样式class
+  const getLeftImageClass = computed((): string => {
+    if (isDefault.value) {
+      return 'zpx-r-arrow-down';
+    } else if (isReleaseToRefresh.value) {
+      return 'zpx-r-arrow-top';
+    }
+    // complete和loading状态不需要额外class
+    return '';
+  })
+
+  // 获取左侧图片src
+  const getLeftImageSrc = computed((): string => {
+    if (isDefault.value) {
+      return base64ArrowImg.value;
+    } else if (isReleaseToRefresh.value) {
+      return base64ArrowImg.value;
+    } else if (isLoading.value) {
+      return base64FlowerImg.value;
+    } else if (isComplete.value) {
+      return base64SuccessImg.value;
+    }
+    return base64ArrowImg.value;
+  })
+
+  // 状态文字
   const statusText = computed((): string => {
-    // 下拉刷新状态 default:默认状态 release-to-refresh:松手立即刷新 loading:刷新中 complete:刷新结束
     if (isDefault.value) {
       return props.defaultText;
     } else if (isReleaseToRefresh.value) {
       return props.pullingText;
     } else if (isLoading.value) {
       return props.refreshingText;
+    } else if (isComplete.value) {
+      return props.completeText;
     } else {
       return '';
     }
