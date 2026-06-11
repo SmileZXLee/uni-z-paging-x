@@ -14,7 +14,8 @@
   "repository": "https://github.com/SmileZXLee/uni-z-paging-x",
   "engines": {
     "HBuilderX": "^3.99",
-    "uni-app-x": "^4.07"
+    "uni-app-x": "^4.07",
+    "uni-app": ""
   },
   "dcloudext": {
     "type": "component-uts",
