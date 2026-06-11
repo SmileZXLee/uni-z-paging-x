@@ -3,7 +3,7 @@
         <view class="index-nav-inner" :style="navbarStyle">
             <view class="index-nav-content" >
                 <image class="index-nav-image" src="/static/title-logo-x.png" mode="aspectFit"></image>
-				<text class="index-nav-version">0.2.2</text>
+        <text class="index-nav-version">0.2.2</text>
             </view>
         </view>
     </view>
@@ -67,13 +67,13 @@
         align-items: center;
     }
     .index-nav-image {
-		width: 540rpx;
-	}
-	.index-nav-version {
-		background-color:  #007AFF;
-		font-size: 24rpx;
-		color: white;
-		padding: 6rpx 12rpx;
-		border-radius: 6rpx;
-	}
+    width: 540rpx;
+  }
+  .index-nav-version {
+    background-color:  #007AFF;
+    font-size: 24rpx;
+    color: white;
+    padding: 6rpx 12rpx;
+    border-radius: 6rpx;
+  }
 </style>

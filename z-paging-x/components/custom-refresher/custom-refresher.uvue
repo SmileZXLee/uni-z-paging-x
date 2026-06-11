@@ -1,61 +1,61 @@
 <!-- z-paging-x自定义的下拉刷新view -->
 <template>
-	<view class="refresher-container">
-		<!-- 这里的图片请换成自己项目的图片 -->
-		<image class="refresher-image" mode="aspectFit" src="@/static/refresher_loading.gif"></image>
-		<text class="refresher-text">{{statusText}}</text>
-	</view>
+  <view class="refresher-container">
+    <!-- 这里的图片请换成自己项目的图片 -->
+    <image class="refresher-image" mode="aspectFit" src="@/static/refresher_loading.gif"></image>
+    <text class="refresher-text">{{statusText}}</text>
+  </view>
 </template>
 
 <script>
-	export default {
-		props: {
-			status: {
-				type: String,
-				default: 0,
-			},
-		},
-		data() {
-			return {
+  export default {
+    props: {
+      status: {
+        type: String,
+        default: 0,
+      },
+    },
+    data() {
+      return {
 
-			};
-		},
-		computed: {
-			statusText(): string {
-				const statusTextMap = {
-					'default': '哎呀，用点力继续下拉！',
-					'release-to-refresh': '拉疼我啦，松手刷新~~',
-					'loading': '正在努力刷新中...',
-					'complete': '刷新成功啦~'
-				};
-				return statusTextMap[this.status] as string;
-			}
-		}
-	}
+      };
+    },
+    computed: {
+      statusText() : string {
+        const statusTextMap = {
+          'default': '哎呀，用点力继续下拉！',
+          'release-to-refresh': '拉疼我啦，松手刷新~~',
+          'loading': '正在努力刷新中...',
+          'complete': '刷新成功啦~'
+        };
+        return statusTextMap[this.status] as string;
+      }
+    }
+  }
 </script>
 
 <style scoped>
-	.refresher-container {
-		/* #ifndef UNI-APP-X */
-		display: flex;
-		/* #endif */
-		/* 这里下拉刷新view高度需要用px，否则在iOS中下拉刷新view会被展示在最底部 */
-		height: 90px;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		background-color: white;
-	}
+  .refresher-container {
+    /* #ifndef UNI-APP-X */
+    display: flex;
+    /* #endif */
+    /* 这里下拉刷新view高度需要用px，否则在iOS中下拉刷新view会被展示在最底部 */
+    height: 90px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+  }
 
-	.refresher-image {
-		margin-top: 10rpx;
-		height: 45px;
-		width: 45px;
-	}
+  .refresher-image {
+    margin-top: 10rpx;
+    height: 45px;
+    width: 45px;
+  }
 
-	.refresher-text {
-		margin-top: 10rpx;
-		font-size: 24rpx;
-		color: #666666;
-	}
+  .refresher-text {
+    margin-top: 10rpx;
+    font-size: 24rpx;
+    color: #666666;
+  }
 </style>

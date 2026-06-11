@@ -1,74 +1,74 @@
 <template>
-	<z-paging-x :refresher-enabled="false">
-		<template #top>
-			<index-nav />
-		</template>
-		<list-item class="demo-item" v-for="(item,index) in list" :key="index" @click="itemClick(item)">
-			<view class="demo-item-main">
-				<text class="demo-item-title">{{item.title}}</text>
-				<text class="demo-item-subtitle" v-if="item.subTitle.length">{{item.subTitle}}</text>
-				<text class="demo-item-file-text">{{item.file + '.uvue'}}</text>
-			</view>
-			<image class="demo-item-more-img" src="../../static/more_icon.png"></image>
-		</list-item>
-	</z-paging-x>
+  <z-paging-x :refresher-enabled="false">
+    <template #top>
+      <index-nav />
+    </template>
+    <list-item class="demo-item" v-for="(item,index) in list" :key="index" @click="itemClick(item)">
+      <view class="demo-item-main">
+        <text class="demo-item-title">{{item.title}}</text>
+        <text class="demo-item-subtitle" v-if="item.subTitle.length">{{item.subTitle}}</text>
+        <text class="demo-item-file-text">{{item.file + '.uvue'}}</text>
+      </view>
+      <image class="demo-item-more-img" src="../../static/more_icon.png"></image>
+    </list-item>
+  </z-paging-x>
 </template>
 
 <script lang="uts">
-	import indexList, { Item } from './list.uts'
-	export default {
-		data() {
-			return {
-				list: [] as Item[]
-			}
-		},
-		onLoad() {
-			this.list = indexList.list;
-			uni.setNavigationBarTitle({
-				title: 'z-paging-X v0.1.5'
-			})
-		},
-		methods: {
-			itemClick(item: Item) {
-				uni.navigateTo({
-					url: `../${item.file}/${item.file}`
-				})
-			}
-		}
-	}
+  import indexList, { Item } from './list.uts'
+  export default {
+    data() {
+      return {
+        list: [] as Item[]
+      }
+    },
+    onLoad() {
+      this.list = indexList.list;
+      uni.setNavigationBarTitle({
+        title: 'z-paging-X v0.1.5'
+      })
+    },
+    methods: {
+      itemClick(item: Item) {
+        uni.navigateTo({
+          url: `../${item.file}/${item.file}`
+        })
+      }
+    }
+  }
 </script>
 
 <style>
-	.demo-item {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		border-bottom: #eeeeee solid 1px;
-		padding: 20rpx 30rpx;
-	}
-	
-	.demo-item-more-img {
-		width: 24rpx;
-		height: 24rpx;
-	}
-	
-	.demo-item-title {
-		font-size: 32rpx;
-		font-weight: bold;
-	}
-	
-	.demo-item-subtitle {
-		font-size: 26rpx;
-		color: #666666;
-	}
-	
-	.demo-item-file-text {
-		margin-top: 20rpx;
-		background-color: #007AFF;
-		color: white;
-		font-size: 28rpx;
-		padding: 5rpx 10rpx;
-		border-radius: 8rpx;
-	}
+  .demo-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: #eeeeee solid 1px;
+    padding: 20rpx 30rpx;
+  }
+  
+  .demo-item-more-img {
+    width: 24rpx;
+    height: 24rpx;
+  }
+  
+  .demo-item-title {
+    font-size: 32rpx;
+    font-weight: bold;
+  }
+  
+  .demo-item-subtitle {
+    font-size: 26rpx;
+    color: #666666;
+  }
+  
+  .demo-item-file-text {
+    margin-top: 20rpx;
+    background-color: #007AFF;
+    color: white;
+    font-size: 28rpx;
+    padding: 5rpx 10rpx;
+    border-radius: 8rpx;
+  }
 </style>

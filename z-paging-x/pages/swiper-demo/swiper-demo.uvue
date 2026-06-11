@@ -1,53 +1,53 @@
 <!-- 滑动切换选项卡演示 -->
 
 <template>
-	<view class="swiper-demo">
-		<common-tabs ref="tabs" :list="tabList" @change="tabChange"/>
-		<swiper class="swiper" :current="current" @transition="onSwiperTransition" @animationfinish="onSwiperAnimationfinish">
-			<swiper-item class="swiper-item" v-for="(_, index) in tabList" :key="index">
-				<!-- 这里的swiper-list-item为demo中为演示用定义的组件，列表及分页代码在swiper-list-item组件内 -->
-				<!-- 请注意，swiper-list-item非z-paging-x内置组件，在自己的项目中必须自己创建，若未创建则会报组件不存在的错误 -->
-				<swiper-list-item :tabIndex="index" :currentIndex="current"></swiper-list-item>
-			</swiper-item>
-		</swiper>
-	</view>
+  <view class="swiper-demo">
+    <common-tabs ref="tabs" :list="tabList" @change="tabChange"/>
+    <swiper class="swiper" :current="current" @transition="onSwiperTransition" @animationfinish="onSwiperAnimationfinish">
+      <swiper-item class="swiper-item" v-for="(_, index) in tabList" :key="index">
+        <!-- 这里的swiper-list-item为demo中为演示用定义的组件，列表及分页代码在swiper-list-item组件内 -->
+        <!-- 请注意，swiper-list-item非z-paging-x内置组件，在自己的项目中必须自己创建，若未创建则会报组件不存在的错误 -->
+        <swiper-list-item :tabIndex="index" :currentIndex="current"></swiper-list-item>
+      </swiper-item>
+    </swiper>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				tabList: ['测试1','测试2','测试3','测试4'],
-				current: 0
-			};
-		},
-		methods: {
-			tabChange(index: number) {
-				this.current = index;
-			},
-			// swiper滑动中
-			onSwiperTransition(e : SwiperTransitionEvent) {
-			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
-			},
-			// swiper滑动动画结束
-			onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
-			  (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
-			  this.current = e.detail.current;
-			},
-		}
-	}
+  export default {
+    data() {
+      return {
+        tabList: ['测试1','测试2','测试3','测试4'],
+        current: 0
+      };
+    },
+    methods: {
+      tabChange(index: number) {
+        this.current = index;
+      },
+      // swiper滑动中
+      onSwiperTransition(e : SwiperTransitionEvent) {
+        (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
+      },
+      // swiper滑动动画结束
+      onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
+        (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
+        this.current = e.detail.current;
+      },
+    }
+  }
 </script>
 
 <style>
-	.swiper-demo {
-		flex: 1;
-	}
-	
-	.swiper {
-		flex: 1;
-	}
-	
-	.swiper-item {
-		height: 100%;
-	}
+  .swiper-demo {
+    flex: 1;
+  }
+  
+  .swiper {
+    flex: 1;
+  }
+  
+  .swiper-item {
+    height: 100%;
+  }
 </style>
