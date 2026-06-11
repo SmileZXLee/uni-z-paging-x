@@ -10,71 +10,72 @@
 	</view>
 </template>
 
-<script>
+<script setup>
+	import { computed } from 'vue'
 	import { base64Empty, base64Error } from '../z-paging-x/static/index.uts'
-	export default {
-		name: "z-paging-x-empty",
-		data() {
-			return {
-				
-			};
+
+	defineOptions({
+		name: 'z-paging-x-empty'
+	})
+
+	const props = defineProps({
+		// 空数据描述文字
+		emptyText: {
+			type: String,
+			default: '没有数据哦~'
 		},
-		props: {
-			// 空数据描述文字
-			emptyText: {
-				type: String,
-				default: '没有数据哦~'
-			},
-			// 空数据图片
-			emptyImg: {
-				type: String,
-				default: ''
-			},
-			// 是否显示空数据图重新加载按钮
-			showEmptyReload: {
-				type: Boolean,
-				default: false
-			},
-			// 空数据点击重新加载文字
-			emptyReloadText: {
-				type: String,
-				default: '重新加载'
-			},
-			// 是否是加载失败
-			isLoadFailed: {
-				type: Boolean,
-				default: false
-			},
-			// 空数据图样式
-			emptyStyle: {
-				type: Object
-			},
-			// 空数据图img样式
-			emptyImgStyle: {
-				type: Object
-			},
-			// 空数据图描述文字样式
-			emptyTitleStyle: {
-				type: Object
-			},
-			// 空数据图重新加载按钮样式
-			emptyReloadStyle: {
-				type: Object
-			}
+		// 空数据图片
+		emptyImg: {
+			type: String,
+			default: ''
 		},
-		computed: {
-			localEmptyImg(): string {
-                return this.isLoadFailed ? base64Error : base64Empty;
-			}
+		// 是否显示空数据图重新加载按钮
+		showEmptyReload: {
+			type: Boolean,
+			default: false
 		},
-		methods: {
-			reloadClick() {
-				this.$emit('reload');
-			},
-			emptyClick() {
-				this.$emit('viewClick');
-			}
+		// 空数据点击重新加载文字
+		emptyReloadText: {
+			type: String,
+			default: '重新加载'
+		},
+		// 是否是加载失败
+		isLoadFailed: {
+			type: Boolean,
+			default: false
+		},
+		// 空数据图样式
+		emptyStyle: {
+			type: Object
+		},
+		// 空数据图img样式
+		emptyImgStyle: {
+			type: Object
+		},
+		// 空数据图描述文字样式
+		emptyTitleStyle: {
+			type: Object
+		},
+		// 空数据图重新加载按钮样式
+		emptyReloadStyle: {
+			type: Object
 		}
+	})
+
+	const emit = defineEmits<{
+		(e: 'reload'): void
+		(e: 'viewClick'): void
+	}>()
+
+	const localEmptyImg = computed((): string => {
+		return props.isLoadFailed ? base64Error : base64Empty;
+	})
+
+	const reloadClick = () => {
+		emit('reload');
+	}
+	const emptyClick = () => {
+		emit('viewClick');
 	}
 </script>
 
