@@ -13,6 +13,10 @@ export default {
     file: 'common-demo',
     subTitle: ''
   },{
+    title: '普通模式演示(setup写法)',
+    file: 'common-setup-demo',
+    subTitle: ''
+  },{
     title: '自定义下拉刷新演示',
     file: 'custom-demo',
     subTitle: ''

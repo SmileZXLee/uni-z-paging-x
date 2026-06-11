@@ -62,7 +62,13 @@
 				"navigationBarTitleText" : "空数据&加载失败演示",
 				"enablePullDownRefresh" : false
 			}
-		}
+    },
+    {
+      "path": "pages/common-setup-demo/common-setup-demo",
+      "style": {
+        "navigationBarTitleText": "普通模式演示(setup写法)"
+      }
+    }
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

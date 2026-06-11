@@ -1,0 +1,45 @@
+<!-- 普通模式演示 (组合式API写法) -->
+
+<template>
+  <z-paging-x ref="pagingX" v-model="(dataList as ListItem[])" @query="queryList">
+    <template #top>
+      <common-tabs :list="tabList" @change="tabChange" />
+    </template>
+    <list-item v-for="(item, index) in dataList" :key="index">
+      <view class="list-item">
+        <text class="list-item-title">{{item.title}}</text>
+        <text class="list-item-type">{{item.detail}}</text>
+      </view>
+    </list-item>
+  </z-paging-x>
+</template>
+
+<script setup lang="uts">
+  import { ref } from 'vue'
+  import { requestList, ListItem } from '@/http/request.uts'
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+  const tabList = ref(['测试1', '测试2', '测试3', '测试4'] as string[])
+  const tabIndex = ref(0)
+  const dataList = ref<ListItem[]>([])
+
+  const tabChange = (index: number) => {
+    tabIndex.value = index
+    pagingX.value?.reload()
+  }
+
+  const queryList = (pageNo: number, pageSize: number) => {
+    const params = {
+      pageNo: pageNo,
+      pageSize: pageSize,
+      type: tabIndex.value + 1
+    }
+    requestList(params).then((res: UTSJSONObject) => {
+      pagingX.value?.complete(res['data'] as any[])
+    })
+  }
+</script>
+
+<style>
+</style>
