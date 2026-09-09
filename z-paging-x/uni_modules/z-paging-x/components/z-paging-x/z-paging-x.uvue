@@ -18,10 +18,6 @@ by ZXLee
     <!-- 顶部固定的slot -->
     <slot name="top" />
     <!-- 因使用component :is的时候设置的list-view在web端无法正常渲染，且不支持微信小程序，因此目前只能先写死list-view和scroll-view节点，通过v-if切换 -->
-    <!-- #ifdef VUE3-VAPOR -->
-    <!-- 蒸汽模式下用相对定位的容器包裹列表，作为空数据图绝对定位的参照 -->
-    <view class="zpx-list-wrapper zpx-flex1">
-    <!-- #endif -->
     <list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1"
     <!-- #ifdef APP -->
     :associative-container="associativeContainer"
@@ -61,13 +57,17 @@ by ZXLee
       <!-- #ifndef WEB -->
       <list-item :class="showEmpty ? 'zpx-flex1' : ''">
       <!-- #endif -->
-        <!-- 蒸汽模式下list-item不参与flex布局无法撑满列表，空数据图改为在列表外层以绝对定位覆盖显示，见下方zpx-empty-overlay -->
-        <!-- #ifndef VUE3-VAPOR -->
         <template v-if="showEmpty">
+          <!-- 蒸汽模式下list-item不参与flex布局且忽略自身高度，flex:1/height:100%均无法撑满列表，因此用内层view按UniResizeObserver监听到的列表高度撑满 -->
+          <!-- #ifdef VUE3-VAPOR -->
+          <view class="zpx-empty-fill" :style="{ height: listHeight > 0 ? listHeight + 'px' : 'auto' }">
+          <!-- #endif -->
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+          <!-- #ifdef VUE3-VAPOR -->
+          </view>
+          <!-- #endif -->
         </template>
-        <!-- #endif -->
         <slot v-if="showLoading" name="loading" />
       <!-- #ifdef WEB -->
       </component>
@@ -115,23 +115,19 @@ by ZXLee
       </view>
       <!-- #endif -->
       <view :class="showEmpty ? 'zpx-flex1' : ''">
-        <!-- #ifndef VUE3-VAPOR -->
         <template v-if="showEmpty">
+          <!-- #ifdef VUE3-VAPOR -->
+          <view class="zpx-empty-fill" :style="{ height: listHeight > 0 ? listHeight + 'px' : 'auto' }">
+          <!-- #endif -->
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+          <!-- #ifdef VUE3-VAPOR -->
+          </view>
+          <!-- #endif -->
         </template>
-        <!-- #endif -->
         <slot v-if="showLoading" name="loading" />
       </view>
     </scroll-view>
-    <!-- #ifdef VUE3-VAPOR -->
-      <!-- 蒸汽模式下空数据图以绝对定位覆盖在列表区域上并居中，随列表尺寸自动铺满；非加载失败时不拦截触摸，列表仍可下拉刷新 -->
-      <view v-if="showEmpty" :class="emptyOverlayClass">
-        <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
-        <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-      </view>
-    </view>
-    <!-- #endif -->
     <!-- 底部固定的slot -->
     <slot name="bottom" />
     <!-- 点击返回顶部view -->
@@ -176,7 +172,7 @@ by ZXLee
    *   }
    * }
    */
-  import { ref, computed, watch, onMounted, nextTick, useSlots } from 'vue'
+  import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick, useSlots } from 'vue'
   import zPagingRefresher from './components/z-paging-refresher.uvue'
   import zPagingLoadMore from './components/z-paging-load-more.uvue'
   import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
@@ -574,6 +570,11 @@ by ZXLee
   const forceHideLoadMore = ref(false)
   // 内容宽度
   const contentWidth = ref(0)
+  // #ifdef VUE3-VAPOR
+  // 列表(list-view/scroll-view)可视高度，蒸汽模式下用于撑满空数据图容器，由UniResizeObserver监听列表尺寸变化自动更新
+  const listHeight = ref(0)
+  let listResizeObserver: UniResizeObserver | null = null
+  // #endif
 
   // 是否是加载中状态
   const isLoading = ref(true)
@@ -628,10 +629,6 @@ by ZXLee
       return false
     }
     return props.loadMoreEnabled && !forceHideLoadMore.value && (!isLoading.value || totalData.value.length > 0) && !showEmpty.value;
-  })
-  // (蒸汽模式)空数据图覆盖层class：非加载失败时不拦截触摸事件，使列表仍可下拉刷新；加载失败时需响应"重新加载"点击
-  const emptyOverlayClass = computed((): string => {
-    return isLoadFailed.value ? 'zpx-empty-overlay' : 'zpx-empty-overlay zpx-empty-overlay-through';
   })
   const finalScrollWithAnimation = computed((): boolean => {
     if (privateScrollWithAnimation.value != -1) {
@@ -986,9 +983,34 @@ by ZXLee
           contentWidth.value = rect.width;
         })
       }
+
+      // #ifdef VUE3-VAPOR
+      // 监听列表尺寸变化，保证空数据图容器高度始终与列表可视高度一致
+      const listEle = zpxList.value;
+      if (listEle !== null) {
+        listEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+          listHeight.value = rect.height;
+        })
+        listResizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
+          entries.forEach((entry : UniResizeObserverEntry) => {
+            listHeight.value = entry.contentRect.height;
+          })
+        })
+        listResizeObserver!.observe(listEle);
+      }
+      // #endif
     })
 
   })
+
+  // #ifdef VUE3-VAPOR
+  onBeforeUnmount(() => {
+    if (listResizeObserver !== null) {
+      listResizeObserver!.disconnect();
+      listResizeObserver = null;
+    }
+  })
+  // #endif
 
   defineExpose({
     reload,
