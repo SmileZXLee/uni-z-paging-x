@@ -42,9 +42,12 @@ npm update z-paging-x
 
 ### 基本使用
 
+> 以下为组合式API(`<script setup>`)写法。蒸汽模式(Vapor)仅支持组合式API，推荐统一使用。
+
 ```html
 <template>
-	<z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
+	<!-- v-model绑定的ref需通过as指定类型，否则App-Android(非蒸汽模式)下无法推导update:modelValue的参数类型 -->
+	<z-paging-x ref="pagingX" v-model="(dataList as ListItem[])" @query="queryList">
 		<template #top>
 			<common-tabs :list="tabList" @change="tabChange" />
 		</template>
@@ -57,36 +60,33 @@ npm update z-paging-x
 	</z-paging-x>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
 	import { requestList, ListItem } from '@/http/request.uts'
-	export default {
-		data() {
-			return {
-				tabList: ['测试1','测试2','测试3','测试4'] as Array<string>,
-				tabIndex: 0,
-				dataList: [] as Array<ListItem>
-			}
-		},
-		methods: {
-			tabChange(index: number) {
-				this.tabIndex = index;
-				// 刷新列表数据
-				(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
-			},
-			// @query所绑定的方法不要自己调用！！需要刷新列表数据时，只需要调用(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload()即可
-			queryList(pageNo: number, pageSize: number) {
-				const params = {
-					pageNo: pageNo,
-					pageSize: pageSize,
-					type: this.tabIndex + 1
-				}
-				// 此处请求仅为演示，请替换为自己项目中的请求
-				requestList(params).then((res: UTSJSONObject) => {
-					// 将请求结果通过complete传给z-paging处理，同时也代表请求结束，这一行必须调用
-					(this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
-				})
-			}
-		}
+
+	// 与模板中ref="pagingX"同名，用于调用z-paging-x的方法
+	const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+	const tabList = ref(['测试1', '测试2', '测试3', '测试4'] as string[])
+	const tabIndex = ref(0)
+	const dataList = ref<ListItem[]>([])
+
+	const tabChange = (index: number) => {
+		tabIndex.value = index
+		// 刷新列表数据
+		pagingX.value?.reload()
+	}
+
+	// @query所绑定的方法不要自己调用！！需要刷新列表数据时，只需要调用pagingX.value?.reload()即可
+	const queryList = (pageNo: number, pageSize: number) => {
+		// 此处请求仅为演示，请替换为自己项目中的请求
+		requestList({
+			pageNo: pageNo,
+			pageSize: pageSize,
+			type: tabIndex.value + 1
+		}).then((res: UTSJSONObject) => {
+			// 将请求结果通过complete传给z-paging处理，同时也代表请求结束，这一行必须调用
+			pagingX.value?.complete(res.getArray('data'))
+		})
 	}
 </script>
 ```

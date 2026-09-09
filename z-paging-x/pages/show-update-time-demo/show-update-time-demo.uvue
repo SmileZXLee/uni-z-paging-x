@@ -35,7 +35,7 @@
       type: tabIndex.value + 1
     }
     requestList(params).then((res: UTSJSONObject) => {
-      pagingX.value?.complete(res['data'] as Array<any>)
+      pagingX.value?.complete(res.getArray('data'))
     })
   }
 </script>

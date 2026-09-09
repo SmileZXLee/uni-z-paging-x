@@ -29,13 +29,12 @@
   }
 
   const queryList = (pageNo: number, pageSize: number) => {
-    const params = {
+    requestList({
       pageNo: pageNo,
       pageSize: pageSize,
       type: tabIndex.value + 1
-    }
-    requestList(params).then((res: UTSJSONObject) => {
-      pagingX.value?.complete(res['data'] as any[])
+    }).then((res: UTSJSONObject) => {
+      pagingX.value?.complete(res.getArray('data'))
     })
   }
 </script>
