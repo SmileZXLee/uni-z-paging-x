@@ -7,31 +7,23 @@
   </view>
 </template>
 
-<script>
-  export default {
-    props: {
-      status: {
-        type: String,
-        default: 0,
-      },
+<script setup lang="uts">
+  const props = defineProps({
+    status: {
+      type: String,
+      default: 'default',
     },
-    data() {
-      return {
+  })
 
-      };
-    },
-    computed: {
-      statusText() : string {
-        const statusTextMap = {
-          'default': '哎呀，用点力继续下拉！',
-          'release-to-refresh': '拉疼我啦，松手刷新~~',
-          'loading': '正在努力刷新中...',
-          'complete': '刷新成功啦~'
-        };
-        return statusTextMap[this.status] as string;
-      }
+  const statusText = computed((): string => {
+    const statusTextMap = {
+      'default': '哎呀，用点力继续下拉！',
+      'release-to-refresh': '拉疼我啦，松手刷新~~',
+      'loading': '正在努力刷新中...',
+      'complete': '刷新成功啦~'
     }
-  }
+    return (statusTextMap[props.status] ?? '') as string
+  })
 </script>
 
 <style scoped>

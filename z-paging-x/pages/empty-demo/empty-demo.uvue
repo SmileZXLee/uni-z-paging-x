@@ -1,7 +1,7 @@
 <!-- 空数据&加载失败演示 -->
 
 <template>
-  <z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
+  <z-paging-x ref="pagingX" v-model="(dataList as ListItem[])" @query="queryList">
     <template #top>
       <view class="top">
         <text style="margin-right: 20rpx;">暂无数据</text>
@@ -19,42 +19,40 @@
   </z-paging-x>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
   import { requestList, ListItem } from '@/http/request.uts'
-  export default {
-    data() {
-      return {
-        emptyChecked: true,
-        errorChecked: false,
-        dataList: [] as ListItem[]
-      }
-    },
-    methods: {
-      onEmptyCheckedChange() {
-        this.emptyChecked = !this.emptyChecked;
-        this.errorChecked = !this.errorChecked;
-        (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
-      },
-      onErrorCheckedChange() {
-        this.errorChecked = !this.errorChecked;
-        this.emptyChecked = !this.emptyChecked;
-        (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
-      },
-      queryList(pageNo: number, pageSize: number) {
-        const params = {
-          pageNo: pageNo,
-          pageSize: pageSize,
-          type:1
-        }
-        requestList(params).then((_: UTSJSONObject) => {
-          if (this.emptyChecked) {
-            (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete([]);
-          } else if (this.errorChecked)  {
-            (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).completeByError();
-          }
-        })
-      }
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+  const emptyChecked = ref(true)
+  const errorChecked = ref(false)
+  const dataList = ref<ListItem[]>([])
+
+  const onEmptyCheckedChange = () => {
+    emptyChecked.value = !emptyChecked.value
+    errorChecked.value = !errorChecked.value
+    pagingX.value?.reload()
+  }
+
+  const onErrorCheckedChange = () => {
+    errorChecked.value = !errorChecked.value
+    emptyChecked.value = !emptyChecked.value
+    pagingX.value?.reload()
+  }
+
+  const queryList = (pageNo: number, pageSize: number) => {
+    const params = {
+      pageNo: pageNo,
+      pageSize: pageSize,
+      type: 1
     }
+    requestList(params).then((_: UTSJSONObject) => {
+      if (emptyChecked.value) {
+        pagingX.value?.complete([])
+      } else if (errorChecked.value) {
+        pagingX.value?.completeByError()
+      }
+    })
   }
 </script>
 

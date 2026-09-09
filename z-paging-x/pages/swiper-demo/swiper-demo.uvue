@@ -13,28 +13,25 @@
   </view>
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        tabList: ['测试1','测试2','测试3','测试4'],
-        current: 0
-      };
-    },
-    methods: {
-      tabChange(index: number) {
-        this.current = index;
-      },
-      // swiper滑动中
-      onSwiperTransition(e : SwiperTransitionEvent) {
-        (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
-      },
-      // swiper滑动动画结束
-      onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
-        (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
-        this.current = e.detail.current;
-      },
-    }
+<script setup lang="uts">
+  const tabs = ref<CommonTabsComponentPublicInstance | null>(null)
+
+  const tabList = ref(['测试1', '测试2', '测试3', '测试4'] as string[])
+  const current = ref(0)
+
+  const tabChange = (index: number) => {
+    current.value = index
+  }
+
+  // swiper滑动中
+  const onSwiperTransition = (e : SwiperTransitionEvent) => {
+    tabs.value?.onSwiperTransition(e)
+  }
+
+  // swiper滑动动画结束
+  const onSwiperAnimationfinish = (e : SwiperAnimationFinishEvent) => {
+    tabs.value?.onSwiperAnimationfinish(e)
+    current.value = e.detail.current
   }
 </script>
 

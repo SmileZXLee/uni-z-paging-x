@@ -3,7 +3,7 @@ import App from './App.uvue'
 import { createSSRApp } from 'vue'
 
 // z-paging-x全局配置，写在setZPXConfig内（局部配置可覆盖全局配置）
-/*
+
 import { setZPXConfig } from '@/uni_modules/z-paging-x/components/z-paging-x/config/index.uts'
 
 setZPXConfig({
@@ -13,7 +13,7 @@ setZPXConfig({
 	'empty-text': '空空如也~~',
 	//...
 });
-*/
+
 
 export function createApp() {
 	const app = createSSRApp(App)

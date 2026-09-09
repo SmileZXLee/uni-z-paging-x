@@ -1,7 +1,7 @@
 <!-- 普通模式演示 -->
 
 <template>
-  <z-paging-x ref="pagingX" v-model="dataList" @query="queryList">
+  <z-paging-x ref="pagingX" v-model="(dataList as ListItem[])" @query="queryList">
     <template #top>
       <common-tabs :list="tabList" @change="tabChange" />
     </template>
@@ -14,32 +14,29 @@
   </z-paging-x>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
   import { requestList, ListItem } from '@/http/request.uts'
-  export default {
-    data() {
-      return {
-        tabList: ['测试1','测试2','测试3','测试4'],
-        tabIndex: 0,
-        dataList: [] as ListItem[]
-      }
-    },
-    methods: {
-      tabChange(index: number) {
-        this.tabIndex = index;
-        (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).reload();
-      },
-      queryList(pageNo: number, pageSize: number) {
-        const params = {
-          pageNo: pageNo,
-          pageSize: pageSize,
-          type: this.tabIndex + 1
-        }
-        requestList(params).then((res: UTSJSONObject) => {
-          (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
-        })
-      }
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+  const tabList = ref(['测试1', '测试2', '测试3', '测试4'] as string[])
+  const tabIndex = ref(0)
+  const dataList = ref<ListItem[]>([])
+
+  const tabChange = (index: number) => {
+    tabIndex.value = index
+    pagingX.value?.reload()
+  }
+
+  const queryList = (pageNo: number, pageSize: number) => {
+    const params = {
+      pageNo: pageNo,
+      pageSize: pageSize,
+      type: tabIndex.value + 1
     }
+    requestList(params).then((res: UTSJSONObject) => {
+      pagingX.value?.complete(res['data'] as any[])
+    })
   }
 </script>
 

@@ -9,39 +9,36 @@
   </view>
 </template>
 
-<script>
+<script setup lang="uts">
   import { zpxVersion } from '@/uni_modules/z-paging-x/components/z-paging-x/utils/index.uts'
 
-  export default {
-    name: "index-nav",
-    data() {
-      return {
-        statusBarHeight: 0,
-        zpxVersion: zpxVersion
-      };
-    },
-    computed: {
-      navbarStyle() : string {
-        return `margin-top:${this.statusBarHeight}px`
-      }
-    },
-    created() {
-      this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight
-    },
-    mounted() {
-      setTimeout(() => {
-        uni.setNavigationBarColor({
-          frontColor: '#000000',
-          backgroundColor: '#ffffff'
-        })
-      }, 100)
-    },
-    methods: {
-      back() {
-        uni.navigateBack({})
-      }
-    },
+  defineOptions({
+    name: 'index-nav'
+  })
+
+  // 原 created 中的逻辑，直接在 setup 顶层执行
+  const statusBarHeight = ref(uni.getSystemInfoSync().statusBarHeight)
+
+  const navbarStyle = computed((): string => {
+    return `margin-top:${statusBarHeight.value}px`
+  })
+
+  onMounted(() => {
+    setTimeout(() => {
+      uni.setNavigationBarColor({
+        frontColor: '#000000',
+        backgroundColor: '#ffffff'
+      })
+    }, 100)
+  })
+
+  const back = () => {
+    uni.navigateBack({})
   }
+
+  defineExpose({
+    back
+  })
 </script>
 
 <style>

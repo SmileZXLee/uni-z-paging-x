@@ -2,9 +2,12 @@
 
 <template>
   <!-- 最外层滚动的z-paging-x容器 -->
-  <z-paging-x ref="pagingX" class="sticky-swiper-demo" 
-  list-is="scroll-view" :rebound="false" :start-nested-scroll="true" :nested-scroll-child="nestedScrollChildId" 
-  @nestedprescroll="onNestedPreScroll" @refresh="onRefresh">
+  <!-- 非蒸汽模式：外层通过start-nested-scroll + @nestedprescroll与子列表做滚动协商；蒸汽模式不支持滚动协商，由子列表的associative-container开启嵌套模式，外层无需额外配置 -->
+  <z-paging-x ref="pagingX" class="sticky-swiper-demo" list-is="scroll-view" :rebound="false"
+  <!-- #ifndef VUE3-VAPOR -->
+  :start-nested-scroll="true" :nested-scroll-child="nestedScrollChildId" @nestedprescroll="onNestedPreScroll"
+  <!-- #endif -->
+  @refresh="onRefresh">
     <!-- 自定义下拉刷新view(非必须) -->
     <template #refresher="{ refresherStatus }">
       <custom-refresher :status="refresherStatus"/>
@@ -19,79 +22,90 @@
       <common-tabs ref="tabs" :list="tabList" @change="tabChange" />
       <swiper class="swiper" :current="current" @transition="onSwiperTransition"
         @animationfinish="onSwiperAnimationfinish">
-        <swiper-item class="swiper-item" v-for="(_, index) in tabList" :key="index">
+        <swiper-item class="swiper-item" v-for="(item, index) in tabList" :key="index">
           <!-- 这里的stick-swiper-list-item为demo中为演示用定义的组件，列表及分页代码在stick-swiper-list-item组件内 -->
           <!-- 请注意，stick-swiper-list-item非z-paging-x内置组件，在自己的项目中必须自己创建，若未创建则会报组件不存在的错误 -->
-          <stick-swiper-list-item ref="listItem" :tabIndex="index" :currentIndex="current"></stick-swiper-list-item>
+          <!-- id需与nested-scroll-child一致，非蒸汽模式下外层scroll-view惯性滚动时会把滚动传递给对应id的子列表 -->
+          <stick-swiper-list-item ref="listItem" :id="item" :tabIndex="index" :currentIndex="current"></stick-swiper-list-item>
         </swiper-item>
       </swiper>
     </view>
   </z-paging-x>
 </template>
 
-<script>
-  export default {
-    data() {
-      return {
-        // header高度
-        $headerHeight: 0,
-        // 嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件
-        nestedScrollChildId: '',
-        tabList: ['测试1','测试2','测试3','测试4'],
-        current: 0
-      }
-    },
-    onReady() {
-      // 获取顶部跟着滚动的banner的高度
-      this.$headerHeight = (this.$refs['header'] as UniElement).offsetHeight;
-      // 设置当前滚动的子组件列表的id
-      this.nestedScrollChildId = this.tabList[0];
-    },
-    methods: {
-      // 页面下拉刷新时触发
-      onRefresh() {
-        // 触发当前子组件刷新，子组件内会触发z-paging-x的列表刷新
-        (this.$refs["listItem"]! as ComponentPublicInstance[])[this.current].$callMethod('refresh', () => {
-          // 当下拉刷新结束，终止页面下拉刷新
-          (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete([]);
-        })
-      },
-      // 子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
-      onNestedPreScroll(event: NestedPreScrollEvent, scrollViewTarget: UniElement) {
-        const deltaY = event.deltaY
-        const scrollTop = scrollViewTarget.scrollTop
-        if (deltaY > 0) {
-          // 向上滚动，如果父容器 header scrollTop < offsetHeight，先滚动父容器
-          if (scrollTop < this.$headerHeight) {
-            const difference = this.$headerHeight - scrollTop - deltaY;
-            // 使得最外层scroll-view滚动到指定位置
-            if (difference > 0) {
-              scrollViewTarget.scrollBy(event.deltaX, deltaY);
-              event.consumed(event.deltaX, deltaY);
-            } else {
-              const top: number = deltaY + difference;
-              event.consumed(event.deltaX, top.toFloat());
-              scrollViewTarget.scrollBy(event.deltaX, top.toFloat());
-            }
-          }
+<script setup lang="uts">
+  // 模板 ref
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+  const header = ref<UniElement | null>(null)
+  const tabs = ref<CommonTabsComponentPublicInstance | null>(null)
+  const listItem = ref<ComponentPublicInstance[] | null>(null)
+
+  // 嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件
+  const nestedScrollChildId = ref('')
+  const tabList = ref(['测试1', '测试2', '测试3', '测试4'] as string[])
+  const current = ref(0)
+  // #ifndef VUE3-VAPOR
+  // header高度（不参与模板渲染，使用普通变量），仅滚动协商时需要
+  let headerHeight = 0
+  // #endif
+
+  onReady(() => {
+    // #ifndef VUE3-VAPOR
+    // 获取顶部跟着滚动的banner的高度
+    headerHeight = header.value!.offsetHeight
+    // #endif
+    // 设置当前滚动的子组件列表的id
+    nestedScrollChildId.value = tabList.value[0]
+  })
+
+  // 页面下拉刷新时触发
+  const onRefresh = () => {
+    // 触发当前子组件刷新，子组件内会触发z-paging-x的列表刷新
+    (listItem.value! as ComponentPublicInstance[])[current.value].$callMethod('refresh', () => {
+      // 当下拉刷新结束，终止页面下拉刷新
+      pagingX.value?.complete([])
+    })
+  }
+
+  // #ifndef VUE3-VAPOR
+  // 子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
+  const onNestedPreScroll = (event: NestedPreScrollEvent, scrollViewTarget: UniElement) => {
+    const deltaY = event.deltaY
+    const scrollTop = scrollViewTarget.scrollTop
+    if (deltaY > 0) {
+      // 向上滚动，如果父容器 header scrollTop < offsetHeight，先滚动父容器
+      if (scrollTop < headerHeight) {
+        const difference = headerHeight - scrollTop - deltaY
+        // 使得最外层scroll-view滚动到指定位置
+        if (difference > 0) {
+          scrollViewTarget.scrollBy(event.deltaX, deltaY)
+          event.consumed(event.deltaX, deltaY)
+        } else {
+          const top: number = deltaY + difference
+          event.consumed(event.deltaX, top.toFloat())
+          scrollViewTarget.scrollBy(event.deltaX, top.toFloat())
         }
-      },
-      // tabs切换
-      tabChange(index: number) {
-        this.current = index;
-        // 设置当前滚动的子组件列表的id
-        this.nestedScrollChildId = this.tabList[index];
-      },
-      // swiper滑动中
-      onSwiperTransition(e : SwiperTransitionEvent) {
-        (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperTransition(e);
-      },
-      // swiper滑动动画结束
-      onSwiperAnimationfinish(e : SwiperAnimationFinishEvent) {
-        (this.$refs['tabs'] as CommonTabsComponentPublicInstance).onSwiperAnimationfinish(e);
-        this.current = e.detail.current;
-      },
+      }
     }
+  }
+  // #endif
+
+  // tabs切换
+  const tabChange = (index: number) => {
+    current.value = index
+    // 设置当前滚动的子组件列表的id
+    nestedScrollChildId.value = tabList.value[index]
+  }
+
+  // swiper滑动中
+  const onSwiperTransition = (e : SwiperTransitionEvent) => {
+    tabs.value?.onSwiperTransition(e)
+  }
+
+  // swiper滑动动画结束
+  const onSwiperAnimationfinish = (e : SwiperAnimationFinishEvent) => {
+    tabs.value?.onSwiperAnimationfinish(e)
+    current.value = e.detail.current
   }
 </script>
 

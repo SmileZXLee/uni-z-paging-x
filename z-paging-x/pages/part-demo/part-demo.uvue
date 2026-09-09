@@ -2,7 +2,7 @@
 
 <template>
   <view class="content">
-    <z-paging-x ref="pagingX" class="pagingX" v-model="dataList" @query="queryList">
+    <z-paging-x ref="pagingX" class="pagingX" v-model="(dataList as ListItem[])" @query="queryList">
       <template #top>
         <view class="tip">
           固定在顶部的view
@@ -23,26 +23,22 @@
   </view>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
   import { requestList, ListItem } from '@/http/request.uts'
-  export default {
-    data() {
-      return {
-        dataList: [] as ListItem[]
-      }
-    },
-    methods: {
-      queryList(pageNo: number, pageSize: number) {
-        const params = {
-          pageNo: pageNo,
-          pageSize: pageSize,
-          type: 0
-        }
-        requestList(params).then((res: UTSJSONObject) => {
-          (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).complete(res['data'] as any[]);
-        })
-      }
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+  const dataList = ref<ListItem[]>([])
+
+  const queryList = (pageNo: number, pageSize: number) => {
+    const params = {
+      pageNo: pageNo,
+      pageSize: pageSize,
+      type: 0
     }
+    requestList(params).then((res: UTSJSONObject) => {
+      pagingX.value?.complete(res['data'] as any[])
+    })
   }
 </script>
 

@@ -8,6 +8,27 @@
   flex: 1;
 }
 
+/* (蒸汽模式)列表外层容器，作为空数据图绝对定位的参照 */
+.zpx-list-wrapper {
+  position: relative;
+}
+
+/* (蒸汽模式)空数据图覆盖层，铺满列表区域并居中 */
+.zpx-empty-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+/* (蒸汽模式)非加载失败时空数据图不拦截触摸，列表仍可下拉刷新 */
+.zpx-empty-overlay-through {
+  pointer-events: none;
+}
+
 .zpx-back-to-top {
   width: 76rpx;
   height: 76rpx;

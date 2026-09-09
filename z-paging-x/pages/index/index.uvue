@@ -14,33 +14,31 @@
   </z-paging-x>
 </template>
 
-<script lang="uts">
+<script setup lang="uts">
   import { zpxVersion } from '@/uni_modules/z-paging-x/components/z-paging-x/utils/index.uts'
   import indexList, { Item } from './list.uts'
-  export default {
-    data() {
-      return {
-        list: [] as Item[]
-      }
-    },
-    onLoad() {
-      this.list = indexList.list;
-      uni.setNavigationBarTitle({
-        title: `z-paging-X v${zpxVersion}`
-      })
-    },
-    methods: {
-      onRefresh() {
-        setTimeout(() => {
-          (this.$refs['pagingX'] as ZPagingXComponentPublicInstance).endRefresh();
-        }, 200)
-      },
-      itemClick(item: Item) {
-        uni.navigateTo({
-          url: `../${item.file}/${item.file}`
-        })
-      }
-    }
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+  const list = ref<Item[]>([])
+
+  onLoad(() => {
+    list.value = indexList.list
+    uni.setNavigationBarTitle({
+      title: `z-paging-X v${zpxVersion}`
+    })
+  })
+
+  const onRefresh = () => {
+    setTimeout(() => {
+      pagingX.value?.endRefresh()
+    }, 200)
+  }
+
+  const itemClick = (item: Item) => {
+    uni.navigateTo({
+      url: `../${item.file}/${item.file}`
+    })
   }
 </script>
 

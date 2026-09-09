@@ -1,8 +1,9 @@
 <!-- [z-paging-x]下拉刷新view -->
 <template name="z-paging-refresher">
   <view class="zpx-r-container" :style="{height: showUpdateTime ? '60px' : '40px'}">
+    <!-- 箭头旋转通过内联style设置transform触发transition(蒸汽模式下通过切换class触发transition不可靠) -->
     <z-paging-loading v-if="isLoading"/>
-    <image v-else class="zpx-r-image" :class="getLeftImageClass" :src="getLeftImageSrc" />
+    <image v-else class="zpx-r-image" :style="{ transform: getLeftImageTransform }" :src="getLeftImageSrc" />
     <view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '25rpx' : '10rpx'}">
       <text class="zpx-r-text">{{statusText}}</text>
       <text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text">
@@ -82,15 +83,13 @@
     return props.status === Enum.Refresher.Complete;
   })
 
-  // 获取左侧图片样式class
-  const getLeftImageClass = computed((): string => {
+  // 获取左侧图片的transform：默认状态箭头(原图向上)旋转180度朝下，松手刷新状态恢复朝上
+  const getLeftImageTransform = computed((): string => {
     if (isDefault.value) {
-      return 'zpx-r-arrow-down';
-    } else if (isReleaseToRefresh.value) {
-      return 'zpx-r-arrow-top';
+      return 'rotate(180deg)';
     }
-    // complete和loading状态不需要额外class
-    return '';
+    // release-to-refresh/complete状态不旋转
+    return 'rotate(0deg)';
   })
 
   // 获取左侧图片src
@@ -142,17 +141,10 @@
   .zpx-r-image {
     width: 34rpx;
     height: 34rpx;
-    transition-duration: .2s;
+    /* transform由模板内联style设置，初始值需写在transition-property之前，避免初始渲染触发过渡 */
+    transform: rotate(0deg);
     transition-property: transform;
-    transform: rotate(0deg);
-  }
-
-  .zpx-r-arrow-top {
-    transform: rotate(0deg);
-  }
-
-  .zpx-r-arrow-down {
-    transform: rotate(180deg);
+    transition-duration: .2s;
   }
 
   .zpx-r-text-container {

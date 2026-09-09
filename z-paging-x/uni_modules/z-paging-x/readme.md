@@ -130,6 +130,7 @@ setZPXConfig({
 | show-scrollbar       | 控制是否出现滚动条                                           | Boolean | true      | false       |
 | rebound              | 控制是否回弹效果                                             | Boolean | true      | false       |
 | custom-nested-scroll | (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理 | Boolean | false     | true        |
+| associative-container | (子元素中使用，仅App)关联的滚动容器，设置为`nested-scroll-view`后与外层滚动容器开启嵌套模式。蒸汽模式(Vapor)不支持nested-scroll滚动协商，需使用此属性替代`custom-nested-scroll` | String  | ''        | nested-scroll-view |
 | start-nested-scroll  | (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商 | Boolean | false     | true        |
 | nested-scroll-child  | (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的`nestedprescroll`事件，嵌套子元素需要设置`custom-nested-scroll` = true | String  | ''        | -           |
 
@@ -194,7 +195,8 @@ setZPXConfig({
 | @refresherrefresh      | 下拉刷新被触发事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherrestore      | 下拉刷新被复位事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
 | @refresherabort        | 下拉刷新被中止事件                                           | `参数1`:(event: [RefresherEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#unirefresherevent) => void |
-| @onRefresh             | 自定义下拉刷新被触发                                         | -                                                            |
+| @onRefresh             | 自定义下拉刷新被触发（与`@refresh`等价）                       | -                                                            |
+| @refresh               | 自定义下拉刷新被触发（与`@onRefresh`等价）                     | -                                                            |
 | @scroll                | 列表滚动时触发                                               | `参数1`:(event: [ScrollEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrollevent)) => void |
 | @scrolltolower         | 滚动到底部/右边，会触发 scrolltolower 事件                   | `参数1`:(event: [ScrollToLowerEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltolowerevent)) => void |
 | @scrolltoupper         | 滚动到顶部/左边，会触发 scrolltoupper 事件                   | `参数1`:(event: [ScrollToUpperEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltoupperevent)) => void |

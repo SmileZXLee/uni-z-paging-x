@@ -18,9 +18,16 @@ by ZXLee
     <!-- 顶部固定的slot -->
     <slot name="top" />
     <!-- 因使用component :is的时候设置的list-view在web端无法正常渲染，且不支持微信小程序，因此目前只能先写死list-view和scroll-view节点，通过v-if切换 -->
+    <!-- #ifdef VUE3-VAPOR -->
+    <!-- 蒸汽模式下用相对定位的容器包裹列表，作为空数据图绝对定位的参照 -->
+    <view class="zpx-list-wrapper zpx-flex1">
+    <!-- #endif -->
     <list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1"
+    <!-- #ifdef APP -->
+    :associative-container="associativeContainer"
+    <!-- #endif -->
     :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
-    :rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+    :bounces="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
     @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
       <slot />
@@ -54,10 +61,13 @@ by ZXLee
       <!-- #ifndef WEB -->
       <list-item :class="showEmpty ? 'zpx-flex1' : ''">
       <!-- #endif -->
+        <!-- 蒸汽模式下list-item不参与flex布局无法撑满列表，空数据图改为在列表外层以绝对定位覆盖显示，见下方zpx-empty-overlay -->
+        <!-- #ifndef VUE3-VAPOR -->
         <template v-if="showEmpty">
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
         </template>
+        <!-- #endif -->
         <slot v-if="showLoading" name="loading" />
       <!-- #ifdef WEB -->
       </component>
@@ -67,8 +77,17 @@ by ZXLee
       <!-- #endif -->
     </list-view>
     <scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
-    :rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+    <!-- #ifdef APP -->
+    :associative-container="associativeContainer"
+    <!-- #endif -->
+    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
+    <!-- #ifndef VUE3-VAPOR -->
+    :custom-nested-scroll="customNestedScroll"
+    <!-- #endif -->
+    <!-- #ifdef APP && !VUE3-VAPOR -->
+    :nested-scroll-child="nestedScrollChild"
+    <!-- #endif -->
+    :bounces="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
     @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
       <slot />
@@ -96,13 +115,23 @@ by ZXLee
       </view>
       <!-- #endif -->
       <view :class="showEmpty ? 'zpx-flex1' : ''">
+        <!-- #ifndef VUE3-VAPOR -->
         <template v-if="showEmpty">
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
         </template>
+        <!-- #endif -->
         <slot v-if="showLoading" name="loading" />
       </view>
     </scroll-view>
+    <!-- #ifdef VUE3-VAPOR -->
+      <!-- 蒸汽模式下空数据图以绝对定位覆盖在列表区域上并居中，随列表尺寸自动铺满；非加载失败时不拦截触摸，列表仍可下拉刷新 -->
+      <view v-if="showEmpty" :class="emptyOverlayClass">
+        <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
+        <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+      </view>
+    </view>
+    <!-- #endif -->
     <!-- 底部固定的slot -->
     <slot name="bottom" />
     <!-- 点击返回顶部view -->
@@ -461,6 +490,14 @@ by ZXLee
       default: gc<boolean>('custom-nested-scroll', false),
     },
     /**
+     * @description (子元素中使用，仅App)关联的滚动容器，设置为nested-scroll-view后与外层滚动容器开启嵌套模式。蒸汽模式(Vapor)不支持nested-scroll滚动协商，需使用此属性替代custom-nested-scroll
+     * @default ''
+     */
+    associativeContainer: {
+      type: String,
+      default: gc<string>('associative-container', ''),
+    },
+    /**
      * @description (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
      * @default false
      */
@@ -497,7 +534,7 @@ by ZXLee
     (e: 'refresherrestore', event: RefresherEvent): void
     (e: 'refresherabort', event: RefresherEvent): void
     (e: 'onRefresh'): void
-    (e: 'Refresh'): void
+    (e: 'refresh'): void
     (e: 'scrolltolower', event: ScrollToLowerEvent): void
     (e: 'scrolltoupper', event: ScrollToUpperEvent): void
     (e: 'scroll', event: ScrollEvent): void
@@ -591,6 +628,10 @@ by ZXLee
       return false
     }
     return props.loadMoreEnabled && !forceHideLoadMore.value && (!isLoading.value || totalData.value.length > 0) && !showEmpty.value;
+  })
+  // (蒸汽模式)空数据图覆盖层class：非加载失败时不拦截触摸事件，使列表仍可下拉刷新；加载失败时需响应"重新加载"点击
+  const emptyOverlayClass = computed((): string => {
+    return isLoadFailed.value ? 'zpx-empty-overlay' : 'zpx-empty-overlay zpx-empty-overlay-through';
   })
   const finalScrollWithAnimation = computed((): boolean => {
     if (privateScrollWithAnimation.value != -1) {
@@ -859,7 +900,7 @@ by ZXLee
   const _onRefresherrefresh = (e: RefresherEvent) => {
     emit('refresherrefresh', e);
     emit('onRefresh');
-    emit('Refresh');
+    emit('refresh');
     _handleRefresh();
   }
   // 下拉刷新被复位事件
