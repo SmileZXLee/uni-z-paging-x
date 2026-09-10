@@ -8,7 +8,7 @@
   flex: 1;
 }
 
-/* (蒸汽模式)空数据图容器，高度由UniResizeObserver监听的列表高度决定，见z-paging-x.uvue */
+/* (蒸汽模式、web端)空数据图容器，高度由UniResizeObserver监听的列表高度决定，见z-paging-x.uvue */
 .zpx-empty-fill {
   width: 100%;
 }

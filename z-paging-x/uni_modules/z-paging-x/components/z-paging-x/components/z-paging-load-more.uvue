@@ -1,10 +1,10 @@
 <!-- [z-paging-x]上拉加载更多view -->
 <template name="z-paging-load-more">
   <view class="zpx-l-container"  @click="onClickMore">
-    <view v-if="isNoMore" class="zpx-l-line" />
-    <z-paging-loading v-if="isLoading" />
-    <text class="zpx-l-loading-text">{{statusText}}</text>
-    <view v-if="isNoMore" class="zpx-l-line" />
+    <view v-if="isNoMore" class="zpx-l-line" :style="{ backgroundColor: lineColor }" />
+    <z-paging-loading v-if="isLoading" :color="indicatorColor" />
+    <text class="zpx-l-loading-text" :style="{ color: titleColor }">{{statusText}}</text>
+    <view v-if="isNoMore" class="zpx-l-line" :style="{ backgroundColor: lineColor }" />
   </view>
 </template>
 <script setup lang="uts">
@@ -42,11 +42,30 @@
       type: String,
       default: '加载失败，点击重新加载'
     },
+    // 主题样式，支持black，white
+    themeStyle: {
+      type: String,
+      default: 'black'
+    },
   })
 
   const emit = defineEmits<{
     (e: 'clickMore'): void
   }>()
+
+  // 与z-paging的zTheme保持一致
+  const isWhiteTheme = computed((): boolean => {
+    return props.themeStyle === 'white';
+  })
+  const titleColor = computed((): string => {
+    return isWhiteTheme.value ? '#efefef' : '#a4a4a4';
+  })
+  const lineColor = computed((): string => {
+    return isWhiteTheme.value ? '#efefef' : '#eeeeee';
+  })
+  const indicatorColor = computed((): string => {
+    return isWhiteTheme.value ? '#ffffff' : '#949494';
+  })
 
   const isDefault = computed((): boolean => {
     return props.status === Enum.More.Default;
@@ -89,13 +108,11 @@
   }
 
   .zpx-l-loading-text {
-    color: #a4a4a4;
     margin-left: 10rpx;
     font-size: 28rpx;
   }
 
   .zpx-l-line {
-    background-color: #eeeeee;
     width: 100rpx;
     height: 1px;
     margin: 0rpx 10rpx;

@@ -27,11 +27,10 @@ by ZXLee
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
     @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
       <slot />
-      <list-item>
-        <template v-if="showLoadMore">
-          <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
-          <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
-        </template>
+      <!-- web端list-view为虚拟列表，内容为空的list-item会按默认item高度估算占位，因此无内容时不渲染该list-item -->
+      <list-item v-if="showLoadMore">
+        <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
+        <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" @clickMore="_handleLoadMore"/>
       </list-item>
       <!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
       <!-- #ifdef WEB -->
@@ -42,7 +41,7 @@ by ZXLee
       <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
           <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
         </view>
       <!-- #ifdef WEB -->
       </component>
@@ -52,19 +51,19 @@ by ZXLee
       <!-- #endif -->
 
       <!-- #ifdef WEB -->
-      <component :is="listItemIs" :class="showEmpty ? 'zpx-flex1' : ''">
+      <component :is="listItemIs" v-if="showEmpty || showLoading" :class="showEmpty ? 'zpx-flex1' : ''">
       <!-- #endif -->
       <!-- #ifndef WEB -->
-      <list-item :class="showEmpty ? 'zpx-flex1' : ''">
+      <list-item v-if="showEmpty || showLoading" :class="showEmpty ? 'zpx-flex1' : ''">
       <!-- #endif -->
         <template v-if="showEmpty">
-          <!-- 蒸汽模式下list-item不参与flex布局且忽略自身高度，flex:1/height:100%均无法撑满列表，因此用内层view按UniResizeObserver监听到的列表高度撑满 -->
-          <!-- #ifdef VUE3-VAPOR -->
+          <!-- 蒸汽模式下list-item不参与flex布局且忽略自身高度，web端list-view为虚拟列表同样无法通过flex:1撑满，因此用内层view按UniResizeObserver监听到的列表高度撑满 -->
+          <!-- #ifdef VUE3-VAPOR || WEB -->
           <view class="zpx-empty-fill" :style="{ height: listHeight > 0 ? listHeight + 'px' : 'auto' }">
           <!-- #endif -->
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-          <!-- #ifdef VUE3-VAPOR -->
+          <!-- #ifdef VUE3-VAPOR || WEB -->
           </view>
           <!-- #endif -->
         </template>
@@ -94,7 +93,7 @@ by ZXLee
       <view>
         <template v-if="showLoadMore">
           <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
-          <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
+          <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" @clickMore="_handleLoadMore"/>
         </template>
       </view>
       <!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
@@ -106,7 +105,7 @@ by ZXLee
       <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
           <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
         </view>
       <!-- #ifdef WEB -->
       </component>
@@ -116,12 +115,12 @@ by ZXLee
       <!-- #endif -->
       <view :class="showEmpty ? 'zpx-flex1' : ''">
         <template v-if="showEmpty">
-          <!-- #ifdef VUE3-VAPOR -->
+          <!-- #ifdef VUE3-VAPOR || WEB -->
           <view class="zpx-empty-fill" :style="{ height: listHeight > 0 ? listHeight + 'px' : 'auto' }">
           <!-- #endif -->
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-          <!-- #ifdef VUE3-VAPOR -->
+          <!-- #ifdef VUE3-VAPOR || WEB -->
           </view>
           <!-- #endif -->
         </template>
@@ -276,6 +275,91 @@ by ZXLee
     refresherBackground: {
       type: String,
       default: gc<string>('refresher-background', '#FFF')
+    },
+    /**
+     * @description loading(下拉刷新、上拉加载更多)的主题样式，支持black，white
+     * @default black
+     */
+    defaultThemeStyle: {
+      type: String,
+      default: gc<string>('default-theme-style', 'black')
+    },
+    /**
+     * @description 下拉刷新的主题样式，支持black，white，未设置时使用default-theme-style
+     * @default ''
+     */
+    refresherThemeStyle: {
+      type: String,
+      default: gc<string>('refresher-theme-style', '')
+    },
+    /**
+     * @description 自定义下拉刷新默认状态下的图片
+     * @default ''
+     */
+    refresherDefaultImg: {
+      type: String,
+      default: gc<string>('refresher-default-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新松手立即刷新状态下的图片，默认与refresher-default-img一致
+     * @default ''
+     */
+    refresherPullingImg: {
+      type: String,
+      default: gc<string>('refresher-pulling-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新刷新中状态下的图片
+     * @default ''
+     */
+    refresherRefreshingImg: {
+      type: String,
+      default: gc<string>('refresher-refreshing-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新刷新结束状态下的图片
+     * @default ''
+     */
+    refresherCompleteImg: {
+      type: String,
+      default: gc<string>('refresher-complete-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新刷新中状态下是否展示旋转动画
+     * @default true
+     */
+    refresherRefreshingAnimated: {
+      type: Boolean,
+      default: gc<boolean>('refresher-refreshing-animated', true)
+    },
+    /**
+     * @description 自定义下拉刷新中左侧图标的样式
+     */
+    refresherImgStyle: {
+      type: Object,
+      default: gc<object>('refresher-img-style', {})
+    },
+    /**
+     * @description 自定义下拉刷新中右侧状态描述文字的样式
+     */
+    refresherTitleStyle: {
+      type: Object,
+      default: gc<object>('refresher-title-style', {})
+    },
+    /**
+     * @description 自定义下拉刷新中右侧最后更新时间文字的样式(show-refresher-update-time为true时有效)
+     */
+    refresherUpdateTimeStyle: {
+      type: Object,
+      default: gc<object>('refresher-update-time-style', {})
+    },
+    /**
+     * @description 底部加载更多的主题样式，支持black，white，未设置时使用default-theme-style
+     * @default ''
+     */
+    loadingMoreThemeStyle: {
+      type: String,
+      default: gc<string>('loading-more-theme-style', '')
     },
     /**
      * @description 是否使用自定义的下拉刷新，设置为false即代表使用uni-app x自带的下拉刷新
@@ -570,8 +654,8 @@ by ZXLee
   const forceHideLoadMore = ref(false)
   // 内容宽度
   const contentWidth = ref(0)
-  // #ifdef VUE3-VAPOR
-  // 列表(list-view/scroll-view)可视高度，蒸汽模式下用于撑满空数据图容器，由UniResizeObserver监听列表尺寸变化自动更新
+  // #ifdef VUE3-VAPOR || WEB
+  // 列表(list-view/scroll-view)可视高度，蒸汽模式及web端用于撑满空数据图容器，由UniResizeObserver监听列表尺寸变化自动更新
   const listHeight = ref(0)
   let listResizeObserver: UniResizeObserver | null = null
   // #endif
@@ -629,6 +713,14 @@ by ZXLee
       return false
     }
     return props.loadMoreEnabled && !forceHideLoadMore.value && (!isLoading.value || totalData.value.length > 0) && !showEmpty.value;
+  })
+  // 下拉刷新最终主题样式，未单独设置时使用defaultThemeStyle
+  const finalRefresherThemeStyle = computed((): string => {
+    return props.refresherThemeStyle.length > 0 ? props.refresherThemeStyle : props.defaultThemeStyle;
+  })
+  // 底部加载更多最终主题样式，未单独设置时使用defaultThemeStyle
+  const finalLoadingMoreThemeStyle = computed((): string => {
+    return props.loadingMoreThemeStyle.length > 0 ? props.loadingMoreThemeStyle : props.defaultThemeStyle;
   })
   const finalScrollWithAnimation = computed((): boolean => {
     if (privateScrollWithAnimation.value != -1) {
@@ -984,7 +1076,7 @@ by ZXLee
         })
       }
 
-      // #ifdef VUE3-VAPOR
+      // #ifdef VUE3-VAPOR || WEB
       // 监听列表尺寸变化，保证空数据图容器高度始终与列表可视高度一致
       const listEle = zpxList.value;
       if (listEle !== null) {
@@ -1003,7 +1095,7 @@ by ZXLee
 
   })
 
-  // #ifdef VUE3-VAPOR
+  // #ifdef VUE3-VAPOR || WEB
   onBeforeUnmount(() => {
     if (listResizeObserver !== null) {
       listResizeObserver!.disconnect();

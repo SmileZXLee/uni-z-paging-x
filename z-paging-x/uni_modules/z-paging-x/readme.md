@@ -119,6 +119,7 @@ setZPXConfig({
 | default-page-size | 自定义pageSize(每页显示多少条)                               | Number  | 10     | -      |
 | auto              | mounted后自动调用reload方法(mounted后自动调用接口)           | Boolean | true   | false  |
 | paging-style      | 自定义组件的样式                                             | Object  | {}     | -      |
+| default-theme-style | loading(下拉刷新、上拉加载更多)的主题样式                     | String  | black  | white  |
 | layout-only       | 是否只使用基础布局，设置为true后将关闭mounted自动请求数据、关闭下拉刷新和滚动到底部加载更多，强制隐藏空数据图 | Boolean | false  | true   |
 
 #### list-view&scroll-view相关配置
@@ -155,6 +156,15 @@ setZPXConfig({
 | refresher-complete-delay   | 自定义下拉刷新结束以后延迟回弹的时间，单位为毫秒，默认为0    | Number  | 0            | -      |
 | refresher-complete-duration | 自定义下拉刷新结束回弹动画时间，单位为毫秒                   | Number  | 300          | -      |
 | refresher-background       | 下拉刷新区域背景颜色                                         | String  | #FFF         |        |
+| refresher-theme-style      | 下拉刷新的主题样式，未设置时使用`default-theme-style`          | String  | ''           | black、white |
+| refresher-default-img      | 自定义下拉刷新默认状态下的图片                                 | String  | ''           | -      |
+| refresher-pulling-img      | 自定义下拉刷新松手立即刷新状态下的图片，默认与`refresher-default-img`一致 | String  | ''           | -      |
+| refresher-refreshing-img   | 自定义下拉刷新刷新中状态下的图片                               | String  | ''           | -      |
+| refresher-complete-img     | 自定义下拉刷新刷新结束状态下的图片                             | String  | ''           | -      |
+| refresher-refreshing-animated | 自定义下拉刷新刷新中状态下是否展示旋转动画 | Boolean | true    | false  |
+| refresher-img-style        | 自定义下拉刷新中左侧图标的样式                                 | Object  | {}           | -      |
+| refresher-title-style      | 自定义下拉刷新中右侧状态描述文字的样式                          | Object  | {}           | -      |
+| refresher-update-time-style | 自定义下拉刷新中右侧最后更新时间文字的样式(`show-refresher-update-time`为true时有效) | Object  | {}  | -      |
 | show-refresher-when-reload | 列表刷新时自动显示下拉刷新view                               | Boolean | false        | true   |
 | refresher-update-time-key  | 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串 | String  | default      | -      |
 
@@ -167,6 +177,7 @@ setZPXConfig({
 | load-more-loading-text | 滑动到底部"加载中"文字                                       | String  | 正在加载...            | -      |
 | load-more-no-more-text | 滑动到底部"没有更多"文字                                     | String  | 没有更多了             | -      |
 | load-more-fail-text    | 滑动到底部"加载失败"文字                                     | String  | 加载失败，点击重新加载 | -      |
+| loading-more-theme-style | 底部加载更多的主题样式，未设置时使用`default-theme-style`     | String  | ''                     | black、white |
 
 #### 空数据图配置
 
