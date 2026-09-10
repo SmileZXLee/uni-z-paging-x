@@ -36,5 +36,9 @@ export default {
     title: '滑动切换选项卡+吸顶演示',
     file: 'sticky-swiper-demo',
     subTitle: ''
+  },{
+    title: '聊天记录模式演示',
+    file: 'chat-demo',
+    subTitle: ''
   }]
 } as List

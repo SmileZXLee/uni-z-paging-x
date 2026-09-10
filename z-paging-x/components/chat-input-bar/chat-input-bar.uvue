@@ -1,0 +1,163 @@
+<!-- z-paging-x聊天输入框 -->
+
+<template>
+  <view class="chat-input-bar-container">
+    <view class="chat-input-bar">
+      <view class="chat-input-container">
+        <!-- :adjust-position="false"必须设置，防止键盘弹出时页面自动上顶，交由z-paging-x内部处理 -->
+        <input :focus="focus" class="chat-input" v-model="msg" :adjust-position="false" confirm-type="send" type="text" placeholder="请输入内容" @confirm="sendClick" />
+      </view>
+      <!-- 表情图标（如果不需要切换表情面板则不用写） -->
+      <view class="emoji-container">
+        <image class="emoji-img" :src="emojiType === 'keyboard' ? '/static/keyboard.png' : '/static/emoji.png'" @click="emojiChange"></image>
+      </view>
+      <view class="chat-input-send" @click="sendClick">
+        <text class="chat-input-send-text">发送</text>
+      </view>
+    </view>
+    <!-- 表情面板，这里使用height控制隐藏显示是为了有高度变化的动画效果（如果不需要切换表情面板则不用写） -->
+    <view class="emoji-panel-container" :style="{ height: emojiType === 'keyboard' ? '400rpx' : '0px' }">
+      <scroll-view class="emoji-panel-scroll">
+        <view class="emoji-panel">
+          <text class="emoji-panel-text" v-for="(item, index) in emojisArr" :key="index" @click="emojiClick(item)">
+            {{item}}
+          </text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  const emit = defineEmits<{
+    (e: 'send', msg: string): void
+    (e: 'emojiTypeChange', emojiType: string): void
+  }>()
+
+  const msg = ref('')
+  // 表情数组（如果不需要切换表情面板则不用写）
+  const emojisArr = ref(['😊', '😁', '😀', '😃', '😣', '😞', '😩', '😫', '😲', '😟', '😦', '😜', '😳', '😋', '😥', '😰', '🤠', '😎', '😇', '😉', '😭', '😈', '😕', '😏', '😘', '😤', '😡', '😅', '😬', '😺', '😻', '😽', '😼', '🙈', '🙉', '🙊', '🔥', '👍', '👎', '👌', '✌️', '🙏', '💪', '👻'] as string[])
+  // 当前input focus（如果不需要切换表情面板则不用写）
+  const focus = ref(false)
+  // 当前表情/键盘点击后的切换类型，为空字符串代表展示表情logo但是不展示表情面板；emoji代表键盘展示中；keyboard代表表情面板展示中
+  const emojiType = ref('')
+
+  // 更新了键盘高度（如果不需要切换表情面板则不用写）
+  const updateKeyboardHeightChange = (height: number) => {
+    if (height > 0) {
+      // 键盘展开，将emojiType设置为emoji
+      emojiType.value = 'emoji'
+    }
+  }
+
+  // 用户尝试隐藏键盘，此时如果表情面板在展示中，应当隐藏表情面板；如果是键盘在展示中不用处理，z-paging-x内部已经处理（如果不需要切换表情面板则不用写）
+  const hidedKeyboard = () => {
+    if (emojiType.value === 'keyboard') {
+      emojiType.value = ''
+    }
+  }
+
+  // 点击了切换表情面板/键盘（如果不需要切换表情面板则不用写）
+  const emojiChange = () => {
+    emit('emojiTypeChange', emojiType.value)
+    if (emojiType.value === 'keyboard') {
+      // 点击了键盘，展示键盘
+      focus.value = true
+    } else {
+      // 点击了切换表情面板，隐藏键盘
+      focus.value = false
+      uni.hideKeyboard()
+    }
+    emojiType.value = (emojiType.value.length == 0 || emojiType.value === 'emoji') ? 'keyboard' : 'emoji'
+  }
+
+  // 点击了某个表情，将其插入输入内容中（如果不需要切换表情面板则不用写）
+  const emojiClick = (text: string) => {
+    msg.value += text
+  }
+
+  // 点击了发送按钮
+  const sendClick = () => {
+    if (msg.value.length == 0) return
+    emit('send', msg.value)
+    msg.value = ''
+  }
+
+  defineExpose({
+    updateKeyboardHeightChange,
+    hidedKeyboard
+  })
+</script>
+
+<style scoped>
+  .chat-input-bar {
+    flex-direction: row;
+    align-items: center;
+    border-top: solid 1px #f5f5f5;
+    background-color: #f8f8f8;
+    padding: 10rpx 20rpx;
+  }
+
+  .chat-input-container {
+    flex: 1;
+    padding: 15rpx;
+    background-color: white;
+    border-radius: 10rpx;
+  }
+
+  .chat-input {
+    flex: 1;
+    font-size: 28rpx;
+  }
+
+  .emoji-container {
+    width: 54rpx;
+    height: 54rpx;
+    margin: 10rpx 0rpx 10rpx 20rpx;
+  }
+
+  .emoji-img {
+    width: 54rpx;
+    height: 54rpx;
+  }
+
+  .chat-input-send {
+    background-color: #007AFF;
+    margin: 10rpx 10rpx 10rpx 20rpx;
+    border-radius: 10rpx;
+    width: 110rpx;
+    height: 60rpx;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .chat-input-send-text {
+    color: white;
+    font-size: 26rpx;
+  }
+
+  .emoji-panel-container {
+    background-color: #f8f8f8;
+    overflow: hidden;
+    transition-property: height;
+    transition-duration: 0.15s;
+  }
+
+  .emoji-panel-scroll {
+    flex: 1;
+  }
+
+  .emoji-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-right: 10rpx;
+    padding-left: 15rpx;
+    padding-bottom: 10rpx;
+  }
+
+  .emoji-panel-text {
+    font-size: 50rpx;
+    margin-left: 15rpx;
+    margin-top: 20rpx;
+  }
+</style>

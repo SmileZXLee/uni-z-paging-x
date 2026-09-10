@@ -85,7 +85,7 @@ npm update z-paging-x
 			type: tabIndex.value + 1
 		}).then((res: UTSJSONObject) => {
 			// 将请求结果通过complete传给z-paging处理，同时也代表请求结束，这一行必须调用
-			pagingX.value?.complete(res.getArray('data'))
+			pagingX.value?.complete(res['data'] as any[])
 		})
 	}
 </script>
@@ -197,6 +197,22 @@ setZPXConfig({
 | back-to-top-img       | 点击返回顶部按钮的自定义图片地址，默认使用z-paging内置的图片 | String  | -      | -      |
 | back-to-top-style     | 点击返回顶部按钮的自定义样式                                 | Object  | {}     | -      |
 
+#### 聊天记录模式配置
+
+> 聊天记录模式下列表会被倒置，数组第0项(最新消息)显示在底部，滚动到视觉顶部会自动触发`@query`加载更多历史消息(from为load-more)，历史消息拼接到数组末尾，加载过程无闪动。`complete`传入的数据应为服务端返回的“新→旧”顺序(与真实IM接口及z-paging一致)。因为列表被倒置，每个列表项需要绑定`@cellStyleChange`回传的样式再倒置回来(见demo)。当第一页就没有更多数据(不满一页)时列表不倒置，消息从顶部开始排列。发送新消息请调用`addChatRecordData`。
+
+| 参数                                | 说明                                                         | 类型    | 默认值 | 可选值 |
+| :---------------------------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
+| use-chat-record-mode                | 使用聊天记录模式                                             | Boolean | false  | true   |
+| bottom-bg-color                     | `slot="bottom"`容器(含底部安全区域及键盘占位)的背景色          | String  | ''     | -      |
+| safe-area-inset-bottom              | 是否开启底部安全区域适配，开启后在列表(及`slot="bottom"`)下方自动添加底部安全区域占位 | Boolean | false  | true   |
+| auto-hide-keyboard-when-chat        | 使用聊天记录模式时是否自动隐藏键盘：在用户触摸列表时自动隐藏键盘 | Boolean | true   | false  |
+| auto-adjust-position-when-chat      | 使用聊天记录模式中键盘弹出时是否自动调整`slot="bottom"`高度(在其下方添加键盘高度的占位)，需将输入框的`adjust-position`设置为false，仅App | Boolean | true   | false  |
+| chat-adjust-position-offset         | 使用聊天记录模式中键盘弹出时占位高度偏移距离，单位px           | Number  | 0      | -      |
+| auto-to-bottom-when-chat            | 使用聊天记录模式中键盘弹出时是否自动滚动到底部                 | Boolean | false  | true   |
+| show-chat-loading-when-reload       | 使用聊天记录模式中reload时是否显示chatLoading                  | Boolean | false  | true   |
+| chat-loading-more-default-as-loading | 在聊天记录模式中滑动到顶部状态为默认状态时，以加载中的状态展示。若设置为false，则默认会显示【点击加载更多】，然后才会显示loading | Boolean | true   | false  |
+
 ### events
 
 | 事件名                 | 说明                                                         | 回调参数                                                     |
@@ -214,6 +230,9 @@ setZPXConfig({
 | @backToTopClick        | 点击了返回到顶部                                             | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
 | @refresherStatusChange | 下拉刷新状态改变                                             | `参数1`:下拉刷新状态：default:默认状态；<br/>release-to-refresh:松手立即刷新；<br/>loading:刷新中；<br/>complete:刷新结束 |
 | @loadMoreStatusChange  | 底部加载更多状态改变                                         | `参数1`:底部加载更多状态：default:默认状态；<br/>loading:加载中；<br/>no-more:没有更多数据；<br/>fail:加载失败 |
+| @keyboardHeightChange  | 聊天记录模式中键盘高度改变(仅App)                              | `参数1`:键盘高度，单位px                                       |
+| @hidedKeyboard         | 聊天记录模式中用户触摸列表导致键盘被自动隐藏时触发             | -                                                            |
+| @cellStyleChange       | 聊天记录模式中列表项需要绑定的样式改变(列表倒置时为倒置样式)，请将其绑定到每个列表项的`:style`上 | `参数1`:cellStyle(UTSJSONObject)                               |
 
 ### methods
 
@@ -229,6 +248,8 @@ setZPXConfig({
 | scrollToTop      | 滚动到顶部                                                   | `参数1(必填)`:是否有动画效果                                 |
 | scrollToBottom   | 滚动到底部                                                   | `参数1(必填)`:是否有动画效果                                 |
 | scrollToY        | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置；`参数2(必填)`:是否有动画效果     |
+| addChatRecordData | 【聊天记录模式】添加聊天记录(显示在列表底部)                  | `参数1(必填)`:单条数据或数组(数组按传入顺序从上到下展示)；`参数2(可选)`:是否滚动到底部，默认为true；`参数3(可选)`:滚动到底部是否有动画，默认为true |
+| doChatRecordLoadMore | 【聊天记录模式】手动触发加载更多历史消息(等同于滚动到顶部)   | -                                                            |
 
 
 ### slots
@@ -242,4 +263,6 @@ setZPXConfig({
 | empty     | 自定义空数据占位view。<br/>slot-scope="{ isLoadFailed(true: 加载失败，false: 加载成功) }" |
 | backToTop | 自定义点击返回顶部view                                       |
 | loading   | 自定义页面reload时的加载view                                 |
+| chatLoading | 【聊天记录模式】自定义顶部加载更多(历史消息)view。<br/>slot-scope="{ loadingMoreStatus(default:默认状态；loading:加载中；no-more:没有更多数据；fail:加载失败) }" |
+| chatNoMore | 【聊天记录模式】自定义没有更多历史消息时顶部展示的view，不设置则不展示 |
 

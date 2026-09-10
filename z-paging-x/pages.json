@@ -62,6 +62,14 @@
 				"navigationBarTitleText" : "空数据&加载失败演示",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/chat-demo/chat-demo",
+			"style" :
+			{
+				"navigationBarTitleText" : "聊天记录模式演示",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

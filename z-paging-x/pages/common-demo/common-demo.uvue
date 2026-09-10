@@ -34,7 +34,7 @@
       pageSize: pageSize,
       type: tabIndex.value + 1
     }).then((res: UTSJSONObject) => {
-      pagingX.value?.complete(res.getArray('data'))
+      pagingX.value?.complete(res['data'] as any[])
     })
   }
 </script>

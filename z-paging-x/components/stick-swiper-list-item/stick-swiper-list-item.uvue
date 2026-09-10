@@ -79,7 +79,7 @@
       type: props.tabIndex + 1
     }
     requestList(params).then((res: UTSJSONObject) => {
-      pagingX.value?.complete(res.getArray('data'))
+      pagingX.value?.complete(res['data'] as any[])
       // 通知页面结束下拉刷新
       if (pageNo == 1 && refreshComplete != null) {
         refreshComplete!()

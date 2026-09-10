@@ -3,7 +3,7 @@
   <view class="zpx-l-container"  @click="onClickMore">
     <view v-if="isNoMore" class="zpx-l-line" :style="{ backgroundColor: lineColor }" />
     <z-paging-loading v-if="isLoading" :color="indicatorColor" />
-    <text class="zpx-l-loading-text" :style="{ color: titleColor }">{{statusText}}</text>
+    <text v-if="showText" class="zpx-l-loading-text" :style="{ color: titleColor }">{{statusText}}</text>
     <view v-if="isNoMore" class="zpx-l-line" :style="{ backgroundColor: lineColor }" />
   </view>
 </template>
@@ -46,6 +46,11 @@
     themeStyle: {
       type: String,
       default: 'black'
+    },
+    // 是否是聊天记录模式，聊天记录模式下加载中仅展示loading不展示文字
+    isChat: {
+      type: Boolean,
+      default: false
     },
   })
 
@@ -92,6 +97,11 @@
     } else {
       return '';
     }
+  })
+
+  // 与z-paging一致：聊天记录模式下仅默认状态与加载失败状态显示文字
+  const showText = computed((): boolean => {
+    return !props.isChat || isDefault.value || isFail.value;
   })
 
   const onClickMore = () => {

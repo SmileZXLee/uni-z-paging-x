@@ -7,10 +7,11 @@ function _asciiToBase64(str: string): string {
   let result = '';
   let i = 0;
   while (i < str.length) {
-    const c1 = str.charCodeAt(i);
-    const c2 = i + 1 < str.length ? str.charCodeAt(i + 1) : 0;
-    const c3 = i + 2 < str.length ? str.charCodeAt(i + 2) : 0;
-    const n = c1 * 65536 + c2 * 256 + c3;
+    // charCodeAt在UTS中返回number | null
+    const c1: number = str.charCodeAt(i) ?? 0;
+    const c2: number = i + 1 < str.length ? (str.charCodeAt(i + 1) ?? 0) : 0;
+    const c3: number = i + 2 < str.length ? (str.charCodeAt(i + 2) ?? 0) : 0;
+    const n: number = c1 * 65536 + c2 * 256 + c3;
     result += _base64Chars.charAt(Math.floor(n / 262144) % 64);
     result += _base64Chars.charAt(Math.floor(n / 4096) % 64);
     result += i + 1 < str.length ? _base64Chars.charAt(Math.floor(n / 64) % 64) : '=';

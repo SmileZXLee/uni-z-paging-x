@@ -1,0 +1,93 @@
+<!-- 聊天记录模式演示，加载更多聊天记录无闪动 -->
+<!-- 聊天记录模式下列表会被倒置，因此每个列表项需要绑定@cellStyleChange回传的cellStyle再倒置回来 -->
+
+<template>
+  <!-- use-chat-record-mode：开启聊天记录模式 -->
+  <!-- safe-area-inset-bottom：开启底部安全区域适配 -->
+  <!-- bottom-bg-color：设置slot="bottom"容器的背景色，这里设置为和chat-input-bar的背景色一致 -->
+  <!-- 聊天记录模式下不使用下拉刷新 -->
+  <z-paging-x ref="pagingX" v-model="(dataList as ChatMessage[])" use-chat-record-mode safe-area-inset-bottom bottom-bg-color="#f8f8f8" :refresher-enabled="false"
+    @query="queryList" @cellStyleChange="cellStyleChange" @keyboardHeightChange="keyboardHeightChange" @hidedKeyboard="hidedKeyboard">
+    <!-- 顶部提示文字 -->
+    <!-- #ifdef WEB -->
+    <template #top>
+      <view class="header">
+        <text class="header-text">由于在Web中无法监听键盘高度变化，底部输入框切换时可能会有些bug，请运行在App体验最佳效果</text>
+      </view>
+    </template>
+    <!-- #endif -->
+
+    <!-- for循环渲染聊天记录列表，:style="cellStyle"必须写，否则会导致列表项倒置 -->
+    <list-item v-for="(item, index) in dataList" :key="index" :style="cellStyle">
+      <chat-item :item="item" />
+    </list-item>
+    <!-- 底部聊天输入框 -->
+    <template #bottom>
+      <chat-input-bar ref="inputBar" @send="doSend" />
+    </template>
+  </z-paging-x>
+</template>
+
+<script setup lang="uts">
+  import { requestChatList, ChatMessage } from '@/http/request.uts'
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+  const inputBar = ref<ChatInputBarComponentPublicInstance | null>(null)
+
+  // v-model绑定的这个变量不要在分页请求结束中自己赋值！！！
+  const dataList = ref<ChatMessage[]>([])
+  // 每个列表项需要绑定的样式(列表倒置时为倒置样式，将列表项倒置回来)，由z-paging-x通过@cellStyleChange回传
+  const cellStyle = ref<UTSJSONObject>({})
+
+  // @query所绑定的方法不要自己调用！！需要刷新列表数据时，只需要调用pagingX.value?.reload()即可
+  const queryList = (pageNo: number, pageSize: number) => {
+    // 模拟请求服务器获取分页数据，请替换成自己的网络请求。聊天记录模式下传入服务端返回的“新→旧”数据即可
+    requestChatList(pageNo, pageSize).then((res: UTSJSONObject) => {
+      pagingX.value?.complete(res['data'] as any[])
+    })
+  }
+
+  // 列表项倒置样式改变
+  const cellStyleChange = (style: UTSJSONObject) => {
+    cellStyle.value = style
+  }
+
+  // 监听键盘高度改变，请不要直接通过uni.onKeyboardHeightChange监听，否则可能导致z-paging-x内置的键盘高度改变监听失效（如果不需要切换表情面板则不用写）
+  const keyboardHeightChange = (height: number) => {
+    inputBar.value?.updateKeyboardHeightChange(height)
+  }
+
+  // 用户尝试隐藏键盘，此时如果表情面板在展示中，应当通知chatInputBar隐藏表情面板（如果不需要切换表情面板则不用写）
+  const hidedKeyboard = () => {
+    inputBar.value?.hidedKeyboard()
+  }
+
+  // 发送新消息
+  const doSend = (msg: string) => {
+    uni.showLoading({
+      title: '发送中...'
+    })
+    setTimeout(() => {
+      uni.hideLoading()
+      pagingX.value?.addChatRecordData({
+        time: '',
+        icon: '/static/daxiong.jpg',
+        name: '大雄',
+        content: msg,
+        isMe: true
+      } as ChatMessage)
+    }, 500)
+  }
+</script>
+
+<style>
+  .header {
+    background-color: red;
+    padding: 20rpx;
+  }
+
+  .header-text {
+    font-size: 20rpx;
+    color: white;
+  }
+</style>

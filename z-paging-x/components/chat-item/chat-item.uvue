@@ -1,0 +1,112 @@
+<!-- z-paging-x聊天item -->
+
+<template>
+  <view class="chat-item">
+    <text class="chat-time" v-if="item.time.length > 0">
+      {{item.time}}
+    </text>
+    <view class="chat-container" :class="item.isMe ? 'chat-location-me' : ''">
+      <view class="chat-icon-container">
+        <image class="chat-icon" :src="item.icon" mode="aspectFill" />
+      </view>
+      <view class="chat-content-container" :class="item.isMe ? 'chat-content-container-me' : ''">
+        <text class="chat-user-name">
+          {{item.name}}
+        </text>
+        <view class="chat-text-container-super" :class="item.isMe ? 'chat-text-container-super-me' : ''">
+          <view class="chat-text-container" :class="item.isMe ? 'chat-text-container-me' : ''">
+            <text class="chat-text" :class="item.isMe ? 'chat-text-me' : ''">{{item.content}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  import type { PropType } from 'vue'
+  import { ChatMessage } from '@/http/request.uts'
+
+  defineProps({
+    item: {
+      type: Object as PropType<ChatMessage>,
+      required: true
+    }
+  })
+</script>
+
+<style scoped>
+  .chat-item {
+    flex-direction: column;
+    padding: 20rpx;
+  }
+
+  .chat-time {
+    padding: 4rpx 0rpx;
+    text-align: center;
+    font-size: 22rpx;
+    color: #aaaaaa;
+  }
+
+  .chat-container {
+    flex-direction: row;
+  }
+
+  .chat-location-me {
+    flex-direction: row-reverse;
+  }
+
+  .chat-icon-container {
+    margin-top: 12rpx;
+  }
+
+  .chat-icon {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 40rpx;
+    background-color: #eeeeee;
+  }
+
+  .chat-content-container {
+    margin: 0rpx 15rpx;
+    align-items: flex-start;
+  }
+
+  .chat-content-container-me {
+    align-items: flex-end;
+  }
+
+  .chat-user-name {
+    font-size: 26rpx;
+    color: #888888;
+  }
+
+  .chat-text-container-super {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .chat-text-container-super-me {
+    justify-content: flex-end;
+  }
+
+  .chat-text-container {
+    background-color: #f1f1f1;
+    border-radius: 8rpx;
+    padding: 10rpx 15rpx;
+    margin-top: 10rpx;
+    max-width: 500rpx;
+  }
+
+  .chat-text-container-me {
+    background-color: #007AFF;
+  }
+
+  .chat-text {
+    font-size: 28rpx;
+  }
+
+  .chat-text-me {
+    color: white;
+  }
+</style>

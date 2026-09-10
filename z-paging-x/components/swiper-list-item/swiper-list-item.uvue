@@ -57,7 +57,7 @@
       type: props.tabIndex + 1
     }
     requestList(params).then((res: UTSJSONObject) => {
-      pagingX.value?.complete(res.getArray('data'))
+      pagingX.value?.complete(res['data'] as any[])
       // 设置当前组件已经加载过了，必须设置
       firstLoaded.value = true
     })
