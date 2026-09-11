@@ -1,7 +1,7 @@
 <!-- 普通模式演示 -->
 
 <template>
-  <z-paging-x ref="pagingX" default-theme-style="black" :show-refresher-when-reload="true" v-model="(dataList as ListItem[])" @query="queryList">
+  <z-paging-x ref="pagingX" v-model="(dataList as ListItem[])" @query="queryList">
     <template #top>
       <common-tabs :list="tabList" @change="tabChange" />
     </template>

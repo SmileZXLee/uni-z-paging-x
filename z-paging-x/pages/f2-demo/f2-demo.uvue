@@ -1,0 +1,119 @@
+<!-- 下拉进入二楼演示 -->
+<!-- 下拉进入二楼建议在pages.json中隐藏系统导航栏(navigationStyle: custom)，使用自定义导航栏，避免二楼被系统导航栏盖住 -->
+
+<template>
+  <!-- refresher-f2-enabled：开启下拉进入二楼 -->
+  <z-paging-x ref="pagingX" v-model="(dataList as ListItem[])" refresher-f2-enabled @query="queryList">
+    <!-- 需要固定在顶部不滚动的view放在slot="top"中 -->
+    <template #top>
+      <view class="f2-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
+        <view class="f2-navbar-content">
+          <view class="f2-navbar-back" @click="back">
+            <image class="f2-navbar-back-img" src="/static/back_icon.png" mode="aspectFit"></image>
+          </view>
+          <text class="f2-navbar-title">下拉进入二楼演示</text>
+        </view>
+      </view>
+      <common-tabs :list="tabList" @change="tabChange" />
+    </template>
+    <!-- 自定义松手进入二楼时的下拉刷新view（非必须，可根据具体需求定制） -->
+    <template #refresherF2>
+      <view class="refresher-f2-view">
+        <text class="refresher-f2-text">松手可以进入二楼哦 (*╹▽╹*)</text>
+      </view>
+    </template>
+    <!-- 自定义需要插入二楼的view，二楼容器高度与z-paging-x一致，插入的view建议flex:1铺满 -->
+    <template #f2>
+      <custom-f2 @closeF2="onCloseF2" />
+    </template>
+    <list-item v-for="(item, index) in dataList" :key="index">
+      <view class="list-item">
+        <text class="list-item-title">{{item.title}}</text>
+        <text class="list-item-type">{{item.detail}}</text>
+      </view>
+    </list-item>
+  </z-paging-x>
+</template>
+
+<script setup lang="uts">
+  import { requestList, ListItem } from '@/http/request.uts'
+
+  const pagingX = ref<ZPagingXComponentPublicInstance | null>(null)
+
+  const statusBarHeight = ref(uni.getWindowInfo().statusBarHeight)
+  const tabList = ref(['测试1', '测试2', '测试3', '测试4'] as string[])
+  const tabIndex = ref(0)
+  const dataList = ref<ListItem[]>([])
+
+  const back = () => {
+    uni.navigateBack({})
+  }
+
+  const tabChange = (index: number) => {
+    tabIndex.value = index
+    pagingX.value?.reload()
+  }
+
+  const queryList = (pageNo: number, pageSize: number) => {
+    requestList({
+      pageNo: pageNo,
+      pageSize: pageSize,
+      type: tabIndex.value + 1
+    }).then((res: UTSJSONObject) => {
+      pagingX.value?.complete(res['data'] as any[])
+    })
+  }
+
+  // 点击了关闭二楼
+  const onCloseF2 = () => {
+    pagingX.value?.closeF2()
+  }
+</script>
+
+<style>
+  .f2-navbar {
+    background-color: #F8F8F8;
+  }
+
+  .f2-navbar-content {
+    position: relative;
+    height: 44px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .f2-navbar-back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .f2-navbar-back-img {
+    width: 40rpx;
+    height: 40rpx;
+  }
+
+  .f2-navbar-title {
+    font-size: 32rpx;
+    color: #000000;
+  }
+
+  .refresher-f2-view {
+    background-color: #007AFF;
+    padding: 20rpx;
+    margin: 0rpx 30rpx;
+    border-radius: 100px;
+    align-items: center;
+  }
+
+  .refresher-f2-text {
+    font-weight: bold;
+    color: white;
+    font-size: 26rpx;
+  }
+</style>

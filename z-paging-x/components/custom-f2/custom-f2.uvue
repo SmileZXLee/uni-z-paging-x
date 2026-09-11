@@ -1,0 +1,102 @@
+<!-- 自定义二楼view -->
+
+<template>
+  <view class="custom-f2">
+    <view class="custom-f2-main">
+      <view class="custom-f2-navbar" :style="{ paddingTop: statusBarHeight + 'px' }">
+        <view class="custom-f2-navbar-content">
+          <text class="custom-f2-navbar-title">我的小程序</text>
+        </view>
+      </view>
+      <scroll-view class="custom-f2-list-container">
+        <view class="custom-f2-list">
+          <view class="custom-f2-item" v-for="index in 16" :key="index">
+            <image class="custom-f2-item-img" src="/static/duola.jpg" mode="aspectFill"></image>
+            <text class="custom-f2-item-title">小程序{{index}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+    <view class="custom-f2-bottom" @click="onCloseF2Click">
+      <text class="custom-f2-bottom-text">回到首页</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+  const emit = defineEmits<{
+    (e: 'closeF2'): void
+  }>()
+
+  const statusBarHeight = ref(uni.getWindowInfo().statusBarHeight)
+
+  const onCloseF2Click = () => {
+    emit('closeF2')
+  }
+</script>
+
+<style scoped>
+  .custom-f2 {
+    flex: 1;
+    background-color: #1b1b2a;
+  }
+
+  .custom-f2-main {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .custom-f2-navbar-content {
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .custom-f2-navbar-title {
+    color: white;
+    font-size: 34rpx;
+    font-weight: bold;
+  }
+
+  .custom-f2-list-container {
+    flex: 1;
+  }
+
+  .custom-f2-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 40rpx 46rpx;
+  }
+
+  .custom-f2-item {
+    width: 25%;
+    align-items: center;
+    margin-top: 40rpx;
+  }
+
+  .custom-f2-item-img {
+    width: 90rpx;
+    height: 90rpx;
+    border-radius: 45rpx;
+  }
+
+  .custom-f2-item-title {
+    margin-top: 20rpx;
+    color: white;
+    font-size: 22rpx;
+  }
+
+  .custom-f2-bottom {
+    background-color: #35364f;
+    padding: 40rpx;
+    align-items: center;
+    border-top-left-radius: 30rpx;
+    border-top-right-radius: 30rpx;
+  }
+
+  .custom-f2-bottom-text {
+    color: white;
+    font-weight: bold;
+    font-size: 32rpx;
+  }
+</style>

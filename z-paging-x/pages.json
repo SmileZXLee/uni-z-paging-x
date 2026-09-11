@@ -70,6 +70,15 @@
 				"navigationBarTitleText" : "聊天记录模式演示",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/f2-demo/f2-demo",
+			"style" :
+			{
+				"navigationStyle" : "custom",
+				"navigationBarTitleText" : "下拉进入二楼演示",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

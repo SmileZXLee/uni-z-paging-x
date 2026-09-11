@@ -11,7 +11,7 @@
 
 > z-paging uniapp x版
 
-[![version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
+[![version](https://img.shields.io/badge/version-1.0.1-blue)](https://github.com/SmileZXLee/uni-z-paging-x)
 [![license](https://img.shields.io/github/license/SmileZXLee/uni-z-paging-x)](https://en.wikipedia.org/wiki/MIT_License)
 
 ***
@@ -153,6 +153,7 @@ setZPXConfig({
 | refresher-pulling-text     | 自定义下拉刷新松手立即刷新状态下的文字                       | String  | 松开立即刷新 | -      |
 | refresher-refreshing-text  | 自定义下拉刷新刷新中状态下的文字                             | String  | 正在刷新...  | -      |
 | refresher-complete-text    | 自定义下拉刷新刷新结束状态下的文字                           | String  | 刷新完成     | -      |
+| refresher-go-f2-text       | 自定义继续下拉进入二楼状态下的文字                            | String  | 松手进入二楼 | -      |
 | refresher-complete-delay   | 自定义下拉刷新结束以后延迟回弹的时间，单位为毫秒，默认为0    | Number  | 0            | -      |
 | refresher-complete-duration | 自定义下拉刷新结束回弹动画时间，单位为毫秒                   | Number  | 300          | -      |
 | refresher-background       | 下拉刷新区域背景颜色                                         | String  | #FFF         |        |
@@ -167,6 +168,17 @@ setZPXConfig({
 | refresher-update-time-style | 自定义下拉刷新中右侧最后更新时间文字的样式(`show-refresher-update-time`为true时有效) | Object  | {}  | -      |
 | show-refresher-when-reload | 列表刷新时自动显示下拉刷新view                               | Boolean | false        | true   |
 | refresher-update-time-key  | 如果需要区别不同页面的最后更新时间，请为不同页面的z-paging-x的`refresher-update-time-key`设置不同的字符串 | String  | default      | -      |
+
+#### 下拉进入二楼配置
+
+> 建议在pages.json中将页面`navigationStyle`设置为`custom`并使用自定义导航栏，避免二楼被系统导航栏盖住。二楼内容通过`slot="f2"`传入，其容器高度与z-paging-x一致。
+
+| 参数                  | 说明                                                         | 类型    | 默认值 | 可选值 |
+| :-------------------- | :----------------------------------------------------------- | :------ | :----- | :----- |
+| refresher-f2-enabled  | 是否开启下拉进入二楼功能                                     | Boolean | false  | true   |
+| refresher-f2-threshold | 下拉进入二楼阈值，单位为px                                   | Number  | 100    | -      |
+| refresher-f2-duration | 下拉进入二楼动画时间，单位为毫秒                             | Number  | 200    | -      |
+| show-refresher-f2     | 下拉进入二楼状态松手后是否弹出二楼(`slot="f2"`)，设置为false时仅触发`@refresherF2Change`，由使用者自行处理 | Boolean | true   | false  |
 
 #### 底部加载更多配置
 
@@ -228,10 +240,11 @@ setZPXConfig({
 | @scrolltolower         | 滚动到底部/右边，会触发 scrolltolower 事件                   | `参数1`:(event: [ScrollToLowerEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltolowerevent)) => void |
 | @scrolltoupper         | 滚动到顶部/左边，会触发 scrolltoupper 事件                   | `参数1`:(event: [ScrollToUpperEvent](https://doc.dcloud.net.cn/uni-app-x/component/list-view.html#uniscrolltoupperevent)) => void |
 | @backToTopClick        | 点击了返回到顶部                                             | 点击返回顶部按钮后是否滚动到顶部，默认为是。<br/>如果需要禁止滚动到顶部事件，则在page的methods中书写：<p style="font-weight:bold;">backToTopClick(e: (toTop: boolean) => void) {<br/> &nbsp;&nbsp;&nbsp;&nbsp;e(false);<br/>  &nbsp;&nbsp;&nbsp;&nbsp;//处理自己的业务逻辑<br/>}</p> |
-| @refresherStatusChange | 下拉刷新状态改变                                             | `参数1`:下拉刷新状态：default:默认状态；<br/>release-to-refresh:松手立即刷新；<br/>loading:刷新中；<br/>complete:刷新结束 |
+| @refresherStatusChange | 下拉刷新状态改变                                             | `参数1`:下拉刷新状态：default:默认状态；<br/>release-to-refresh:松手立即刷新；<br/>loading:刷新中；<br/>complete:刷新结束；<br/>go-f2:松手进入二楼 |
 | @loadMoreStatusChange  | 底部加载更多状态改变                                         | `参数1`:底部加载更多状态：default:默认状态；<br/>loading:加载中；<br/>no-more:没有更多数据；<br/>fail:加载失败 |
 | @keyboardHeightChange  | 聊天记录模式中键盘高度改变(仅App)                              | `参数1`:键盘高度，单位px                                       |
 | @hidedKeyboard         | 聊天记录模式中用户触摸列表导致键盘被自动隐藏时触发             | -                                                            |
+| @refresherF2Change     | 下拉进入二楼状态改变                                         | `参数1`:go(进入二楼)；close(退出二楼)                          |
 | @cellStyleChange       | 聊天记录模式中列表项需要绑定的样式改变(列表倒置时为倒置样式)，请将其绑定到每个列表项的`:style`上 | `参数1`:cellStyle(UTSJSONObject)                               |
 
 ### methods
@@ -250,6 +263,8 @@ setZPXConfig({
 | scrollToY        | 滚动到指定位置                                               | `参数1(必填)`:滚动到的位置；`参数2(必填)`:是否有动画效果     |
 | addChatRecordData | 【聊天记录模式】添加聊天记录(显示在列表底部)                  | `参数1(必填)`:单条数据或数组(数组按传入顺序从上到下展示)；`参数2(可选)`:是否滚动到底部，默认为true；`参数3(可选)`:滚动到底部是否有动画，默认为true |
 | doChatRecordLoadMore | 【聊天记录模式】手动触发加载更多历史消息(等同于滚动到顶部)   | -                                                            |
+| goF2             | 进入二楼(需开启`refresher-f2-enabled`)                        | -                                                            |
+| closeF2          | 关闭二楼                                                     | -                                                            |
 
 
 ### slots
@@ -258,11 +273,13 @@ setZPXConfig({
 | :-------- | ------------------------------------------------------------ |
 | top       | 可以将自定义导航栏、tab-view等需要固定的`(不需要跟着滚动的)`元素放入`slot="top"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="top"`。需要固定在顶部的view请勿设置`position: fixed;` |
 | bottom    | 可以将需要固定在底部的`(不需要跟着滚动的)`元素放入`slot="bottom"`的view中。<br/>注意，当有多个需要固定的view时，请用一个view包住它们，并且在这个view上设置`slot="bottom"`。需要固定在底部的view请勿设置`position: fixed;`。 |
-| refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ rrefresherStatus(default:默认状态；release-to-refresh:松手立即刷新；loading:刷新中；complete:刷新结束 }" |
+| refresher | 自定义下拉刷新view，设置后则不使用uni自带的下拉刷新view和z-paging自定义的下拉刷新view。<br>slot-scope="{ refresherStatus(default:默认状态；release-to-refresh:松手立即刷新；loading:刷新中；complete:刷新结束；go-f2:松手进入二楼) }" |
 | loadMore  | 自定义底部加载更多view，设置后则不使用z-paging-x内置的下拉刷新view。<br/>slot-scope="{ loadMoreStatus(default:默认状态；loading:加载中；no-more:没有更多数据；fail:加载失败) }" |
 | empty     | 自定义空数据占位view。<br/>slot-scope="{ isLoadFailed(true: 加载失败，false: 加载成功) }" |
 | backToTop | 自定义点击返回顶部view                                       |
 | loading   | 自定义页面reload时的加载view                                 |
 | chatLoading | 【聊天记录模式】自定义顶部加载更多(历史消息)view。<br/>slot-scope="{ loadingMoreStatus(default:默认状态；loading:加载中；no-more:没有更多数据；fail:加载失败) }" |
 | chatNoMore | 【聊天记录模式】自定义没有更多历史消息时顶部展示的view，不设置则不展示 |
+| refresherF2 | 自定义松手进入二楼状态下的下拉刷新view，不设置则显示内置下拉刷新view及`refresher-go-f2-text` |
+| f2        | 二楼view，开启`refresher-f2-enabled`后下拉至阈值松手弹出，容器高度与z-paging-x一致，建议内容设置flex:1铺满 |
 

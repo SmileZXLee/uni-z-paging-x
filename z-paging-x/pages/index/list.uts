@@ -40,5 +40,9 @@ export default {
     title: '聊天记录模式演示',
     file: 'chat-demo',
     subTitle: ''
+  },{
+    title: '下拉进入二楼演示',
+    file: 'f2-demo',
+    subTitle: ''
   }]
 } as List

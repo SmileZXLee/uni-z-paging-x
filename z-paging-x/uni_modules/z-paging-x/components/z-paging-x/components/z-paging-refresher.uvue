@@ -49,6 +49,11 @@
       type: String,
       default: '刷新完成'
     },
+    // 自定义继续下拉进入二楼状态下的文字
+    goF2Text: {
+      type: String,
+      default: '松手进入二楼'
+    },
     // 是否显示最后更新时间，默认为否
     showUpdateTime: {
       type: Boolean,
@@ -147,13 +152,16 @@
   const isComplete = computed((): boolean => {
     return props.status === Enum.Refresher.Complete;
   })
+  const isGoF2 = computed((): boolean => {
+    return props.status === Enum.Refresher.GoF2;
+  })
 
   // 获取左侧图片的transform：默认状态箭头(原图向上)旋转180度朝下，松手刷新状态恢复朝上
   const getLeftImageTransform = computed((): string => {
     if (isDefault.value) {
       return 'rotate(180deg)';
     }
-    // release-to-refresh/complete状态不旋转
+    // release-to-refresh/complete/go-f2状态不旋转
     return 'rotate(0deg)';
   })
 
@@ -178,6 +186,8 @@
       return props.refreshingText;
     } else if (isComplete.value) {
       return props.completeText;
+    } else if (isGoF2.value) {
+      return props.goF2Text;
     } else {
       return '';
     }

@@ -5,7 +5,7 @@
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
           |_|          |___/         |___/ -X
 
-v0.4.0 (2026-06-11)
+v1.0.1 (2026-09-10)
 by ZXLee
 -->
 <!-- 文档地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
@@ -23,7 +23,7 @@ by ZXLee
     <!-- #ifdef APP -->
     :associative-container="associativeContainer"
     <!-- #endif -->
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
+    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
     :bounces="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
     @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll" @touchstart="_onListTouchstart">
@@ -47,8 +47,10 @@ by ZXLee
       <list-item slot="refresher">
       <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
+          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
+          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
+          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
         </view>
       <!-- #ifdef WEB -->
       </component>
@@ -86,7 +88,7 @@ by ZXLee
     <!-- #ifdef APP -->
     :associative-container="associativeContainer"
     <!-- #endif -->
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
+    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
     <!-- #ifndef VUE3-VAPOR -->
     :custom-nested-scroll="customNestedScroll"
     <!-- #endif -->
@@ -117,8 +119,10 @@ by ZXLee
       <view slot="refresher">
       <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
+          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
+          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
+          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
         </view>
       <!-- #ifdef WEB -->
       </component>
@@ -152,6 +156,10 @@ by ZXLee
     <view v-if="showBackToTopClass" :class="backToTopClass" :style="[backToTopStyle]" @click.stop="_onBackToTopClick">
       <slot v-if="$slots['backToTop']" name="backToTop" />
       <image v-else class="zpx-back-to-top-img" :src="backToTopImg.length > 0 ? backToTopImg : base64BackToTopImg" />
+    </view>
+    <!-- 二楼，覆盖在z-paging-x上方，通过translateY从顶部滑入/滑出 -->
+    <view v-if="showF2 && showRefresherF2" class="zpx-f2-content" :style="[f2Style]">
+      <slot name="f2" />
     </view>
   </view>
 </template>
@@ -270,6 +278,46 @@ by ZXLee
     refresherCompleteText: {
       type: String,
       default: gc<string>('refresher-complete-text', '刷新完成')
+    },
+    /**
+     * @description 自定义继续下拉进入二楼状态下的文字
+     * @default 松手进入二楼
+     */
+    refresherGoF2Text: {
+      type: String,
+      default: gc<string>('refresher-go-f2-text', '松手进入二楼')
+    },
+    /**
+     * @description 是否开启下拉进入二楼功能
+     * @default false
+     */
+    refresherF2Enabled: {
+      type: Boolean,
+      default: gc<boolean>('refresher-f2-enabled', false)
+    },
+    /**
+     * @description 下拉进入二楼阈值，单位为px
+     * @default 100
+     */
+    refresherF2Threshold: {
+      type: Number,
+      default: gc<number>('refresher-f2-threshold', 100)
+    },
+    /**
+     * @description 下拉进入二楼动画时间，单位为毫秒
+     * @default 200
+     */
+    refresherF2Duration: {
+      type: Number,
+      default: gc<number>('refresher-f2-duration', 200)
+    },
+    /**
+     * @description 下拉进入二楼状态松手后是否弹出二楼(slot=f2)，设置为false时仅触发@refresherF2Change事件，由使用者自行处理
+     * @default true
+     */
+    showRefresherF2: {
+      type: Boolean,
+      default: gc<boolean>('show-refresher-f2', true)
     },
     /**
      * @description 自定义下拉刷新结束以后延迟回弹的时间，单位为毫秒
@@ -713,6 +761,7 @@ by ZXLee
     (e: 'keyboardHeightChange', height: number): void
     (e: 'hidedKeyboard'): void
     (e: 'cellStyleChange', cellStyle: UTSJSONObject): void
+    (e: 'refresherF2Change', type: string): void
   }>()
 
   const slots = useSlots()
@@ -783,6 +832,14 @@ by ZXLee
   const keyboardHeight = ref(0)
   // 底部安全区域高度
   const safeAreaBottom = ref(0)
+  // 二楼是否展示中
+  const showF2 = ref(false)
+  // 二楼的transform，通过translateY动画从顶部滑入/滑出
+  const f2Transform = ref('translateY(0px)')
+  // z-paging-x根节点高度，二楼高度与之一致
+  const contentHeight = ref(0)
+  // 二楼关闭动画结束后隐藏的定时器
+  let f2CloseTimer: number = -1
   // #ifdef APP
   // 键盘高度变化监听id，-1代表未监听
   let keyboardListenerId: number = -1
@@ -797,6 +854,26 @@ by ZXLee
       return 0
     }
     return props.refresherThreshold > 0 ? props.refresherThreshold : refresherNodeHeight.value > 0 ? refresherNodeHeight.value : 40
+  })
+  // 下拉最大拖拽距离：list-view默认为下拉刷新控件高度的2.5倍，开启下拉进入二楼时需保证能拖拽超过进入二楼阈值
+  const finalRefresherMaxDragDistance = computed((): number => {
+    const defaultDistance = finalRefresherThreshold.value * 2.5;
+    if (!props.refresherF2Enabled) {
+      return defaultDistance;
+    }
+    return Math.max(defaultDistance, props.refresherF2Threshold + 60);
+  })
+  // 是否处于松手进入二楼状态
+  const isRefresherGoF2 = computed((): boolean => {
+    return refresherStatus.value === Enum.Refresher.GoF2;
+  })
+  // 二楼样式
+  const f2Style = computed((): UTSJSONObject => {
+    return {
+      transform: f2Transform.value,
+      height: `${contentHeight.value}px`,
+      transitionDuration: `${props.refresherF2Duration}ms`
+    };
   })
   const showEmpty = computed((): boolean => {
     // layoutOnly时强制隐藏空数据图
@@ -1204,10 +1281,59 @@ by ZXLee
   }
   // 下拉刷新控件被下拉事件
   const _onRefresherpulling = (e: RefresherEvent) => {
-    emit('refresherpulling', e.detail.dy);
+    const dy = e.detail.dy;
+    emit('refresherpulling', dy);
     if (!isLoading.value) {
-      refresherStatus.value = e.detail.dy < finalRefresherThreshold.value ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
+      if (dy < finalRefresherThreshold.value) {
+        refresherStatus.value = Enum.Refresher.Default;
+      } else if (props.refresherF2Enabled && dy >= props.refresherF2Threshold) {
+        // 开启了下拉进入二楼且下拉距离超过进入二楼阈值，则为松手进入二楼状态
+        refresherStatus.value = Enum.Refresher.GoF2;
+      } else {
+        refresherStatus.value = Enum.Refresher.ReleaseToRefresh;
+      }
     }
+  }
+  // 处理进入二楼
+  const _handleGoF2 = () => {
+    if (showF2.value || !props.refresherF2Enabled) return;
+    emit('refresherF2Change', 'go');
+    if (!props.showRefresherF2) return;
+    if (f2CloseTimer != -1) {
+      clearTimeout(f2CloseTimer);
+      f2CloseTimer = -1;
+    }
+    const zPagingXEle = zPagingX.value;
+    if (zPagingXEle === null) return;
+    // 二楼高度与z-paging-x根节点一致，先移出到顶部外，渲染后再滑入
+    zPagingXEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+      contentHeight.value = rect.height;
+      f2Transform.value = `translateY(-${rect.height}px)`;
+      showF2.value = true;
+      setTimeout(() => {
+        f2Transform.value = 'translateY(0px)';
+      }, 100)
+    })
+  }
+  // 处理退出二楼
+  const _handleCloseF2 = () => {
+    if (!showF2.value || !props.refresherF2Enabled) return;
+    emit('refresherF2Change', 'close');
+    if (!props.showRefresherF2) return;
+    f2Transform.value = `translateY(-${contentHeight.value}px)`;
+    // 滑出动画结束后再隐藏
+    f2CloseTimer = setTimeout(() => {
+      showF2.value = false;
+      f2CloseTimer = -1;
+    }, props.refresherF2Duration)
+  }
+  // 进入二楼
+  const goF2 = () => {
+    _handleGoF2();
+  }
+  // 关闭二楼
+  const closeF2 = () => {
+    _handleCloseF2();
   }
   // 处理用户下拉刷新
   const _handleRefresh = () => {
@@ -1223,6 +1349,16 @@ by ZXLee
   }
   // 下拉刷新被触发事件
   const _onRefresherrefresh = (e: RefresherEvent) => {
+    // 松手进入二楼状态下松手：进入二楼并结束下拉刷新，不触发刷新
+    if (refresherStatus.value === Enum.Refresher.GoF2) {
+      _handleGoF2();
+      // 需先置为true再置为false，list-view的refresher才会收回
+      refresherTriggered.value = true;
+      nextTick(() => {
+        endRefresh();
+      })
+      return;
+    }
     emit('refresherrefresh', e);
     emit('onRefresh');
     emit('refresh');
@@ -1360,6 +1496,10 @@ by ZXLee
       keyboardListenerId = -1;
     }
     // #endif
+    if (f2CloseTimer != -1) {
+      clearTimeout(f2CloseTimer);
+      f2CloseTimer = -1;
+    }
   })
 
   defineExpose({
@@ -1374,7 +1514,9 @@ by ZXLee
     scrollToBottom,
     scrollToY,
     addChatRecordData,
-    doChatRecordLoadMore
+    doChatRecordLoadMore,
+    goF2,
+    closeF2
   })
 </script>
 
