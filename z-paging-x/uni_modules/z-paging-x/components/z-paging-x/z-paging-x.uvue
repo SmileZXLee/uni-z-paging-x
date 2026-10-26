@@ -23,7 +23,7 @@ by ZXLee
     <!-- #ifdef APP -->
     :associative-container="associativeContainer"
     <!-- #endif -->
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
+    :id="listId" :refresher-enabled="finalRefresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
     :bounces="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
     @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll" @touchstart="_onListTouchstart">
@@ -39,25 +39,6 @@ by ZXLee
         <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
         <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" @clickMore="_handleLoadMore"/>
       </list-item>
-      <!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
-      <!-- #ifdef WEB -->
-      <component :is="listItemIs" slot="refresher">
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      <list-item slot="refresher">
-      <!-- #endif -->
-        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
-          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
-          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
-        </view>
-      <!-- #ifdef WEB -->
-      </component>
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      </list-item>
-      <!-- #endif -->
 
       <!-- #ifdef WEB -->
       <component :is="listItemIs" v-if="showEmpty || showLoading" :class="showEmpty ? 'zpx-flex1' : ''" :style="[chatRecordRotateStyle]">
@@ -83,12 +64,32 @@ by ZXLee
       <!-- #ifndef WEB -->
       </list-item>
       <!-- #endif -->
+
+      <!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
+      <!-- #ifdef WEB -->
+      <component :is="listItemIs" v-if="showCustomRefresher" slot="refresher">
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
+      <list-item v-if="showCustomRefresher" slot="refresher">
+      <!-- #endif -->
+        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
+          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
+          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
+          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
+        </view>
+      <!-- #ifdef WEB -->
+      </component>
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
+      </list-item>
+      <!-- #endif -->
     </list-view>
     <scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1" :style="[chatRecordRotateStyle]"
     <!-- #ifdef APP -->
     :associative-container="associativeContainer"
     <!-- #endif -->
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
+    :id="listId" :refresher-enabled="finalRefresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
     <!-- #ifndef VUE3-VAPOR -->
     :custom-nested-scroll="customNestedScroll"
     <!-- #endif -->
@@ -111,25 +112,6 @@ by ZXLee
           <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" @clickMore="_handleLoadMore"/>
         </template>
       </view>
-      <!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
-      <!-- #ifdef WEB -->
-      <component :is="listItemIs" slot="refresher">
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      <view slot="refresher">
-      <!-- #endif -->
-        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
-          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
-          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
-        </view>
-      <!-- #ifdef WEB -->
-      </component>
-      <!-- #endif -->
-      <!-- #ifndef WEB -->
-      </view>
-      <!-- #endif -->
       <view :class="showEmpty ? 'zpx-flex1' : ''" :style="[chatRecordRotateStyle]">
         <template v-if="showEmpty">
           <!-- #ifdef VUE3-VAPOR || WEB -->
@@ -143,6 +125,25 @@ by ZXLee
         </template>
         <slot v-if="showLoading" name="loading" />
       </view>
+      <!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
+      <!-- #ifdef WEB -->
+      <component :is="listItemIs" v-if="showCustomRefresher" slot="refresher">
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
+      <view v-if="showCustomRefresher" slot="refresher">
+      <!-- #endif -->
+        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
+          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
+          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
+          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
+        </view>
+      <!-- #ifdef WEB -->
+      </component>
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
+      </view>
+      <!-- #endif -->
     </scroll-view>
     <!-- 底部固定的slot及其下方的安全区域/键盘占位，背景色由bottom-bg-color控制 -->
     <view :style="[bottomContainerStyle]">
@@ -848,12 +849,23 @@ by ZXLee
   const isFirstPage = computed((): boolean => {
     return pageNo.value === props.defaultPageNo;
   })
-  const finalRefresherThreshold = computed((): number => {
-    // layoutOnly时禁用下拉刷新
-    if (props.layoutOnly) {
-      return 0
+  // 最终是否启用下拉刷新：聊天记录模式下不使用下拉刷新，layoutOnly或明确禁用refresherEnabled时均不开启
+  const finalRefresherEnabled = computed((): boolean => {
+    if (props.layoutOnly || props.useChatRecordMode || !props.refresherEnabled) {
+      return false;
     }
-    return props.refresherThreshold > 0 ? props.refresherThreshold : refresherNodeHeight.value > 0 ? refresherNodeHeight.value : 40
+    return true;
+  })
+  // 是否渲染自定义下拉刷新组件节点
+  const showCustomRefresher = computed((): boolean => {
+    return finalRefresherEnabled.value && props.useCustomRefresher;
+  })
+  const finalRefresherThreshold = computed((): number => {
+    // layoutOnly或未启用下拉刷新时禁用
+    if (props.layoutOnly || !finalRefresherEnabled.value) {
+      return 0;
+    }
+    return props.refresherThreshold > 0 ? props.refresherThreshold : refresherNodeHeight.value > 0 ? refresherNodeHeight.value : 40;
   })
   // 下拉最大拖拽距离：list-view默认为下拉刷新控件高度的2.5倍，开启下拉进入二楼时需保证能拖拽超过进入二楼阈值
   const finalRefresherMaxDragDistance = computed((): number => {
@@ -879,6 +891,10 @@ by ZXLee
     // layoutOnly时强制隐藏空数据图
     if (props.layoutOnly) {
       return false
+    }
+    // 用户主动下拉刷新过程中，如果原本就是空数据，保持显示空数据图，避免空数据图闪烁及引起列表重排打断收回动画
+    if (queryFrom.value === Enum.QueryFrom.UserPullDown && totalData.value.length == 0) {
+      return true
     }
     return totalData.value.length == 0 && !isLoading.value
   })
@@ -1082,10 +1098,22 @@ by ZXLee
     // 清理定时器
     _cleanRefresherCompleteDelayTimer()
     _cleanRefresherEndAnimateTimer()
+    const wasTriggered = refresherTriggered.value;
     // 设置下拉刷新状态为结束
     refresherTriggered.value = false;
-    refresherStatus.value = Enum.Refresher.Default;
     isLoading.value = false;
+    // 若此前不是触发下拉刷新的状态，直接置为Default
+    // 若此前处于下拉刷新中，状态保持不变（保持Loading等），等收回动画完成触发_onRefresherrestore时再切回Default，避免收回过程中显示"继续下拉刷新"
+    if (!wasTriggered) {
+      refresherStatus.value = Enum.Refresher.Default;
+    } else {
+      // 兜底定时器：若平台未触发refresherrestore，回弹动画结束后重置状态
+      refresherEndAnimateTimer.value = setTimeout(() => {
+        if (refresherStatus.value !== Enum.Refresher.Complete) {
+          refresherStatus.value = Enum.Refresher.Default;
+        }
+      }, props.refresherCompleteDuration);
+    }
   }
 
   // 聊天记录模式：首屏数据渲染后滚动到底部，多次触发以避免list-item尚未渲染完毕导致位置不正确
@@ -1281,6 +1309,7 @@ by ZXLee
   }
   // 下拉刷新控件被下拉事件
   const _onRefresherpulling = (e: RefresherEvent) => {
+    if (!finalRefresherEnabled.value) return;
     const dy = e.detail.dy;
     emit('refresherpulling', dy);
     if (!isLoading.value) {
@@ -1349,6 +1378,7 @@ by ZXLee
   }
   // 下拉刷新被触发事件
   const _onRefresherrefresh = (e: RefresherEvent) => {
+    if (!finalRefresherEnabled.value) return;
     // 松手进入二楼状态下松手：进入二楼并结束下拉刷新，不触发刷新
     if (refresherStatus.value === Enum.Refresher.GoF2) {
       _handleGoF2();
@@ -1367,6 +1397,7 @@ by ZXLee
   // 下拉刷新被复位事件
   const _onRefresherrestore = (e: RefresherEvent) => {
     emit('refresherrestore', e);
+    _cleanRefresherEndAnimateTimer();
     // 如果当前正处于complete延迟状态，不要立即切回default，等动画完成后再切
     if (refresherStatus.value !== Enum.Refresher.Complete) {
       refresherStatus.value = Enum.Refresher.Default;
@@ -1447,7 +1478,7 @@ by ZXLee
     // #endif
     // 更新缓存的refresher高度
     nextTick(() => {
-      if (props.refresherEnabled) {
+      if (showCustomRefresher.value) {
         const refresherEle = zpxListRefresher.value;
         if (refresherEle !== null) {
           refresherEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
