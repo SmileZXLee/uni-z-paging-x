@@ -526,6 +526,14 @@ by ZXLee
       default: gc<boolean>('cleanListWhenReload', true)
     },
     /**
+     * @description 是否强制隐藏空数据图
+     * @default false
+     */
+    hideEmptyView: {
+      type: Boolean,
+      default: gc<boolean>('hide-empty-view', false)
+    },
+    /**
      * @description 空数据描述文字
      * @default 没有数据哦~
      */
@@ -668,6 +676,14 @@ by ZXLee
     layoutOnly: {
       type: Boolean,
       default: gc<boolean>('layout-only', false),
+    },
+    /**
+     * @description 是否只使用下拉刷新功能，设置为true后将关闭mounted自动请求数据、关闭滚动到底部加载更多，强制隐藏空数据图
+     * @default false
+     */
+    refresherOnly: {
+      type: Boolean,
+      default: gc<boolean>('refresher-only', false),
     },
     /**
      * @description 是否开启底部安全区域适配，开启后在列表(及slot=bottom)下方自动添加底部安全区域占位
@@ -849,9 +865,12 @@ by ZXLee
   const isFirstPage = computed((): boolean => {
     return pageNo.value === props.defaultPageNo;
   })
-  // 最终是否启用下拉刷新：聊天记录模式下不使用下拉刷新，layoutOnly或明确禁用refresherEnabled时均不开启
+  // 最终是否启用下拉刷新：聊天记录模式下不使用下拉刷新，layoutOnly(且未开启refresherOnly)或明确禁用refresherEnabled时均不开启
   const finalRefresherEnabled = computed((): boolean => {
-    if (props.layoutOnly || props.useChatRecordMode || !props.refresherEnabled) {
+    if (props.useChatRecordMode || !props.refresherEnabled) {
+      return false;
+    }
+    if (props.layoutOnly && !props.refresherOnly) {
       return false;
     }
     return true;
@@ -861,8 +880,8 @@ by ZXLee
     return finalRefresherEnabled.value && props.useCustomRefresher;
   })
   const finalRefresherThreshold = computed((): number => {
-    // layoutOnly或未启用下拉刷新时禁用
-    if (props.layoutOnly || !finalRefresherEnabled.value) {
+    // layoutOnly(且未开启refresherOnly)或未启用下拉刷新时禁用
+    if ((props.layoutOnly && !props.refresherOnly) || !finalRefresherEnabled.value) {
       return 0;
     }
     return props.refresherThreshold > 0 ? props.refresherThreshold : refresherNodeHeight.value > 0 ? refresherNodeHeight.value : 40;
@@ -888,8 +907,8 @@ by ZXLee
     };
   })
   const showEmpty = computed((): boolean => {
-    // layoutOnly时强制隐藏空数据图
-    if (props.layoutOnly) {
+    // layoutOnly、refresherOnly或hideEmptyView时强制隐藏空数据图
+    if (props.layoutOnly || props.refresherOnly || props.hideEmptyView) {
       return false
     }
     // 用户主动下拉刷新过程中，如果原本就是空数据，保持显示空数据图，避免空数据图闪烁及引起列表重排打断收回动画
@@ -899,22 +918,22 @@ by ZXLee
     return totalData.value.length == 0 && !isLoading.value
   })
   const showLoading = computed((): boolean => {
-    // layoutOnly时隐藏加载中
-    if (props.layoutOnly) {
+    // layoutOnly或refresherOnly时隐藏加载中
+    if (props.layoutOnly || props.refresherOnly) {
       return false
     }
     return slots['loading'] != null && isLoading.value && totalData.value.length == 0
   })
   const showLoadMore = computed((): boolean => {
-    // layoutOnly时隐藏加载更多；聊天记录模式加载更多显示在顶部，不显示底部加载更多
-    if (props.layoutOnly || props.useChatRecordMode) {
+    // layoutOnly或refresherOnly时隐藏加载更多；聊天记录模式加载更多显示在顶部，不显示底部加载更多
+    if (props.layoutOnly || props.refresherOnly || props.useChatRecordMode) {
       return false
     }
-    return props.loadMoreEnabled && !forceHideLoadMore.value && (!isLoading.value || totalData.value.length > 0) && !showEmpty.value;
+    return props.loadMoreEnabled && !forceHideLoadMore.value && totalData.value.length > 0 && !showEmpty.value;
   })
   // 聊天记录模式：是否显示顶部加载更多(历史消息)
   const showChatLoadMore = computed((): boolean => {
-    if (!props.useChatRecordMode || props.layoutOnly || !props.loadMoreEnabled || isFirstPageAndNoMore.value) {
+    if (!props.useChatRecordMode || props.layoutOnly || props.refresherOnly || !props.loadMoreEnabled || isFirstPageAndNoMore.value) {
       return false
     }
     const hasData = totalData.value.length > 0
@@ -1312,7 +1331,8 @@ by ZXLee
     if (!finalRefresherEnabled.value) return;
     const dy = e.detail.dy;
     emit('refresherpulling', dy);
-    if (!isLoading.value) {
+    // 只要不是已经处于刷新中或完成状态，就根据下拉距离更新状态
+    if (refresherStatus.value !== Enum.Refresher.Loading && refresherStatus.value !== Enum.Refresher.Complete) {
       if (dy < finalRefresherThreshold.value) {
         refresherStatus.value = Enum.Refresher.Default;
       } else if (props.refresherF2Enabled && dy >= props.refresherF2Threshold) {
@@ -1374,7 +1394,9 @@ by ZXLee
     pageNo.value = props.defaultPageNo;
     queryFrom.value = Enum.QueryFrom.UserPullDown;
     customNoMore.value = -1;
-    _emitQuery(pageNo.value, props.defaultPageSize);
+    if (!props.refresherOnly) {
+      _emitQuery(pageNo.value, props.defaultPageSize);
+    }
   }
   // 下拉刷新被触发事件
   const _onRefresherrefresh = (e: RefresherEvent) => {
@@ -1389,10 +1411,10 @@ by ZXLee
       })
       return;
     }
+    _handleRefresh();
     emit('refresherrefresh', e);
     emit('onRefresh');
     emit('refresh');
-    _handleRefresh();
   }
   // 下拉刷新被复位事件
   const _onRefresherrestore = (e: RefresherEvent) => {
@@ -1458,11 +1480,11 @@ by ZXLee
 
   onMounted(() => {
     pageNo.value = props.defaultPageNo;
-    // layoutOnly为true时跳过自动加载
-    if (!props.layoutOnly && props.auto) {
+    // layoutOnly或refresherOnly为true时跳过自动加载
+    if (!props.layoutOnly && !props.refresherOnly && props.auto) {
       reload();
     }
-    if (props.layoutOnly) {
+    if (props.layoutOnly || props.refresherOnly) {
       endRefresh();
     }
     if (props.safeAreaInsetBottom) {

@@ -3,16 +3,14 @@
   "name": "z-paging-x",
   "displayName": "【z-paging-x下拉刷新、上拉加载】z-paging uniappx版-2025插件大赛二等奖",
   "version": "1.0.1",
-  "description": "分页全自动处理，支持自定义下拉刷新、上拉加载更多、聊天记录模式、自动管理空数据图、点击返回顶部、下拉显示最后更新时间、主题切换等等，支持蒸汽模式(Vapor)，支持iOS、安卓、h5、小程序、鸿蒙Next等",
+  "description": "分页全自动处理，支持自定义下拉刷新、上拉加载更多、聊天记录模式、点击返回顶部、下拉显示最后更新时间等等，支持蒸汽模式(Vapor)，支持iOS、安卓、h5、小程序、鸿蒙Next等",
   "keywords": [
     "uniapp-x",
     "z-paging",
     "分页",
     "下拉刷新",
-    "上拉加载",
-    "聊天记录",
-    "蒸汽模式"
-  ],
+    "上拉加载"
+],
   "repository": "https://github.com/SmileZXLee/uni-z-paging-x",
   "engines": {
     "HBuilderX": "^5.0",
